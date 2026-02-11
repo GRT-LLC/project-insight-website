@@ -16,3 +16,15 @@ _site/
 # counterproductive to check this file into the repository.
 # Details at https://github.com/github/pages-gem/issues/768
 Gemfile.lock
+
+# Apple Files
+.DS_Store
+
+# Node Modules
+node_modules/
+
+# Package Lock
+package-lock.json
+
+# Yarn Lock
+yarn.lock
