@@ -1,3 +1,5 @@
+import lucideReact from 'lucide-react';
+
 const { useState, useEffect, createContext, useContext } = React;
 const { MapPin, Check, ChevronDown, Menu, X, Star, Globe, Shield, Clock, CreditCard, Smartphone, ArrowRight, Users, Calendar, DollarSign, Plane, Hotel, Utensils, Camera, Heart, Zap, Mail, Phone, MessageCircle, Facebook, Twitter, Instagram, Linkedin, ChevronRight, Send, Sparkles, Bell, AlertCircle } = lucideReact;
 
