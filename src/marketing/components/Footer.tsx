@@ -1,34 +1,32 @@
+import { Link } from 'react-router-dom';
 import { Globe, MapPin } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
 
 const FOOTER_LINKS: Record<
   'Product' | 'Company' | 'Legal',
-  { name: string; page: 'features' | 'pricing' | 'about' | 'contact' | 'privacy' | 'terms' }[]
+  { name: string; path: string }[]
 > = {
   Product: [
-    { name: 'Features', page: 'features' },
-    { name: 'Pricing', page: 'pricing' },
-    { name: 'Mobile App', page: 'features' },
-    { name: 'Integrations', page: 'features' },
+    { name: 'Features', path: '/features' },
+    { name: 'Pricing', path: '/pricing' },
+    { name: 'Mobile App', path: '/features' },
+    { name: 'Integrations', path: '/features' },
   ],
   Company: [
-    { name: 'About', page: 'about' },
-    { name: 'Careers', page: 'about' },
-    { name: 'Press', page: 'about' },
-    { name: 'Contact', page: 'contact' },
+    { name: 'About', path: '/about' },
+    { name: 'Careers', path: '/about' },
+    { name: 'Press', path: '/about' },
+    { name: 'Contact', path: '/contact' },
   ],
   Legal: [
-    { name: 'Privacy Policy', page: 'privacy' },
-    { name: 'Terms of Service', page: 'terms' },
-    { name: 'Cookie Policy', page: 'privacy' },
+    { name: 'Privacy Policy', path: '/privacy' },
+    { name: 'Terms of Service', path: '/terms' },
+    { name: 'Cookie Policy', path: '/privacy' },
   ],
 };
 
 const SOCIALS = ['twitter', 'instagram', 'linkedin', 'facebook'] as const;
 
 export function Footer() {
-  const { navigate } = useMarketingRouter();
-
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -64,13 +62,12 @@ export function Footer() {
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.name}>
-                    <button
-                      type="button"
-                      onClick={() => navigate(link.page)}
+                    <Link
+                      to={link.path}
                       className="text-gray-400 hover:text-white transition-colors"
                     >
                       {link.name}
-                    </button>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -88,4 +85,3 @@ export function Footer() {
     </footer>
   );
 }
-

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
+import { useAuth } from '../context/AuthContext';
 
 export function SignInPage() {
-  const { navigate, login } = useMarketingRouter();
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +22,7 @@ export function SignInPage() {
 
     if (email && password.length >= 6) {
       login({ email, name: email.split('@')[0] });
+      navigate('/app');
     } else {
       setError('Invalid email or password');
       setLoading(false);
@@ -30,16 +33,15 @@ export function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 py-20">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <button
-            type="button"
-            onClick={() => navigate('home')}
+          <Link
+            to="/"
             className="inline-flex items-center cursor-pointer mb-8"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
               <MapPin className="w-6 h-6 text-white" />
             </div>
             <span className="ml-3 text-2xl font-bold text-white">JarvisTravel</span>
-          </button>
+          </Link>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-white/60">Sign in to continue your journey</p>
         </div>
@@ -94,13 +96,12 @@ export function SignInPage() {
                 />
                 <span className="ml-2">Remember me</span>
               </label>
-              <button
-                type="button"
-                onClick={() => navigate('forgot-password')}
+              <Link
+                to="/forgot-password"
                 className="text-sky-400 hover:text-sky-300"
               >
                 Forgot password?
-              </button>
+              </Link>
             </div>
 
             <button
@@ -114,13 +115,12 @@ export function SignInPage() {
 
           <div className="mt-6 text-center text-white/60">
             Don't have an account?{' '}
-            <button
-              type="button"
-              onClick={() => navigate('signup')}
+            <Link
+              to="/signup"
               className="text-sky-400 hover:text-sky-300 font-medium"
             >
               Sign up free
-            </button>
+            </Link>
           </div>
         </div>
       </div>

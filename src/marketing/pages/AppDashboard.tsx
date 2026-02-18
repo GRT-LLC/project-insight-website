@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
+import { useAuth } from '../context/AuthContext';
 
 export function AppDashboard() {
-  const { logout, user } = useMarketingRouter();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,7 +31,10 @@ export function AppDashboard() {
 
           <button
             type="button"
-            onClick={logout}
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
             className="px-6 py-3 bg-gray-100 text-gray-700 rounded-full font-medium hover:bg-gray-200 transition-all"
           >
             Sign Out

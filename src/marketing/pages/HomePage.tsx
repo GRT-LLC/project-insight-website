@@ -14,7 +14,7 @@ import {
   Star,
   Quote,
 } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
+import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 
 interface Feature {
@@ -37,7 +37,7 @@ interface Review {
 }
 
 export function HomePage() {
-  const { navigate } = useMarketingRouter();
+  const navigate = useNavigate();
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
   useEffect(() => {
@@ -154,7 +154,7 @@ export function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <button
                 type="button"
-                onClick={() => navigate('signup')}
+                onClick={() => navigate('/signup')}
                 className="group px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-semibold text-lg shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/30 transition-all"
               >
                 Start Free Trial
@@ -162,7 +162,7 @@ export function HomePage() {
               </button>
               <button
                 type="button"
-                onClick={() => navigate('features')}
+                onClick={() => navigate('/features')}
                 className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all flex items-center justify-center"
               >
                 <Play className="w-5 h-5 mr-2" />
@@ -261,7 +261,7 @@ export function HomePage() {
               </ul>
               <button
                 type="button"
-                onClick={() => navigate('features')}
+                onClick={() => navigate('/features')}
                 className="px-6 py-3 bg-emerald-500 text-white rounded-full font-medium hover:bg-emerald-600 transition-all"
               >
                 Learn More About FI™
@@ -339,7 +339,7 @@ export function HomePage() {
           </p>
           <button
             type="button"
-            onClick={() => navigate('signup')}
+            onClick={() => navigate('/signup')}
             className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
           >
             Get Started Free

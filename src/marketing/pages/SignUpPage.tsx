@@ -1,6 +1,7 @@
 import { useState, Fragment } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
+import { useAuth } from '../context/AuthContext';
 
 interface TravelStyle {
   id: string;
@@ -39,7 +40,8 @@ const BUDGETS: Budget[] = [
 ];
 
 export function SignUpPage() {
-  const { navigate, login } = useMarketingRouter();
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -82,6 +84,7 @@ export function SignUpPage() {
         setStep(step + 1);
       } else {
         login({ email: formData.email, name: formData.firstName });
+        navigate('/app');
       }
     }
   };
@@ -94,16 +97,15 @@ export function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 py-20">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <button
-            type="button"
-            onClick={() => navigate('home')}
+          <Link
+            to="/"
             className="inline-flex items-center cursor-pointer mb-8"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
               <MapPin className="w-6 h-6 text-white" />
             </div>
             <span className="ml-3 text-2xl font-bold text-white">JarvisTravel</span>
-          </button>
+          </Link>
 
           {/* Progress Steps */}
           <div className="flex items-center justify-center space-x-3 mb-8">
@@ -263,21 +265,19 @@ export function SignUpPage() {
               <div className="pt-4 text-center">
                 <p className="text-white/50 text-sm">
                   By creating an account, you agree to our{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('terms')}
-                    className="text-sky-400"
+                  <Link
+                    to="/terms"
+                    className="text-sky-400 hover:text-sky-300"
                   >
                     Terms
-                  </button>{' '}
+                  </Link>{' '}
                   and{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('privacy')}
-                    className="text-sky-400"
+                  <Link
+                    to="/privacy"
+                    className="text-sky-400 hover:text-sky-300"
                   >
                     Privacy Policy
-                  </button>
+                  </Link>
                 </p>
               </div>
             </div>
@@ -307,13 +307,12 @@ export function SignUpPage() {
           {step === 1 && (
             <div className="mt-6 text-center text-white/60">
               Already have an account?{' '}
-              <button
-                type="button"
-                onClick={() => navigate('signin')}
+              <Link
+                to="/signin"
                 className="text-sky-400 hover:text-sky-300 font-medium"
               >
                 Sign in
-              </button>
+              </Link>
             </div>
           )}
         </div>

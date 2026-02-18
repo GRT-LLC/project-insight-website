@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Plan {
   name: string;
@@ -47,7 +47,7 @@ const PLANS: Plan[] = [
 ];
 
 export function PricingPage() {
-  const { navigate } = useMarketingRouter();
+  const navigate = useNavigate();
   const [annual, setAnnual] = useState(true);
 
   return (
@@ -110,7 +110,7 @@ export function PricingPage() {
                 </ul>
                 <button
                   type="button"
-                  onClick={() => navigate('signup')}
+                  onClick={() => navigate('/signup')}
                   className={`w-full py-3 rounded-full font-medium transition-all ${
                     plan.popular
                       ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white hover:shadow-lg'

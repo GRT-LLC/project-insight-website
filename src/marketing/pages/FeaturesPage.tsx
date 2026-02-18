@@ -8,7 +8,7 @@ import {
   Hotel,
   Shield,
 } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
+import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 
 interface Feature {
@@ -70,7 +70,7 @@ const FEATURES: Feature[] = [
 ];
 
 export function FeaturesPage() {
-  const { navigate } = useMarketingRouter();
+  const navigate = useNavigate();
 
   return (
     <div className="pt-20">
@@ -108,7 +108,7 @@ export function FeaturesPage() {
           <div className="text-center mt-16">
             <button
               type="button"
-              onClick={() => navigate('signup')}
+              onClick={() => navigate('/signup')}
               className="px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-semibold text-lg hover:shadow-xl transition-all"
             >
               Try All Features Free

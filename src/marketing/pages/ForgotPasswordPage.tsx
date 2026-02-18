@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, AlertCircle } from 'lucide-react';
-import { useMarketingRouter } from '../router/RouterContext';
 
 export function ForgotPasswordPage() {
-  const { navigate } = useMarketingRouter();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState<string[]>(['', '', '', '', '', '', '', '']);
@@ -37,7 +37,7 @@ export function ForgotPasswordPage() {
         setError('Passwords do not match');
         return;
       }
-      navigate('signin');
+      navigate('/signin');
     }
   };
 
@@ -45,16 +45,15 @@ export function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 py-20">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <button
-            type="button"
-            onClick={() => navigate('home')}
+          <Link
+            to="/"
             className="inline-flex items-center cursor-pointer mb-8"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
               <MapPin className="w-6 h-6 text-white" />
             </div>
             <span className="ml-3 text-2xl font-bold text-white">JarvisTravel</span>
-          </button>
+          </Link>
         </div>
 
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
@@ -149,13 +148,12 @@ export function ForgotPasswordPage() {
           </button>
 
           <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => navigate('signin')}
+            <Link
+              to="/signin"
               className="text-white/60 hover:text-white/80"
             >
               ← Back to Sign In
-            </button>
+            </Link>
           </div>
         </div>
       </div>
