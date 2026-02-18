@@ -1,7 +1,7 @@
 {
   "name": "jarvistravel-marketing",
   "version": "1.0.0",
-  "description": "JarvisTravel Marketing Website - Modern React App",
+  "description": "JarvisTravel Marketing Website",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@plasmicapp/loader-react": "^1.0.413",
     "lucide-react": "^0.460.0",
     "path": "^0.12.7",
     "react": "^18.2.0",
