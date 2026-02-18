@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import * as path from 'path';
 
 export default defineConfig({
-  base: '/<project-insight-website>/',
+  base: '/project-insight-website/',
   plugins: [react()],
   resolve: {
     alias: {
