@@ -11,18 +11,13 @@ import { TermsPage } from '../pages/TermsPage';
 import { SignInPage } from '../pages/SignInPage';
 import { SignUpPage } from '../pages/SignUpPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
-import { PlasmicPage } from '../pages/PlasmicPage';
 import { AppDashboard } from '../pages/AppDashboard';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 
-/** Renders redirect if authenticated, otherwise the auth page. Avoids sibling race with Navigate. */
-function AuthRouteGuard({ children }: { children: React.ReactNode }) {
+function AuthRedirect() {
   const { isAuthenticated } = useAuth();
-  if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
-  }
-  return <>{children}</>;
+  return isAuthenticated ? <Navigate to="/app" replace /> : null;
 }
 
 function MarketingLayout({ children }: { children: React.ReactNode }) {
@@ -42,25 +37,28 @@ export function PageRouter() {
       <Route
         path="/signin"
         element={
-          <AuthRouteGuard>
+          <>
+            <AuthRedirect />
             <SignInPage />
-          </AuthRouteGuard>
+          </>
         }
       />
       <Route
         path="/signup"
         element={
-          <AuthRouteGuard>
+          <>
+            <AuthRedirect />
             <SignUpPage />
-          </AuthRouteGuard>
+          </>
         }
       />
       <Route
         path="/forgot-password"
         element={
-          <AuthRouteGuard>
+          <>
+            <AuthRedirect />
             <ForgotPasswordPage />
-          </AuthRouteGuard>
+          </>
         }
       />
 
@@ -132,8 +130,8 @@ export function PageRouter() {
         }
       />
 
-      {/* Catch all - try Plasmic page by path, else redirect to home */}
-      <Route path="*" element={<PlasmicPage />} />
+      {/* Catch all - redirect to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

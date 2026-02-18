@@ -1,4 +1,4 @@
-import { useState, Fragment, useEffect } from 'react';
+import { useState, Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -41,14 +41,8 @@ const BUDGETS: Budget[] = [
 
 export function SignUpPage() {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const [step, setStep] = useState(1);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/app', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -90,6 +84,7 @@ export function SignUpPage() {
         setStep(step + 1);
       } else {
         login({ email: formData.email, name: formData.firstName });
+        navigate('/app');
       }
     }
   };

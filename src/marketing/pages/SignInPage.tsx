@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -12,14 +12,6 @@ export function SignInPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Navigate after auth state is applied so ProtectedRoute sees isAuthenticated
-  const { isAuthenticated } = useAuth();
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/app', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -30,7 +22,7 @@ export function SignInPage() {
 
     if (email && password.length >= 6) {
       login({ email, name: email.split('@')[0] });
-      setLoading(false);
+      navigate('/app');
     } else {
       setError('Invalid email or password');
       setLoading(false);
