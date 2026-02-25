@@ -15,9 +15,13 @@ import { AppDashboard } from '../pages/AppDashboard';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 
-function AuthRedirect() {
+/** Renders redirect if authenticated, otherwise the auth page. Avoids sibling race with Navigate. */
+function AuthRouteGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/app" replace /> : null;
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
+  return <>{children}</>;
 }
 
 function MarketingLayout({ children }: { children: React.ReactNode }) {
@@ -37,28 +41,25 @@ export function PageRouter() {
       <Route
         path="/signin"
         element={
-          <>
-            <AuthRedirect />
+          <AuthRouteGuard>
             <SignInPage />
-          </>
+          </AuthRouteGuard>
         }
       />
       <Route
         path="/signup"
         element={
-          <>
-            <AuthRedirect />
+          <AuthRouteGuard>
             <SignUpPage />
-          </>
+          </AuthRouteGuard>
         }
       />
       <Route
         path="/forgot-password"
         element={
-          <>
-            <AuthRedirect />
+          <AuthRouteGuard>
             <ForgotPasswordPage />
-          </>
+          </AuthRouteGuard>
         }
       />
 
@@ -130,7 +131,6 @@ export function PageRouter() {
         }
       />
 
-      {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

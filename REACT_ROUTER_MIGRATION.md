@@ -1,6 +1,8 @@
-# React Router v6 Migration Complete ✅
+# React Router Migration Complete ✅
 
-The marketing website has been successfully migrated from a custom context-based routing system to React Router v6.
+The marketing website uses **React Router v7** (`react-router` and `react-router-dom` ^7.13.1). Types are built-in (no `@types/react-router-dom` needed).
+
+Previously migrated from a custom context-based routing system to React Router v6; now on v7.
 
 ## What Changed
 
