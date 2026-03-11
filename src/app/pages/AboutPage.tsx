@@ -1,84 +1,62 @@
-
-interface TeamMember {
-  name: string;
-  role: string;
-  bio: string;
-}
-
-interface Value {
-  title: string;
-  desc: string;
-}
-
-const TEAM: TeamMember[] = [
-  { name: 'Alex Rivera', role: 'CEO & Founder', bio: 'Former Google PM. 50+ countries visited.' },
-  {
-    name: 'Dr. Sarah Kim',
-    role: 'Chief Science Officer',
-    bio: 'PhD in Sleep Medicine. Created Fatigue Index™.',
-  },
-  {
-    name: 'James Chen',
-    role: 'CTO',
-    bio: 'Ex-Airbnb engineer. Built booking systems at scale.',
-  },
-];
-
-const VALUES: Value[] = [
-  {
-    title: 'Traveler First',
-    desc: 'Every feature starts with "How does this make travel better?"',
-  },
-  {
-    title: 'Science-Backed',
-    desc: 'Our Fatigue Index™ is based on peer-reviewed sleep research.',
-  },
-  {
-    title: 'Privacy Respected',
-    desc: 'Your data is yours. We never sell it, period.',
-  },
-];
+import { Zap, Sparkles, Shield, Globe } from 'lucide-react';
 
 export function AboutPage() {
   return (
     <div className="pt-20">
-      <section className="py-24 bg-gradient-to-br from-slate-50 to-sky-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Our Mission</h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              We believe travel should energize you, not exhaust you. JarvisTravel was born from
-              frustration with jet-lagged first days and over-packed itineraries. We're building the
-              AI travel assistant we always wished we had.
+      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            About JarvisTravel
+          </h1>
+          <p className="text-xl text-gray-600">
+            We're on a mission to make travel planning effortless and enjoyable for everyone
+          </p>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="prose prose-lg mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
+            <p className="text-gray-600 mb-6">
+              JarvisTravel was born from a simple frustration: planning trips shouldn't be stressful. 
+              Our founders, avid travelers themselves, spent countless hours juggling spreadsheets, 
+              bookmark folders, and messaging apps trying to coordinate trips with friends and family.
             </p>
-          </div>
+            <p className="text-gray-600 mb-6">
+              In 2023, we set out to build the travel companion we wished existed - an intelligent 
+              assistant that could handle everything from inspiration to booking to on-trip guidance. 
+              Using cutting-edge AI technology, we created Jarvis: your personal travel assistant.
+            </p>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-24">
-            {TEAM.map((member, i) => (
-              <div key={i} className="bg-white p-8 rounded-3xl shadow-sm text-center">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 mx-auto mb-6 flex items-center justify-center text-white text-2xl font-bold">
-                  {member.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-1">{member.name}</h3>
-                <p className="text-sky-600 font-medium mb-3">{member.role}</p>
-                <p className="text-gray-600">{member.bio}</p>
-              </div>
-            ))}
-          </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">Our Mission</h2>
+            <p className="text-gray-600 mb-6">
+              To democratize luxury travel planning by making personalized, intelligent travel assistance 
+              accessible to everyone, regardless of budget or experience level.
+            </p>
 
-          <div className="bg-white rounded-3xl p-12 shadow-sm">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Values</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {VALUES.map((value, i) => (
-                <div key={i} className="text-center">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{value.title}</h3>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">Our Values</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                { title: 'Simplicity', desc: 'Travel planning should be effortless', icon: Zap },
+                { title: 'Intelligence', desc: 'AI that truly understands your needs', icon: Sparkles },
+                { title: 'Privacy', desc: 'Your data is yours and yours alone', icon: Shield },
+                { title: 'Accessibility', desc: 'Great travel experiences for everyone', icon: Globe }
+              ].map((value, index) => (
+                <div key={index} className="bg-white rounded-xl p-6 shadow-lg">
+                  <value.icon className="w-8 h-8 text-blue-600 mb-3" />
+                  <h3 className="font-semibold text-gray-900 mb-2">{value.title}</h3>
                   <p className="text-gray-600">{value.desc}</p>
                 </div>
               ))}
             </div>
+
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">The Team</h2>
+            <p className="text-gray-600 mb-6">
+              We're a diverse team of travelers, engineers, designers, and dreamers united by our 
+              passion for exploration. Based across multiple time zones, we understand the challenges 
+              of travel firsthand.
+            </p>
           </div>
         </div>
       </section>
