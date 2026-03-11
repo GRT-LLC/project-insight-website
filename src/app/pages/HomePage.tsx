@@ -6,8 +6,6 @@ import {
   Users,
   Camera,
   MessageCircle,
-  ArrowRight,
-  Play,
   ChevronDown,
   Award,
   CheckCircle,
@@ -154,19 +152,10 @@ export function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <button
                 type="button"
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/contact')}
                 className="group px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-semibold text-lg shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/30 transition-all"
               >
-                Start Free Trial
-                <ArrowRight className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/features')}
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all flex items-center justify-center"
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Watch Demo
+                Join The Waitlist
               </button>
             </div>
 
@@ -335,14 +324,14 @@ export function HomePage() {
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Travel Smarter?</h2>
           <p className="text-xl text-white/80 mb-10">
-            Start your free trial today. No credit card required.
+            Join the waitlist to be the first to know when we launch.
           </p>
           <button
             type="button"
-            onClick={() => navigate('/signup')}
+            onClick={() => navigate('/contact')}
             className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
           >
-            Get Started Free
+            Join The Waitlist
           </button>
         </div>
       </section>

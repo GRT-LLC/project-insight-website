@@ -96,20 +96,10 @@ export function Navigation() {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link
-                  to="/signin"
-                  className={`font-medium px-4 py-2 rounded-full transition-all ${
-                    isLightNav
-                      ? 'text-white hover:bg-white/10'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
+                  to="/contact"
                   className="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-medium hover:shadow-lg hover:shadow-sky-500/25 transition-all"
                 >
-                  Get Started
+                  Join The Waitlist
                 </Link>
               </div>
             )}
@@ -144,18 +134,11 @@ export function Navigation() {
             ))}
             <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
               <Link
-                to="/signin"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 block text-center"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
+                to="/contact"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl font-medium block text-center"
               >
-                Get Started Free
+                Join The Waitlist
               </Link>
             </div>
           </div>

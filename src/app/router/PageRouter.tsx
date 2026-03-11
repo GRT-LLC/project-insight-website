@@ -8,21 +8,6 @@ import { AboutPage } from '../pages/AboutPage';
 import { ContactPage } from '../pages/ContactPage';
 import { PrivacyPage } from '../pages/PrivacyPage';
 import { TermsPage } from '../pages/TermsPage';
-import { SignInPage } from '../pages/SignInPage';
-import { SignUpPage } from '../pages/SignUpPage';
-import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
-import { AppDashboard } from '../pages/AppDashboard';
-import { ProtectedRoute } from './ProtectedRoute';
-import { useAuth } from '../context/AuthContext';
-
-/** Renders redirect if authenticated, otherwise the auth page. Avoids sibling race with Navigate. */
-function AuthRouteGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
-  }
-  return <>{children}</>;
-}
 
 function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -37,42 +22,6 @@ function MarketingLayout({ children }: { children: React.ReactNode }) {
 export function PageRouter() {
   return (
     <Routes>
-      {/* Auth pages - no nav/footer */}
-      <Route
-        path="/signin"
-        element={
-          <AuthRouteGuard>
-            <SignInPage />
-          </AuthRouteGuard>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <AuthRouteGuard>
-            <SignUpPage />
-          </AuthRouteGuard>
-        }
-      />
-      <Route
-        path="/forgot-password"
-        element={
-          <AuthRouteGuard>
-            <ForgotPasswordPage />
-          </AuthRouteGuard>
-        }
-      />
-
-      {/* Protected app route */}
-      <Route
-        path="/app"
-        element={
-          <ProtectedRoute>
-            <AppDashboard />
-          </ProtectedRoute>
-        }
-      />
-
       {/* Marketing pages - with nav/footer */}
       <Route
         path="/"

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Globe, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 const FOOTER_LINKS: Record<
   'Product' | 'Company' | 'Legal',
@@ -7,9 +7,7 @@ const FOOTER_LINKS: Record<
 > = {
   Product: [
     { name: 'Features', path: '/features' },
-    { name: 'Pricing', path: '/pricing' },
-    { name: 'Mobile App', path: '/features' },
-    { name: 'Integrations', path: '/features' },
+    { name: 'Data Security', path: '/data-security' } // TODO: Add data security page
   ],
   Company: [
     { name: 'About', path: '/about' },
@@ -23,8 +21,6 @@ const FOOTER_LINKS: Record<
     { name: 'Cookie Policy', path: '/privacy' },
   ],
 };
-
-const SOCIALS = ['twitter', 'instagram', 'linkedin', 'facebook'] as const;
 
 export function Footer() {
   return (
@@ -42,18 +38,6 @@ export function Footer() {
               Your AI-powered travel companion. Plan smarter, travel better, and create unforgettable
               memories with personalized recommendations.
             </p>
-            <div className="flex space-x-3">
-              {SOCIALS.map((social) => (
-                <button
-                  key={social}
-                  type="button"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors"
-                  aria-label={social}
-                >
-                  <Globe className="w-5 h-5 text-gray-400" />
-                </button>
-              ))}
-            </div>
           </div>
 
           {Object.entries(FOOTER_LINKS).map(([category, links]) => (
