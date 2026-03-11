@@ -24,7 +24,7 @@ export function PageRouter() {
     <Routes>
       {/* Marketing pages - with nav/footer */}
       <Route
-        path="/"
+        path="/project-insight-website"
         element={
           <MarketingLayout>
             <HomePage />
@@ -32,7 +32,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/features"
+        path="/project-insight-website/features"
         element={
           <MarketingLayout>
             <FeaturesPage />
@@ -40,7 +40,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/pricing"
+        path="/project-insight-website/pricing"
         element={
           <MarketingLayout>
             <PricingPage />
@@ -48,7 +48,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/about"
+        path="/project-insight-website/about"
         element={
           <MarketingLayout>
             <AboutPage />
@@ -56,7 +56,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/contact"
+        path="/project-insight-website/contact"
         element={
           <MarketingLayout>
             <ContactPage />
@@ -64,7 +64,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/privacy"
+        path="/project-insight-website/privacy"
         element={
           <MarketingLayout>
             <PrivacyPage />
@@ -72,7 +72,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/terms"
+        path="/project-insight-website/terms"
         element={
           <MarketingLayout>
             <TermsPage />
@@ -80,7 +80,7 @@ export function PageRouter() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/project-insight-website" replace />} />
     </Routes>
   );
 }

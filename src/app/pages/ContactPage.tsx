@@ -131,7 +131,7 @@ export function ContactPage() {
                 <p className="text-gray-600 mb-4">
                   Check out our FAQ section for quick answers to common questions.
                 </p>
-                <a href="/faq" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+                <a href="/project-insight-website/faq" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
                   Visit FAQ
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </a>

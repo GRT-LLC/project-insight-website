@@ -128,7 +128,7 @@ export function FeaturesPage() {
           <h2 className="text-4xl font-bold mb-4">Ready to Transform Your Travel?</h2>
           <p className="text-xl mb-8">Join our waitlist for early access</p>
           <button
-            onClick={() => navigate('contact')}
+            onClick={() => navigate('/project-insight-website/contact')}
             className="px-8 py-4 bg-white text-blue-600 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all shadow-xl"
           >
             Join the Waitlist

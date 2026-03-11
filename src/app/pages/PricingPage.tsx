@@ -110,7 +110,7 @@ export function PricingPage() {
                 </ul>
                 <button
                   type="button"
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate('/project-insight-website/contact')}
                   className={`w-full py-3 rounded-full font-medium transition-all ${
                     plan.popular
                       ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white hover:shadow-lg'

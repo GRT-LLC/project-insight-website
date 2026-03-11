@@ -152,7 +152,7 @@ export function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <button
                 type="button"
-                onClick={() => navigate('/contact')}
+                onClick={() => navigate('/project-insight-website/contact')}
                 className="group px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-semibold text-lg shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/30 transition-all"
               >
                 Join The Waitlist
@@ -328,7 +328,7 @@ export function HomePage() {
           </p>
           <button
             type="button"
-            onClick={() => navigate('/contact')}
+            onClick={() => navigate('/project-insight-website/contact')}
             className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
           >
             Join The Waitlist

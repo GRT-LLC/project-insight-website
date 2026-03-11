@@ -4,10 +4,10 @@ import { MapPin, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const NAV_LINKS: { name: string; path: string }[] = [
-  { name: 'Features', path: '/features' },
-  { name: 'Pricing', path: '/pricing' },
-  { name: 'About', path: '/about' },
-  { name: 'Contact', path: '/contact' },
+  { name: 'Features', path: '/project-insight-website/features' },
+  { name: 'Pricing', path: '/project-insight-website/pricing' },
+  { name: 'About', path: '/project-insight-website/about' },
+  { name: 'Contact', path: '/project-insight-website/contact' },
 ];
 
 export function Navigation() {
@@ -23,13 +23,13 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isLightNav = location.pathname === '/' && !isScrolled;
+  const isLightNav = location.pathname === '/project-insight-website' && !isScrolled;
   const currentPath = location.pathname;
 
   return (
     <nav
       className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        isScrolled || currentPath !== '/'
+        isScrolled || currentPath !== '/project-insight-website'
           ? 'bg-white/95 backdrop-blur-lg shadow-lg'
           : 'bg-transparent'
       }`}
@@ -37,7 +37,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <Link
-            to="/"
+            to="/project-insight-website"
             className="flex items-center cursor-pointer group"
           >
             <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
@@ -84,7 +84,7 @@ export function Navigation() {
                   type="button"
                   onClick={() => {
                     logout();
-                    navigate('/');
+                    navigate('/project-insight-website');
                   }}
                   className={`font-medium ${
                     isLightNav ? 'text-white/80' : 'text-gray-500'
@@ -96,7 +96,7 @@ export function Navigation() {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link
-                  to="/contact"
+                  to="/project-insight-website/contact"
                   className="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-medium hover:shadow-lg hover:shadow-sky-500/25 transition-all"
                 >
                   Join The Waitlist
@@ -134,7 +134,7 @@ export function Navigation() {
             ))}
             <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
               <Link
-                to="/contact"
+                to="/project-insight-website/contact"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl font-medium block text-center"
               >
