@@ -8,6 +8,7 @@ import { AboutPage } from '../pages/AboutPage';
 import { ContactPage } from '../pages/ContactPage';
 import { PrivacyPage } from '../pages/PrivacyPage';
 import { TermsPage } from '../pages/TermsPage';
+import { DataSecurityPage } from '../pages/DataSecurityPage';
 
 function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -79,7 +80,11 @@ export function PageRouter() {
           </MarketingLayout>
         }
       />
-
+      <Route path="/project-insight-website/data-security" element={
+        <MarketingLayout>
+          <DataSecurityPage />
+        </MarketingLayout>
+      } />
       <Route path="*" element={<Navigate to="/project-insight-website" replace />} />
     </Routes>
   );

@@ -7,7 +7,7 @@ const FOOTER_LINKS: Record<
 > = {
   Product: [
     { name: 'Features', path: '/project-insight-website/features' },
-    { name: 'Data Security', path: '/project-insight-website/data-security' } // TODO: Add data security page
+    { name: 'Data Security', path: '/project-insight-website/data-security' }
   ],
   Company: [
     { name: 'About', path: '/project-insight-website/about' },
