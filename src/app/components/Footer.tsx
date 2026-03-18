@@ -6,8 +6,7 @@ const FOOTER_LINKS: Record<
   { name: string; path: string }[]
 > = {
   Product: [
-    { name: 'Features', path: '/project-insight-website/features' },
-    { name: 'Data Security', path: '/project-insight-website/data-security' }
+    { name: 'Features', path: '/project-insight-website/features' }    
   ],
   Company: [
     { name: 'About', path: '/project-insight-website/about' },
@@ -19,6 +18,7 @@ const FOOTER_LINKS: Record<
     { name: 'Privacy Policy', path: '/project-insight-website/privacy' },
     { name: 'Terms of Service', path: '/project-insight-website/terms' },
     { name: 'Cookie Policy', path: '/project-insight-website/privacy' },
+    { name: 'Data Security', path: '/project-insight-website/data-security' }
   ],
 };
 
