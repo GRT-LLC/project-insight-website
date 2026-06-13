@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './app/context/AuthContext';
+import { AuthProvider } from './app/context/AuthProvider';
 import { PageRouter } from './app/router/PageRouter';
 import { ScrollToTop } from './app/router/ScrollToTop';
 import { PlasmicRootProvider } from '@plasmicapp/loader-react';

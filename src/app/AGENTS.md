@@ -13,7 +13,7 @@ happens.
 | Shared layout components | `components/Navigation.tsx`, `components/Footer.tsx`, `components/index.ts` |
 | Page components | `pages/HomePage.tsx`, `pages/FeaturesPage.tsx`, `pages/PricingPage.tsx`, `pages/AboutPage.tsx`, `pages/ContactPage.tsx`, `pages/PrivacyPage.tsx`, `pages/TermsPage.tsx`, `pages/DataSecurityPage.tsx`, `pages/SignInPage.tsx`, `pages/SignUpPage.tsx`, `pages/ForgotPasswordPage.tsx`, `pages/AppDashboard.tsx`, `pages/index.ts` |
 | Routing | `router/PageRouter.tsx`, `router/ProtectedRoute.tsx`, `router/RouterContext.tsx` (deprecated), `router/ScrollToTop.tsx` |
-| Auth | `context/AuthContext.tsx` |
+| Auth | `context/auth.ts` (context creation), `context/AuthProvider.tsx` (provider component), `context/useAuth.ts` (hook) |
 
 ## Local Contracts
 
@@ -35,10 +35,10 @@ happens.
 
 ### Auth
 
-- `AuthContext` provides `login`, `logout`, `isAuthenticated`, and `user` via React context
-- `login(userData: MarketingUser)` sets the user into state (no backend call)
-- `logout()` clears auth state
-- `useAuth()` hook must be called within `<AuthProvider>` — throws if used outside
+- Context and types live in `context/auth.ts` — exports `AuthContext`, `AuthContextValue`, `MarketingUser`
+- `AuthProvider` component in `context/AuthProvider.tsx` provides `login`, `logout`, `isAuthenticated`, and `user` via React context
+- `useAuth()` hook in `context/useAuth.ts` must be called within `<AuthProvider>` — throws if used outside
+- `auth.ts`, `AuthProvider.tsx`, and `useAuth.ts` are split to satisfy Fast Refresh constraints (only component exports in component files)
 - Auth is purely client-side/simulated — there is no backend session, JWT, or persistent storage
 
 ### Global entry points (outside `src/app/`)

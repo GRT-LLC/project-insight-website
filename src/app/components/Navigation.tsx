@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MapPin, Menu, X } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 const NAV_LINKS: { name: string; path: string }[] = [
   { name: 'Features', path: '/project-insight-website/features' },
