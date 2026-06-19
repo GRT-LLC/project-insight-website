@@ -71,6 +71,7 @@ npm run lint         # eslint with zero-warnings policy
 4. **Auth pages** — `SignInPage`, `SignUpPage`, `ForgotPasswordPage`, and `AppDashboard` are defined but not yet wired into `PageRouter.tsx`. If activating them, create routes with or without `MarketingLayout` as appropriate.
 5. **Lint discipline** — `npm run lint` enforces `--max-warnings 0`. Zero warnings is the bar.
 6. **Before editing any file in `src/app/`**, read `src/app/AGENTS.md` first.
+7. **Before any code editing**, load the `code-workflow` skill and follow its standard engineering workflow (branching, TDD, conventional commits, quality gates, PRs)
 
 ## Verification
 
