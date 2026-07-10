@@ -58,16 +58,16 @@ const FEATURES: Feature[] = [
   {
     icon: MessageCircle,
     title: 'AI Concierge',
-    desc: 'Chat with Jarvis anytime for restaurant recommendations, translation help, booking changes, or local tips. Available 24/7.',
+    desc: 'Chat with Jarvis anytime for restaurant recommendations, translation help, plan changes, or local tips. Available 24/7.',
     color: 'indigo',
-    highlights: ['Instant responses', 'Multi-language support', 'Emergency assistance']
+    highlights: ['Instant responses', 'Multi-language support', '24/7 app support']
   },
   {
     icon: Hotel,
     title: 'Multi-Property Management',
-    desc: 'Staying at multiple hotels? Jarvis tracks check-in times, coordinates luggage, and ensures smooth transitions.',
+    desc: 'Staying at multiple hotels? Jarvis tracks check-in times and helps you plan smooth transitions between stays.',
     color: 'purple',
-    highlights: ['Check-in tracking', 'Luggage coordination', 'Smooth transitions']
+    highlights: ['Check-in tracking', 'Stay details in one place', 'Smooth transitions']
   },
   {
     icon: Shield,
@@ -90,7 +90,7 @@ export function FeaturesPage() {
             Powerful Features for Perfect Trips
           </h1>
           <p className="text-xl text-gray-600">
-            Everything you need to plan, book, and experience unforgettable journeys
+            Everything you need to plan and experience unforgettable journeys
           </p>
         </div>
       </section>

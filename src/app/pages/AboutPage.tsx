@@ -25,7 +25,7 @@ export function AboutPage() {
             </p>
             <p className="text-gray-600 mb-6">
               In 2023, we set out to build the travel companion we wished existed - an intelligent 
-              assistant that could handle everything from inspiration to booking to on-trip guidance. 
+              assistant that could handle everything from inspiration to planning to on-trip guidance.
               Using cutting-edge AI technology, we created Jarvis: your personal travel assistant.
             </p>
 

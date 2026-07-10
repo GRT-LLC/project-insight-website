@@ -16,8 +16,18 @@ export function TermsPage() {
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">2. Service Description</h2>
             <p>
-              JarvisTravel provides AI-powered travel planning, booking assistance, budget tracking,
+              JarvisTravel provides AI-powered travel planning, trip intelligence, budget tracking,
               and the Fatigue Index™ system. Features may vary by subscription tier.
+            </p>
+            <p>
+              JarvisTravel is a software service. It is not a travel agency and is not a seller of
+              travel: it does not sell, provide, furnish, contract for, or arrange air, sea, or
+              ground transportation, lodging, tours, or any other travel services. All travel
+              arrangements are made by you, directly with airlines, hotels, tour operators, and
+              other providers, on those providers' own websites and under their terms. JarvisTravel
+              is not a party to, receives no payment in connection with, and earns no commission on
+              any such transaction. The only charges from JarvisTravel are subscription or
+              single-trip access fees for the software itself.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">3. User Responsibilities</h2>

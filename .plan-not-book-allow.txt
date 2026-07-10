@@ -1,0 +1,4 @@
+# plan-not-book allowlist — one case-insensitive regex per line.
+# A flagged source line is permitted when any pattern here matches it.
+# Keep entries narrow; every entry is a standing legal-review exception.
+# (No exceptions currently required for the marketing site.)
