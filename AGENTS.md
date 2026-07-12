@@ -14,7 +14,7 @@ binding work contract for its subtree.
 ## Purpose
 
 React TypeScript marketing website for JarvisTravel — a standalone SPA deployed
-to GitHub Pages. Serves as the public-facing landing experience: marketing pages,
+to the production Droplet (mktg.jarvistravel.com) and GitHub Pages. Serves as the public-facing landing experience: marketing pages,
 sign-up/sign-in flows, and a placeholder app dashboard.
 
 ## Ownership
@@ -22,7 +22,7 @@ sign-up/sign-in flows, and a placeholder app dashboard.
 | Area | Owner |
 |------|-------|
 | Root config & build | `AGENTS.md` (this file) |
-| Deployment & CI | `.github/workflows/node.js.yml` |
+| Deployment & CI | `.github/workflows/node.js.yml`, `.github/workflows/deploy-droplet.yml` |
 | Application source | `src/app/` — see `src/app/AGENTS.md` |
 | Entry point & global styles | `src/main.tsx`, `src/index.css` |
 | Plasmic integration | `src/plasmic-init.ts` |
@@ -42,9 +42,9 @@ npm run lint         # eslint with zero-warnings policy
 
 ### Base path & routing
 
-- All routes are prefixed with `/project-insight-website/` (configured in `vite.config.ts` and `tsconfig.json`)
-- The GitHub Pages deployment serves from this subdirectory
-- `tsconfig.json` `baseUrl` and `paths` (`@/*`) reference `/project-insight-website/src/*` — keep in sync with `vite.config.ts` resolve alias
+- Routes are served at the domain root (`/`) on both deployments (configured in `vite.config.ts` and `tsconfig.json`)
+- The Droplet deployment serves from mktg.jarvistravel.com/, GitHub Pages from the /project-insight-website/ subdirectory
+- `tsconfig.json` `baseUrl` and `paths` (`@/*`) — keep in sync with `vite.config.ts` resolve alias
 
 ### UI stack
 
@@ -60,7 +60,7 @@ npm run lint         # eslint with zero-warnings policy
 - **SPA** — no server-side rendering. All pages are client-rendered React.
 - **Marketing layout** — `MarketingLayout` in `PageRouter.tsx` wraps all public-facing pages with `<Navigation />` + `<Footer />`. New marketing routes should follow the same pattern.
 - **Auth is simulated** — `AuthContext` provides a client-side `login`/`logout` cycle with no backend. The `ProtectedRoute` component redirects unauthenticated users.
-- **Static output** — `npm run build` produces `dist/`. The GitHub Actions workflow uploads `dist/` to GitHub Pages.
+- **Static output** — `npm run build` produces `dist/`. The GitHub Actions workflow uploads `dist/` to GitHub Pages or rsyncs it to the Droplet.
 - **Sourcemaps enabled** in production builds (`vite.config.ts` `sourcemap: true`).
 
 ## Work Guidance
@@ -90,6 +90,6 @@ Before merging to `main`:
 
 ## User Preferences
 
-- Routes use the `/project-insight-website/` prefix for GitHub Pages subdirectory hosting
+- Routes are served at the domain root (`/`); the old `/project-insight-website/` GitHub Pages prefix is deprecated
 - React Router is the routing library; the legacy custom router in `RouterContext.tsx` is deprecated
 - Tailwind CSS is the only styling approach — no CSS modules, no styled-components

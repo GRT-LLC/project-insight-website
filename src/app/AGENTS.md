@@ -26,12 +26,12 @@ happens.
 
 ### Routing
 
-- All routes are defined in `PageRouter.tsx` under the `/project-insight-website/` prefix
+- All routes are defined in `PageRouter.tsx` at root (`/`) paths
 - Every marketing route wraps its page in `<MarketingLayout>` (provides Navigation + Footer)
 - `ProtectedRoute` in `router/ProtectedRoute.tsx` gates authenticated pages — redirects to `/signin` if not logged in
 - `ScrollToTop` in `router/ScrollToTop.tsx` scrolls to top on route change — included in the root component tree
 - `RouterContext.tsx` is kept for backward compatibility but is deprecated; use `react-router-dom` hooks directly
-- The catch-all `Route path="*"` redirects to `/project-insight-website`
+- The catch-all `Route path="*"` redirects to `/`
 
 ### Auth
 
@@ -61,7 +61,7 @@ Before changing any file in `src/app/`:
 - [ ] Read the root `AGENTS.md` plus this file (the full DOX chain)
 - [ ] After changes: `npm run type-check` passes
 - [ ] After changes: `npm run lint` passes (zero warnings)
-- [ ] If routes changed: verify all `/project-insight-website/` prefixed paths work
+- [ ] If routes changed: verify all root (`/`) paths work
 
 ## Child DOX Index
 

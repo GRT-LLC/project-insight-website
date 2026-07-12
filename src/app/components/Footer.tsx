@@ -6,19 +6,19 @@ const FOOTER_LINKS: Record<
   { name: string; path: string }[]
 > = {
   Product: [
-    { name: 'Features', path: '/project-insight-website/features' }    
+    { name: 'Features', path: '/features' }    
   ],
   Company: [
-    { name: 'About', path: '/project-insight-website/about' },
-    { name: 'Careers', path: '/project-insight-website/about' },
-    { name: 'Press', path: '/project-insight-website/about' },
-    { name: 'Contact', path: '/project-insight-website/contact' },
+    { name: 'About', path: '/about' },
+    { name: 'Careers', path: '/about' },
+    { name: 'Press', path: '/about' },
+    { name: 'Contact', path: '/contact' },
   ],
   Legal: [
-    { name: 'Privacy Policy', path: '/project-insight-website/privacy' },
-    { name: 'Terms of Service', path: '/project-insight-website/terms' },
-    { name: 'Cookie Policy', path: '/project-insight-website/privacy' },
-    { name: 'Data Security', path: '/project-insight-website/data-security' }
+    { name: 'Privacy Policy', path: '/privacy' },
+    { name: 'Terms of Service', path: '/terms' },
+    { name: 'Cookie Policy', path: '/privacy' },
+    { name: 'Data Security', path: '/data-security' }
   ],
 };
 
