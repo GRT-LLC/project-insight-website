@@ -25,7 +25,7 @@ export function PageRouter() {
     <Routes>
       {/* Marketing pages - with nav/footer */}
       <Route
-        path="/project-insight-website"
+        path="/"
         element={
           <MarketingLayout>
             <HomePage />
@@ -33,7 +33,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/project-insight-website/features"
+        path="/features"
         element={
           <MarketingLayout>
             <FeaturesPage />
@@ -41,7 +41,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/project-insight-website/pricing"
+        path="/pricing"
         element={
           <MarketingLayout>
             <PricingPage />
@@ -49,7 +49,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/project-insight-website/about"
+        path="/about"
         element={
           <MarketingLayout>
             <AboutPage />
@@ -57,7 +57,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/project-insight-website/contact"
+        path="/contact"
         element={
           <MarketingLayout>
             <ContactPage />
@@ -65,7 +65,7 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/project-insight-website/privacy"
+        path="/privacy"
         element={
           <MarketingLayout>
             <PrivacyPage />
@@ -73,19 +73,19 @@ export function PageRouter() {
         }
       />
       <Route
-        path="/project-insight-website/terms"
+        path="/terms"
         element={
           <MarketingLayout>
             <TermsPage />
           </MarketingLayout>
         }
       />
-      <Route path="/project-insight-website/data-security" element={
+      <Route path="/data-security" element={
         <MarketingLayout>
           <DataSecurityPage />
         </MarketingLayout>
       } />
-      <Route path="*" element={<Navigate to="/project-insight-website" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
