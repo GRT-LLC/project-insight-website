@@ -113,7 +113,7 @@ export function PricingPage() {
                   onClick={() => navigate('/contact')}
                   className={`w-full py-3 rounded-full font-medium transition-all ${
                     plan.popular
-                      ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white hover:shadow-lg'
+                      ? 'bg-amber-400 text-gray-900 hover:shadow-lg'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >

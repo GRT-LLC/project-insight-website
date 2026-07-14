@@ -49,7 +49,7 @@ export function ForgotPasswordPage() {
             to="/"
             className="inline-flex items-center cursor-pointer mb-8"
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-sky-600 rounded-xl flex items-center justify-center">
               <MapPin className="w-6 h-6 text-white" />
             </div>
             <span className="ml-3 text-2xl font-bold text-white">JarvisTravel</span>
@@ -142,7 +142,7 @@ export function ForgotPasswordPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            className="w-full mt-6 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-sky-500/25 transition-all"
+            className="w-full mt-6 py-4 bg-amber-400 text-gray-900 rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-400/25 transition-all"
           >
             {step === 1 ? 'Send Reset Code' : step === 2 ? 'Verify Code' : 'Reset Password'}
           </button>

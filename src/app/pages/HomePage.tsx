@@ -139,7 +139,7 @@ export function HomePage() {
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
               Travel Smarter,<br />
-              <span className="bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="text-sky-300">
                 Not Harder
               </span>
             </h1>
@@ -153,7 +153,7 @@ export function HomePage() {
               <button
                 type="button"
                 onClick={() => navigate('/contact')}
-                className="group px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-semibold text-lg shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/30 transition-all"
+                className="group px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold text-lg shadow-xl shadow-amber-400/25 hover:shadow-2xl hover:shadow-amber-400/30 transition-all"
               >
                 Join The Waitlist
               </button>
@@ -302,7 +302,7 @@ export function HomePage() {
                 <Quote className="w-8 h-8 text-gray-200 mb-4" />
                 <p className="text-gray-700 mb-6 leading-relaxed">{review.text}</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
+                  <div className="w-12 h-12 rounded-full bg-sky-600 flex items-center justify-center text-white font-semibold">
                     {review.name
                       .split(' ')
                       .map((n) => n[0])

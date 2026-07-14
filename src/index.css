@@ -42,9 +42,9 @@
     @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
   }
 
-  /* Gradient text */
+  /* Display emphasis — solid Ateneo (Meridian bans gradient text). */
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+    @apply text-sky-600;
   }
 
   /* Glass effect */
