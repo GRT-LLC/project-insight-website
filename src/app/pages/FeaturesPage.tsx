@@ -60,7 +60,7 @@ const FEATURES: Feature[] = [
     title: 'AI Concierge',
     desc: 'Chat with Jarvis anytime for restaurant recommendations, translation help, plan changes, or local tips. Available 24/7.',
     color: 'indigo',
-    highlights: ['Instant responses', 'Multi-language support', '24/7 app support']
+    highlights: ['Instant responses', 'Multi-language support', '24/7 travel guidance']
   },
   {
     icon: Hotel,
