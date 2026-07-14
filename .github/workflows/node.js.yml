@@ -46,6 +46,8 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm i
+      - name: Plan-not-book language guard
+        run: npm run lint:plan-not-book
       - name: Build
         run: npm run build
       - name: Setup Pages

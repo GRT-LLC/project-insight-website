@@ -78,7 +78,7 @@ export function HomePage() {
     {
       icon: MessageCircle,
       title: '24/7 AI Concierge',
-      desc: 'Get instant help with bookings, translations, and local tips',
+      desc: 'Get instant help with your plans, translations, and local tips',
       color: 'from-indigo-500 to-violet-600',
     },
   ];
@@ -106,7 +106,7 @@ export function HomePage() {
     {
       name: 'Elena Rodriguez',
       role: 'Business Traveler',
-      text: "Jarvis handles all my bookings and keeps me on schedule. It's like having a personal travel assistant 24/7.",
+      text: "Jarvis keeps my whole trip plan in one place and keeps me on schedule. It's like having a personal travel assistant 24/7.",
       rating: 5,
     },
   ];
