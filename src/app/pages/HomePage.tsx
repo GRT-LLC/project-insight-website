@@ -49,7 +49,7 @@ export function HomePage() {
       icon: Sparkles,
       title: 'AI-Powered Planning',
       desc: 'Smart recommendations tailored to your travel style and preferences',
-      color: 'from-violet-500 to-purple-600',
+      color: 'from-mauve-500 to-mauve-600',
     },
     {
       icon: TrendingUp,
@@ -61,7 +61,7 @@ export function HomePage() {
       icon: CreditCard,
       title: 'Smart Budgeting',
       desc: 'Real-time expense tracking with bank sync and receipt scanning',
-      color: 'from-amber-500 to-orange-600',
+      color: 'from-amber-600 to-amber-700',
     },
     {
       icon: Users,
@@ -73,13 +73,13 @@ export function HomePage() {
       icon: Camera,
       title: 'Trip Journal',
       desc: 'Capture memories with location-verified photos and AI captions',
-      color: 'from-rose-500 to-pink-600',
+      color: 'from-coral-500 to-coral-600',
     },
     {
       icon: MessageCircle,
       title: '24/7 AI Concierge',
       desc: 'Get instant help with your plans, translations, and local tips',
-      color: 'from-indigo-500 to-violet-600',
+      color: 'from-sky-600 to-sky-700',
     },
   ];
 

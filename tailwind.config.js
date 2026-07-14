@@ -21,6 +21,10 @@ export default {
         amber: { 300: '#FFCC85', 400: '#FFBF65', 500: '#F0A94D', 600: '#C98A2E', 700: '#9A5B00' },
         gray: { 50: '#F0EEEB', 100: '#E8E4DE', 200: '#DAD5CD', 300: '#C7C1B8', 400: '#8E9AA4', 500: '#5C6B77', 600: '#4A5560', 700: '#3A444C', 800: '#262E33', 900: '#13181B', 950: '#0C1013' },
         slate: { 900: '#0E2A47', 950: '#081E33' },
+        // Meridian data-set extensions (match the app's categorical colors):
+        // coral = the journal's family, mauve = the dusk stop of the palette.
+        coral: { 400: '#FD8973', 500: '#C94F36', 600: '#B23F2C', 700: '#8F3223' },
+        mauve: { 400: '#A85D79', 500: '#8A5474', 600: '#6E4A62', 700: '#5A3C50' },
       },
     },
   },
