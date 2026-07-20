@@ -40,7 +40,7 @@ export function Navigation() {
             to="/"
             className="flex items-center cursor-pointer group"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
+            <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
               <MapPin className="w-5 h-5 text-white" />
             </div>
             <span
@@ -76,7 +76,7 @@ export function Navigation() {
               <div className="flex items-center space-x-4">
                 <Link
                   to="/app"
-                  className="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-medium hover:shadow-lg transition-all"
+                  className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg transition-all"
                 >
                   Open App
                 </Link>
@@ -97,7 +97,7 @@ export function Navigation() {
               <div className="flex items-center space-x-3">
                 <Link
                   to="/contact"
-                  className="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-full font-medium hover:shadow-lg hover:shadow-sky-500/25 transition-all"
+                  className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
                 >
                   Join The Waitlist
                 </Link>
@@ -136,7 +136,7 @@ export function Navigation() {
               <Link
                 to="/contact"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl font-medium block text-center"
+                className="w-full py-3 bg-amber-400 text-gray-900 rounded-xl font-medium block text-center"
               >
                 Join The Waitlist
               </Link>
