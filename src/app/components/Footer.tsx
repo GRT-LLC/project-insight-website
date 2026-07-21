@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
 
 const FOOTER_LINKS: Record<
   'Product' | 'Company' | 'Legal',
@@ -28,11 +27,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-5 gap-12">
           <div className="md:col-span-2">
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
-              <span className="ml-3 text-xl font-bold">JarvisTravel</span>
+            <div className="mb-6">
+              <span className="text-xl font-bold">JarvisTravel</span>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Your AI-powered travel companion. Plan smarter, travel better, and create unforgettable

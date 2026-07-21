@@ -9,8 +9,6 @@ import {
   ChevronDown,
   Award,
   CheckCircle,
-  Star,
-  Quote,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
@@ -25,13 +23,6 @@ interface Feature {
 interface Stat {
   value: string;
   label: string;
-}
-
-interface Review {
-  name: string;
-  role: string;
-  text: string;
-  rating: number;
 }
 
 export function HomePage() {
@@ -88,27 +79,6 @@ export function HomePage() {
     { value: '120+', label: 'Countries' },
     { value: '4.9', label: 'App Rating' },
     { value: '24/7', label: 'AI Support' },
-  ];
-
-  const reviews: Review[] = [
-    {
-      name: 'Sarah Chen',
-      role: 'Digital Nomad',
-      text: 'The Fatigue Index changed how I plan trips. No more exhausting first days trying to do everything at once.',
-      rating: 5,
-    },
-    {
-      name: 'Marcus Johnson',
-      role: 'Family Traveler',
-      text: 'Finally an app that understands traveling with kids. The budget tracking saved us hundreds on our Europe trip.',
-      rating: 5,
-    },
-    {
-      name: 'Elena Rodriguez',
-      role: 'Business Traveler',
-      text: "Jarvis keeps my whole trip plan in one place and keeps me on schedule. It's like having a personal travel assistant 24/7.",
-      rating: 5,
-    },
   ];
 
   return (
@@ -281,41 +251,20 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof */}
+      {/* The first real review. One genuine, attributed quote — no invented
+          ratings, no fabricated reviewer roster. Add more only as real ones
+          arrive, with any material connection disclosed. */}
       <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Loved by Travelers Worldwide</h2>
-            <p className="text-xl text-gray-600">
-              Join thousands who've transformed their travel experience
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {reviews.map((review, i) => (
-              <div key={i} className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all">
-                <div className="flex mb-4">
-                  {[...Array(review.rating)].map((_, j) => (
-                    <Star key={j} className="w-5 h-5 text-amber-400 fill-current" />
-                  ))}
-                </div>
-                <Quote className="w-8 h-8 text-gray-200 mb-4" />
-                <p className="text-gray-700 mb-6 leading-relaxed">{review.text}</p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-sky-600 flex items-center justify-center text-white font-semibold">
-                    {review.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-gray-900">{review.name}</div>
-                    <div className="text-sm text-gray-500">{review.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm font-semibold tracking-widest uppercase text-amber-700 mb-8">
+            From an early traveler
+          </p>
+          <blockquote className="text-2xl md:text-3xl font-medium text-gray-900 leading-snug mb-8">
+            “JarvisTravel made the most of my extra day in Chicago on a routine
+            work trip. I took a boat tour, found a new favorite deep dish spot,
+            and had an amazing time at a famous blues joint.”
+          </blockquote>
+          <p className="text-gray-600 font-medium">Joe · San Diego</p>
         </div>
       </section>
 
