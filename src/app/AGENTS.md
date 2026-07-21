@@ -43,9 +43,8 @@ happens.
 
 ### Global entry points (outside `src/app/`)
 
-- `src/main.tsx` — renders the React tree into `#root` with `BrowserRouter` > `PlasmicRootProvider` > `AuthProvider` > `ScrollToTop` + `PageRouter`
+- `src/main.tsx` — renders the React tree into `#root` with `BrowserRouter` > `AuthProvider` > `ScrollToTop` + `PageRouter`
 - `src/index.css` — Tailwind directives (`@tailwind base; @tailwind components; @tailwind utilities`)
-- `src/plasmic-init.ts` — Plasmic loader configuration (project ID and API token)
 
 ## Work Guidance
 

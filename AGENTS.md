@@ -25,7 +25,6 @@ sign-up/sign-in flows, and a placeholder app dashboard.
 | Deployment & CI | `.github/workflows/node.js.yml`, `.github/workflows/deploy-droplet.yml` |
 | Application source | `src/app/` — see `src/app/AGENTS.md` |
 | Entry point & global styles | `src/main.tsx`, `src/index.css` |
-| Plasmic integration | `src/plasmic-init.ts` |
 
 ## Local Contracts
 
@@ -52,7 +51,6 @@ npm run lint         # eslint with zero-warnings policy
 - **Vite 5** with `@vitejs/plugin-react`
 - **Tailwind CSS 3** via PostCSS — utility-first styling, no CSS modules
 - **Lucide React** for icons (import individual icons from `lucide-react`)
-- **Plasmic** (`@plasmicapp/loader-react`) for visual content management
 - **react-router-dom v7** for client-side routing
 
 ### Architectural invariants
