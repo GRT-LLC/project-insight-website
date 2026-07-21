@@ -1,100 +1,118 @@
-import { Shield, Check, ArrowRight } from 'lucide-react';
+import { Check } from 'lucide-react';
+
+// Data Security (JAR-432) — every claim here is either true today or clearly
+// framed as a forward commitment. Removed (audit findings): "PCI DSS
+// Compliant" (an attested status we do not hold — payments, when live, are
+// processed by Stripe), "third-party security experts regularly audit our
+// systems" (the only audit on record was internal), and the "256-bit /
+// bank-level" specifics. Payment information is not collected today.
+
+const PROTECTIONS = [
+  {
+    name: 'Encrypted in transit',
+    desc: 'Connections to JarvisTravel are encrypted. Your plans and journal entries are not sent in the clear.',
+  },
+  {
+    name: 'Minimal collection',
+    desc: 'We collect what planning a trip requires — account details, preferences, and the trips you build — and nothing else.',
+  },
+  {
+    name: 'Payments, when they launch, run through Stripe',
+    desc: 'Card details will be handled by Stripe, a dedicated payment processor. They will never touch our servers.',
+  },
+];
+
+const COMMITMENTS = [
+  'We never sell your data.',
+  'We never share your data without your consent.',
+  'We don’t track you across other sites.',
+];
+
+const RIGHTS = [
+  'Request a copy of your data',
+  'Request deletion of your account and its data',
+  'Opt out of marketing email with one click',
+  'Update your information at any time',
+];
 
 export function DataSecurityPage() {
   return (
     <div className="pt-20">
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Shield className="w-16 h-16 text-blue-600 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Your Data, Your Control
+      {/* Header — flat Ateneo band. */}
+      <section className="bg-sky-600">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
+            Data security
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl mb-6">
+            Your data, your control.
           </h1>
-          <p className="text-xl text-gray-600">
-            We take your privacy and data security seriously
+          <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
+            What we protect, what we will never do, and the rights you keep.
           </p>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="space-y-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Data Security</h2>
-              <div className="bg-white rounded-xl p-8 shadow-lg">
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <Check className="w-6 h-6 text-green-500 mr-3 mt-0.5" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">256-bit Encryption</h3>
-                      <p className="text-gray-600">All data is encrypted both in transit and at rest using bank-level encryption standards</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Check className="w-6 h-6 text-green-500 mr-3 mt-0.5" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">PCI DSS Compliant</h3>
-                      <p className="text-gray-600">Our payment processing meets the highest industry security standards</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Check className="w-6 h-6 text-green-500 mr-3 mt-0.5" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Regular Security Audits</h3>
-                      <p className="text-gray-600">Third-party security experts regularly audit our systems</p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 space-y-14">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+              How we protect it
+            </h2>
+            <ul className="border-t border-gray-200">
+              {PROTECTIONS.map((item) => (
+                <li key={item.name} className="py-5 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
+                  <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Data Privacy</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">What We Collect</h3>
-                  <ul className="space-y-2 text-gray-600">
-                    <li>• Account information</li>
-                    <li>• Travel preferences</li>
-                    <li>• Trip history</li>
-                    <li>• Payment information (encrypted)</li>
-                  </ul>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">What We Don't Do</h3>
-                  <ul className="space-y-2 text-gray-600">
-                    <li>• Sell your data to third parties</li>
-                    <li>• Share data without consent</li>
-                    <li>• Store unencrypted payment details</li>
-                    <li>• Track you across other sites</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+              What we will never do
+            </h2>
+            <ul className="space-y-3">
+              {COMMITMENTS.map((line) => (
+                <li key={line} className="flex items-start gap-3">
+                  <Check
+                    className="w-4 h-4 text-sky-600 flex-shrink-0 mt-1.5"
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  />
+                  <span className="text-gray-600 text-lg">{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Your Rights</h2>
-              <div className="bg-blue-50 rounded-xl p-8">
-                <p className="text-gray-700 mb-4">You have complete control over your data:</p>
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <ArrowRight className="w-5 h-5 text-blue-600 mr-3" />
-                    <span className="text-gray-700">Request a copy of all your data</span>
-                  </li>
-                  <li className="flex items-center">
-                    <ArrowRight className="w-5 h-5 text-blue-600 mr-3" />
-                    <span className="text-gray-700">Delete your account and all associated data</span>
-                  </li>
-                  <li className="flex items-center">
-                    <ArrowRight className="w-5 h-5 text-blue-600 mr-3" />
-                    <span className="text-gray-700">Opt-out of marketing communications</span>
-                  </li>
-                  <li className="flex items-center">
-                    <ArrowRight className="w-5 h-5 text-blue-600 mr-3" />
-                    <span className="text-gray-700">Update your information at any time</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+              Your rights
+            </h2>
+            <ul className="space-y-3 mb-6">
+              {RIGHTS.map((line) => (
+                <li key={line} className="flex items-start gap-3">
+                  <Check
+                    className="w-4 h-4 text-sky-600 flex-shrink-0 mt-1.5"
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  />
+                  <span className="text-gray-600 text-lg">{line}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-gray-600">
+              For any of these, write to{' '}
+              <a
+                href="mailto:privacy@jarvistravel.com"
+                className="text-sky-600 underline underline-offset-4 decoration-1 hover:text-sky-700"
+              >
+                privacy@jarvistravel.com
+              </a>
+              .
+            </p>
           </div>
         </div>
       </section>

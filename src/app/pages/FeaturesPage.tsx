@@ -1,138 +1,99 @@
-import {
-  Sparkles,
-  TrendingUp,
-  CreditCard,
-  Users,
-  Camera,
-  MessageCircle,
-  Hotel,
-  Shield,
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-interface Feature {
-  icon: LucideIcon;
-  title: string;
+// "How it works" (JAR-432) — five named traveler moments replace the eight
+// identical feature rows with placeholder icon-boxes and unbuilt claims
+// (bank sync, receipt scanning, group voting, multi-property, E2E/2FA all
+// removed). Every moment below corresponds to shipped code: the planner and
+// walk-between-stops, the FI >= 7 flag with the lighter-day offer, the
+// day-numbered map, budget categories/totals/remaining, and the journal.
+
+interface Moment {
+  numeral: string;
+  name: string;
   desc: string;
-  color: string;
-  highlights: string[];
 }
 
-const FEATURES: Feature[] = [
+const MOMENTS: Moment[] = [
   {
-    icon: Sparkles,
-    title: 'AI Trip Planning',
-    desc: 'Tell Jarvis your preferences, and get a personalized itinerary in seconds. Our AI considers weather, local events, your interests, and optimal timing.',
-    color: 'violet',
-    highlights: ['Personalized recommendations', 'Time optimization', 'Local insights']
+    numeral: '01',
+    name: 'The week before you go',
+    desc: 'Jarvis drafts the days — pacing, order, and the walk between stops — with the forecast and your budget sitting inside the same plan. You move things; the numbers move with them.',
   },
   {
-    icon: TrendingUp,
-    title: 'Fatigue Index™',
-    desc: 'Our patent-pending algorithm calculates your energy levels based on jet lag, sleep, and activities—then optimizes your schedule accordingly.',
-    color: 'emerald',
-    highlights: ['Energy tracking', 'Rest recommendations', 'Activity balancing']
+    numeral: '02',
+    name: 'The day that reads seven',
+    desc: 'When a day scores seven or above, the plan says so before you commit — and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
   },
   {
-    icon: CreditCard,
-    title: 'Smart Budget Tracking',
-    desc: 'Connect your bank, scan receipts with your camera, and track every expense in real-time. Get alerts before you overspend.',
-    color: 'amber',
-    highlights: ['Real-time tracking', 'Currency conversion', 'Split expenses']
+    numeral: '03',
+    name: 'The ground',
+    desc: 'Your trip on one map, numbered by day. The route you would actually walk, not a cloud of pins.',
   },
   {
-    icon: Users,
-    title: 'Group Collaboration',
-    desc: 'Invite travel companions, vote on activities, split expenses fairly, and keep everyone on the same page with shared itineraries.',
-    color: 'sky',
-    highlights: ['Shared planning', 'Fair cost splitting', 'Group voting']
+    numeral: '04',
+    name: 'What it costs',
+    desc: 'A budget that lives inside the plan: categories, running totals, and what is left — visible while you decide, not after.',
   },
   {
-    icon: Camera,
-    title: 'Trip Journal',
-    desc: 'Capture memories with location-verified photos. Our AI generates captions and organizes your travel story automatically.',
-    color: 'rose',
-    highlights: ['Auto-organization', 'Location tagging', 'Shareable albums']
-  },
-  {
-    icon: MessageCircle,
-    title: 'AI Concierge',
-    desc: 'Chat with Jarvis anytime for restaurant recommendations, translation help, plan changes, or local tips. Available 24/7.',
-    color: 'indigo',
-    highlights: ['Instant responses', 'Multi-language support', '24/7 travel guidance']
-  },
-  {
-    icon: Hotel,
-    title: 'Multi-Property Management',
-    desc: 'Staying at multiple hotels? Jarvis tracks check-in times and helps you plan smooth transitions between stays.',
-    color: 'purple',
-    highlights: ['Check-in tracking', 'Stay details in one place', 'Smooth transitions']
-  },
-  {
-    icon: Shield,
-    title: 'Bank-Level Security',
-    desc: 'Your data is encrypted end-to-end. We never sell your information, and you control what Jarvis remembers.',
-    color: 'slate',
-    highlights: ['End-to-end encryption', '2FA protection', 'Privacy controls']
+    numeral: '05',
+    name: 'The flight home',
+    desc: 'Notes, photos, receipts and places, assembled into a journal worth rereading — yours to keep after the trip ends.',
   },
 ];
 
 export function FeaturesPage() {
-  const navigate = useNavigate();
-
   return (
     <div className="pt-20">
-      {/* Header */}
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Powerful Features for Perfect Trips
+      {/* Header — flat Ateneo band. */}
+      <section className="bg-sky-600">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
+            How it works
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl mb-6">
+            Five moments a plan has to survive.
           </h1>
-          <p className="text-xl text-gray-600">
-            Everything you need to plan and experience unforgettable journeys
+          <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
+            Not a feature list — the points in a real trip where most plans
+            quietly fail, and what Jarvis does at each one.
           </p>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-16">
-            {FEATURES.map((feature) => (
-              <div key={feature.title} className="grid md:grid-cols-2 gap-12 items-center">
+      {/* The five moments — hairline rows on Moonlight, numerals on the left. */}
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <ol className="border-t border-gray-200 list-none m-0 p-0">
+            {MOMENTS.map((moment) => (
+              <li
+                key={moment.numeral}
+                className="grid grid-cols-[48px_1fr] gap-x-5 py-8 border-b border-gray-200"
+              >
+                <span
+                  aria-hidden="true"
+                  className="text-2xl font-bold text-gray-300 [font-variant-numeric:tabular-nums] leading-tight"
+                >
+                  {moment.numeral}
+                </span>
                 <div>
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
-                    <feature.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                  <p className="text-lg text-gray-600 mb-6">{feature.desc}</p>
-                  {feature.highlights.map((highlight) => (
-                    <span key={highlight} className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                      {highlight}
-                    </span>
-                  ))}
+                  <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">
+                    {moment.name}
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed">{moment.desc}</p>
                 </div>
-                <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl p-8 h-64 flex items-center justify-center">
-                  <feature.icon className="w-24 h-24 text-blue-600/30" />
-                </div>
-              </div>
+              </li>
             ))}
-          </div>
-        </div>
-      </section>
+          </ol>
 
-      {/* CTA */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-4xl font-bold mb-4">Ready to Transform Your Travel?</h2>
-          <p className="text-xl mb-8">Sign up for early access</p>
-          <button
-            onClick={() => navigate('/contact')}
-            className="px-8 py-4 bg-white text-blue-600 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all shadow-xl"
-          >
-            Sign up
-          </button>
+          {/* Routes to the contact page's signup path until app/payment is live. */}
+          <div className="text-center mt-12">
+            <Link
+              to="/contact"
+              className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Sign up
+            </Link>
+          </div>
         </div>
       </section>
     </div>

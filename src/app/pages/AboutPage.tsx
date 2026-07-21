@@ -1,61 +1,61 @@
-import { Zap, Sparkles, Shield, Globe } from 'lucide-react';
+// About (JAR-432) — the founder letter replaces the fabricated company page
+// ("our founders" plural, "In 2023", the distributed-team claim, the empty
+// team section, the four abstract values cards — all deleted; none were true).
+//
+// LETTER STATUS: DRAFT in the founder's voice, written for his edit. Do not
+// merge until Brent has read and revised it — flagged on the PR.
 
 export function AboutPage() {
   return (
     <div className="pt-20">
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            About JarvisTravel
-          </h1>
-          <p className="text-xl text-gray-600">
-            We're on a mission to make travel planning effortless and enjoyable for everyone
+      {/* Header — flat Ateneo band. */}
+      <section className="bg-sky-600">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
+            About
           </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl">
+            Who&rsquo;s building JarvisTravel.
+          </h1>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="prose prose-lg mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-            <p className="text-gray-600 mb-6">
-              JarvisTravel was born from a simple frustration: planning trips shouldn't be stressful. 
-              Our founders, avid travelers themselves, spent countless hours juggling spreadsheets, 
-              bookmark folders, and messaging apps trying to coordinate trips with friends and family.
+      {/* The letter — one voice, signed and dated. */}
+      <section className="bg-gray-50">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
+            <p>
+              I started JarvisTravel after coming home from trips that looked
+              perfect on paper — and feeling like I needed a vacation from the
+              vacation. The tools I had were good at collecting places and
+              terrible at telling me what a day would actually cost me: in
+              hours, in miles, in energy.
             </p>
-            <p className="text-gray-600 mb-6">
-              In 2023, we set out to build the travel companion we wished existed - an intelligent 
-              assistant that could handle everything from inspiration to planning to on-trip guidance.
-              Using cutting-edge AI technology, we created Jarvis: your personal travel assistant.
+            <p>
+              So we built the pacing model first. Every day of a plan gets a
+              score from one to nine, computed from the things that genuinely
+              drain you — how far your body clock moves, how long you sit in
+              transit, how far you walk, how much is packed in, and how much
+              downtime is left. The itinerary hangs off that number, not the
+              other way around.
             </p>
-
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">Our Mission</h2>
-            <p className="text-gray-600 mb-6">
-              To democratize luxury travel planning by making personalized, intelligent travel assistance 
-              accessible to everyone, regardless of budget or experience level.
+            <p>
+              Two commitments have shaped everything since. JarvisTravel plans
+              — it never sells travel. No commissions, no placements; nothing
+              appears in your plan because someone paid for the spot. And the
+              trip you take is yours: the journal, the photos, the places
+              belong to you.
             </p>
-
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">Our Values</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                { title: 'Simplicity', desc: 'Travel planning should be effortless', icon: Zap },
-                { title: 'Intelligence', desc: 'AI that truly understands your needs', icon: Sparkles },
-                { title: 'Privacy', desc: 'Your data is yours and yours alone', icon: Shield },
-                { title: 'Accessibility', desc: 'Great travel experiences for everyone', icon: Globe }
-              ].map((value, index) => (
-                <div key={index} className="bg-white rounded-xl p-6 shadow-lg">
-                  <value.icon className="w-8 h-8 text-blue-600 mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-2">{value.title}</h3>
-                  <p className="text-gray-600">{value.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">The Team</h2>
-            <p className="text-gray-600 mb-6">
-              We're a diverse team of travelers, engineers, designers, and dreamers united by our 
-              passion for exploration. Based across multiple time zones, we understand the challenges 
-              of travel firsthand.
+            <p>
+              The app is nearly ready, and we&rsquo;re building it carefully. If
+              planning a trip has ever felt like a second job, I&rsquo;d love
+              for you to try it.
+            </p>
+          </div>
+          <div className="mt-10 pt-8 border-t border-gray-200">
+            <p className="font-semibold text-gray-900">Brent Bailey</p>
+            <p className="text-gray-500 text-sm">
+              Founder, JarvisTravel · San Diego · July 2026
             </p>
           </div>
         </div>
