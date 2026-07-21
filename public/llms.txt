@@ -1,0 +1,35 @@
+# JarvisTravel
+
+> AI-powered travel planning platform that creates personalized itineraries optimized for your preferences, energy levels, and interests. JarvisTravel combines smart recommendations with real-time data to make trip planning effortless.
+
+## Key pages
+
+- [Home](https://www.jarvistravel.com/): Landing page with feature overview, testimonials, and call-to-action for the AI travel planning service
+- [Features](https://www.jarvistravel.com/features): Detailed breakdown of AI Trip Planning, Fatigue Index™ itinerary optimization, real-time weather integration, receipt scanning, expense tracking, and hotel price comparison
+- [Pricing](https://www.jarvistravel.com/pricing): Subscription plans and Early Access pricing tiers for the JarvisTravel platform
+- [About](https://www.jarvistravel.com/about): Company background and mission for JarvisTravel
+- [Contact](https://www.jarvistravel.com/contact): Support contact form and inquiry submission
+- [Privacy Policy](https://www.jarvistravel.com/privacy): Data collection, usage, and privacy practices
+- [Data Security](https://www.jarvistravel.com/data-security): Security measures, encryption standards, and data protection commitments
+- [Terms of Service](https://www.jarvistravel.com/terms): Legal terms governing use of the JarvisTravel platform
+- [Sign In](https://www.jarvistravel.com/signin): User authentication page for existing account holders
+- [Sign Up](https://www.jarvistravel.com/signup): New account registration for the JarvisTravel platform
+
+## Core features
+
+- **AI Trip Planning**: Personalized itineraries built from natural-language preferences, considering weather, local events, interests, and optimal timing
+- **Fatigue Index™**: Proprietary system that scores and optimizes itineraries to balance activity and rest for maximum enjoyment
+- **Real-time Weather Integration**: Live weather data integrated into trip planning and itinerary recommendations
+- **Receipt Scanning**: Automatic receipt processing and expense categorization using AI-powered OCR
+- **Expense Tracking**: Multi-trip expense management with categorization, budgets, and export capabilities
+- **Hotel Price Comparison**: Aggregate pricing across booking platforms with price-drop alerts and loyalty-tier matching
+- **Flight Monitoring**: Route-hint intake, schedule tracking, and operating-carrier field support using real-time flight data sources
+- **Trip Journal**: AI-assisted travel diary with photo capture, location tagging, and automatic chronology generation
+
+## Technical information
+
+- The website is a React 18 single-page application (SPA) built with TypeScript, Vite, and Tailwind CSS
+- Deployed at mktg.jarvistravel.com with GitHub Pages as a secondary deployment target
+- Auth is client-side simulated for the marketing site; the production travel platform uses Clerk for authentication
+- The production BFF API is hosted at api.jarvistravel.com
+- The travel platform codebase spans multiple repositories: core (Go BFF API), web-app (React SPA), ops-dashboard, monitoring, and waitlist
