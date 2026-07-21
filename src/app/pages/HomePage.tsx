@@ -125,7 +125,7 @@ export function HomePage() {
                 onClick={() => navigate('/contact')}
                 className="group px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold text-lg shadow-xl shadow-amber-400/25 hover:shadow-2xl hover:shadow-amber-400/30 transition-all"
               >
-                Join The Waitlist
+                Sign up
               </button>
             </div>
 
@@ -251,36 +251,25 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* The first real review. One genuine, attributed quote — no invented
-          ratings, no fabricated reviewer roster. Add more only as real ones
-          arrive, with any material connection disclosed. */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-amber-700 mb-8">
-            From an early traveler
-          </p>
-          <blockquote className="text-2xl md:text-3xl font-medium text-gray-900 leading-snug mb-8">
-            “JarvisTravel made the most of my extra day in Chicago on a routine
-            work trip. I took a boat tour, found a new favorite deep dish spot,
-            and had an amazing time at a famous blues joint.”
-          </blockquote>
-          <p className="text-gray-600 font-medium">Joe · San Diego</p>
-        </div>
-      </section>
+      {/* Testimonials removed (JAR-429): the previous roster was fabricated,
+          and early-access quotes are held back by brand-owner decision so no
+          published review needs a material-connection disclosure. Reintroduce
+          only post-launch, from arm's-length users. */}
 
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-r from-sky-600 to-indigo-600 text-white">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Travel Smarter?</h2>
           <p className="text-xl text-white/80 mb-10">
-            Join the waitlist to be the first to know when we launch.
+            Sign up to be the first to know when we launch.
           </p>
+          {/* Routes to the interest form until the app/payment flow is live. */}
           <button
             type="button"
             onClick={() => navigate('/contact')}
             className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
           >
-            Join The Waitlist
+            Sign up
           </button>
         </div>
       </section>

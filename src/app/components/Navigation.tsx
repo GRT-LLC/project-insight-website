@@ -93,7 +93,7 @@ export function Navigation() {
                   to="/contact"
                   className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
                 >
-                  Join The Waitlist
+                  Sign up
                 </Link>
               </div>
             )}
@@ -132,7 +132,7 @@ export function Navigation() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full py-3 bg-amber-400 text-gray-900 rounded-xl font-medium block text-center"
               >
-                Join The Waitlist
+                Sign up
               </Link>
             </div>
           </div>

@@ -126,12 +126,12 @@ export function FeaturesPage() {
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl font-bold mb-4">Ready to Transform Your Travel?</h2>
-          <p className="text-xl mb-8">Join our waitlist for early access</p>
+          <p className="text-xl mb-8">Sign up for early access</p>
           <button
             onClick={() => navigate('/contact')}
             className="px-8 py-4 bg-white text-blue-600 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all shadow-xl"
           >
-            Join the Waitlist
+            Sign up
           </button>
         </div>
       </section>
