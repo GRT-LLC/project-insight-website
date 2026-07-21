@@ -1,276 +1,371 @@
-import { useEffect, useState } from 'react';
 import {
+  BookOpen,
+  CloudSun,
+  Map as MapIcon,
+  Plane,
   Sparkles,
   TrendingUp,
-  CreditCard,
-  Users,
-  Camera,
-  MessageCircle,
-  ChevronDown,
-  Award,
-  CheckCircle,
+  Wallet,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 
-interface Feature {
-  icon: LucideIcon;
-  title: string;
+// NINE interim home page (JAR-431). Asset-light by design: no photography and
+// no app captures yet, so the page rests on the two things that are real —
+// the shipped 1–9 Fatigue Index and honest copy. Every factual claim below
+// maps to shipped code; the five inputs are the engine's FATIGUE_WEIGHTS
+// keys, and the dial uses the app's FI ramp hexes verbatim.
+//
+// Removed relative to the old page (audit findings): fabricated stats and
+// testimonials framing, gradient hero + blur orbs + noise texture, gradient
+// icon tiles wearing data-palette colors as chrome, min-h-screen hero,
+// unbuilt-feature claims (bank sync, receipt scanning, group voting, 24/7,
+// "sleep patterns" — restPeriods is not sleep debt).
+
+interface FiInput {
+  name: string;
   desc: string;
-  color: string;
 }
 
-interface Stat {
-  value: string;
-  label: string;
+// The five engine inputs (FATIGUE_WEIGHTS): jetLag, travelTime,
+// walkingDistance, activityDensity, restPeriods.
+const FI_INPUTS: FiInput[] = [
+  { name: 'Time-zone shift', desc: 'How far your body clock has to move.' },
+  { name: 'Hours in transit', desc: 'Flights, trains, transfers — the time spent getting there.' },
+  { name: 'Walking distance', desc: 'The miles a day actually asks of you.' },
+  { name: 'Day density', desc: 'How much is packed in, and how tightly.' },
+  { name: 'Downtime', desc: 'How much recovery the day leaves you.' },
+];
+
+interface Restraint {
+  name: string;
+  desc: string;
+}
+
+// Three restraints, not four: the fourth slot requires a measured claim and
+// nothing is measured yet. Refusing to fill the grid is the point.
+const RESTRAINTS: Restraint[] = [
+  {
+    name: 'No commissions.',
+    desc: 'We’re not a seller of travel, and no company that appears in your plan pays us anything to appear there.',
+  },
+  {
+    name: 'No ads.',
+    desc: 'The product has no slot for one — now, or at scale.',
+  },
+  {
+    // "never used to train anyone's model" is held back until the Privacy
+    // Policy states it in writing — a published commitment must match the
+    // policy word for word. Restore alongside the legal-pages phase.
+    name: 'Your journal is yours.',
+    desc: 'Entries, photos and locations are yours, and they are never sold.',
+  },
+];
+
+interface ProductRow {
+  icon: LucideIcon;
+  name: string;
+  desc: string;
+  voice: 'accent' | 'journal';
+}
+
+// Shipped features only. Icons follow the app's row recipe: a w-9 tinted
+// voice container with the glyph drawn in the voice color — coral belongs to
+// the journal and appears nowhere else.
+const PRODUCT_ROWS: ProductRow[] = [
+  {
+    icon: TrendingUp,
+    name: 'The Fatigue Index',
+    desc: 'Every day of your plan scored one to nine, so the hard days show up before you commit.',
+    voice: 'accent',
+  },
+  {
+    icon: Sparkles,
+    name: 'Trip planning',
+    desc: 'Jarvis drafts the days — pacing, order, and the walk between stops. You decide.',
+    voice: 'accent',
+  },
+  {
+    icon: Wallet,
+    name: 'Budget',
+    desc: 'A budget that sits inside the plan: categories, running totals, what’s left.',
+    voice: 'accent',
+  },
+  {
+    icon: BookOpen,
+    name: 'Trip journal',
+    desc: 'Notes, photos, receipts and places, kept together and worth rereading.',
+    voice: 'journal',
+  },
+  {
+    icon: MapIcon,
+    name: 'The map',
+    desc: 'Your trip on one map, numbered by day.',
+    voice: 'accent',
+  },
+  {
+    icon: CloudSun,
+    name: 'Weather',
+    desc: 'Seven days out, plus what the season usually does there.',
+    voice: 'accent',
+  },
+  {
+    icon: Plane,
+    name: 'Flights',
+    desc: 'Your flights, tracked inside the plan.',
+    voice: 'accent',
+  },
+];
+
+/** Concentric contour rings — the Meridian motif, Moonlight at 13% on navy.
+ *  pointer-events-none so the overlay can never intercept clicks on content. */
+function ContourArcs({ className }: { className: string }) {
+  return (
+    <svg
+      className={`pointer-events-none ${className}`}
+      viewBox="0 0 520 520"
+      fill="none"
+      aria-hidden="true"
+    >
+      {[130, 170, 210, 250].map((r) => (
+        <circle
+          key={r}
+          cx="260"
+          cy="260"
+          r={r}
+          stroke="#F0EEEB"
+          strokeOpacity="0.13"
+          strokeWidth="1"
+        />
+      ))}
+    </svg>
+  );
+}
+
+/** The Fatigue Index dial — the shipped 1–9 ramp, drawn exactly.
+ *  Not an app screenshot: a brand instrument rendering the real scale.
+ *  Hexes are the app's DARK-ground ramp tokens (index.css --fi-* dark set) —
+ *  the dial sits on navy, and the light-set red reads under 3:1 there.
+ *  The figcaption is the text alternative; the drawing itself is aria-hidden
+ *  so screen readers hear the reading once, not twice. */
+function FiDial() {
+  return (
+    <figure className="mx-auto max-w-[340px]">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <g fill="none">
+          <circle cx="100" cy="100" r="30" stroke="#38BDF8" strokeWidth="2.5" opacity="0.85" />
+          <circle cx="100" cy="100" r="37" stroke="#38BDF8" strokeWidth="2.5" opacity="0.85" />
+          <circle cx="100" cy="100" r="44" stroke="#38BDF8" strokeWidth="2.5" opacity="0.85" />
+          <circle cx="100" cy="100" r="51" stroke="#34D399" strokeWidth="3" opacity="0.9" />
+          <circle cx="100" cy="100" r="58" stroke="#34D399" strokeWidth="3" opacity="0.9" />
+          <circle cx="100" cy="100" r="65" stroke="#34D399" strokeWidth="3" opacity="0.9" />
+          <circle cx="100" cy="100" r="72" stroke="#FBBF24" strokeWidth="4" />
+          <circle cx="100" cy="100" r="79" stroke="#FBBF24" strokeWidth="4" />
+          <circle cx="100" cy="100" r="88" stroke="#F07668" strokeWidth="5" />
+          <line x1="100" y1="100" x2="100" y2="12" stroke="#F0EEEB" strokeOpacity="0.3" strokeWidth="1" />
+        </g>
+        <text
+          x="100"
+          y="100"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#F0EEEB"
+          fontSize="42"
+          fontWeight="700"
+          style={{ fontVariantNumeric: 'tabular-nums' }}
+        >
+          7
+        </text>
+      </svg>
+      <figcaption className="mt-4 text-[13px] text-sky-200 text-center">
+        The Fatigue Index. Every day scored, one to nine — seven is a day
+        you&rsquo;ll feel.
+      </figcaption>
+    </figure>
+  );
 }
 
 export function HomePage() {
-  const navigate = useNavigate();
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => setShowScrollIndicator(window.scrollY < 100);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const features: Feature[] = [
-    {
-      icon: Sparkles,
-      title: 'AI-Powered Planning',
-      desc: 'Smart recommendations tailored to your travel style and preferences',
-      color: 'from-mauve-500 to-mauve-600',
-    },
-    {
-      icon: TrendingUp,
-      title: 'Fatigue Index™',
-      desc: 'Proprietary system that optimizes your itinerary for energy and enjoyment',
-      color: 'from-emerald-500 to-teal-600',
-    },
-    {
-      icon: CreditCard,
-      title: 'Smart Budgeting',
-      desc: 'Real-time expense tracking with bank sync and receipt scanning',
-      color: 'from-amber-600 to-amber-700',
-    },
-    {
-      icon: Users,
-      title: 'Group Travel',
-      desc: 'Coordinate plans and split expenses effortlessly with travel companions',
-      color: 'from-sky-500 to-blue-600',
-    },
-    {
-      icon: Camera,
-      title: 'Trip Journal',
-      desc: 'Capture memories with location-verified photos and AI captions',
-      color: 'from-coral-500 to-coral-600',
-    },
-    {
-      icon: MessageCircle,
-      title: '24/7 AI Concierge',
-      desc: 'Get instant help with your plans, translations, and local tips',
-      color: 'from-sky-600 to-sky-700',
-    },
-  ];
-
-  const stats: Stat[] = [
-    { value: '50K+', label: 'Happy Travelers' },
-    { value: '120+', label: 'Countries' },
-    { value: '4.9', label: 'App Rating' },
-    { value: '24/7', label: 'AI Support' },
-  ];
-
   return (
-    <div className="overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" />
-          <div
-            className="absolute inset-0 opacity-30"
-            style={{
-              backgroundImage:
-                'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.15"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-            }}
-          />
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/20">
-              <Sparkles className="w-4 h-4 text-amber-400 mr-2" />
-              <span className="text-white/90 text-sm font-medium">
-                Introducing Fatigue Index™ Technology
-              </span>
-            </div>
-
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Travel Smarter,<br />
-              <span className="text-sky-300">
-                Not Harder
-              </span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed">
-              Your AI travel assistant that plans perfect itineraries, tracks budgets, and keeps you
-              energized throughout your journey.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <button
-                type="button"
-                onClick={() => navigate('/contact')}
-                className="group px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold text-lg shadow-xl shadow-amber-400/25 hover:shadow-2xl hover:shadow-amber-400/30 transition-all"
+    <div>
+      {/* 01 — The number. Flat Ateneo, no photograph: the scale is the image. */}
+      <section className="relative overflow-hidden bg-sky-600">
+        <ContourArcs className="absolute -top-44 -left-44 w-[520px] h-[520px]" />
+        <ContourArcs className="absolute -bottom-56 -right-40 w-[520px] h-[520px]" />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 md:pt-40 md:pb-28">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            <div className="lg:col-span-7">
+              <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6 [font-variant-numeric:tabular-nums]">
+                01 — The Fatigue Index
+              </p>
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] mb-6">
+                Nine is a hard day.
+              </h1>
+              <p className="text-lg md:text-xl text-sky-100 leading-relaxed max-w-xl mb-4">
+                JarvisTravel scores every day of a trip from one to nine. It
+                reads how far your body clock will move, how long you&rsquo;ll be
+                in transit, how far you&rsquo;ll walk, how densely the day is
+                packed, and how much downtime it leaves you. One is easy. Nine
+                you will feel.
+              </p>
+              <p className="text-sm text-sky-200 mb-10">
+                Planning only. We take no commissions, and we&rsquo;re not a
+                seller of travel.
+              </p>
+              {/* Routes to the interest form until the app/payment flow is live. */}
+              <Link
+                to="/contact"
+                className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
               >
                 Sign up
-              </button>
+              </Link>
             </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-              {stats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-white/50 text-sm">{stat.label}</div>
-                </div>
-              ))}
+            <div className="lg:col-span-5">
+              <FiDial />
             </div>
-          </div>
-        </div>
-
-        <div
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-500 ${
-            showScrollIndicator ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <div className="animate-bounce">
-            <ChevronDown className="w-8 h-8 text-white/50" />
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Everything You Need to Travel Better
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Powerful features designed to make every trip unforgettable
-            </p>
-          </div>
+      {/* 02 — The belief. Tight, no image, no CTA: a belief with a button
+          attached stops being a belief. */}
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-700 mb-6 [font-variant-numeric:tabular-nums]">
+            02 — Why it works this way
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
+            We started from the end of the day.
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            Twelve tabs, a shared spreadsheet and a map full of pins will get
+            you a plan. What none of them will tell you is whether Thursday is
+            survivable. So we built the pacing model first and hung the
+            itinerary off it — because the failure everyone recognizes is not a
+            museum you missed. It&rsquo;s standing somewhere you spent a year
+            wanting to be, too tired to want it.
+          </p>
+        </div>
+      </section>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, i) => {
-              const IconComponent = feature.icon;
+      {/* 03 — How the number is made. The dial's chapter carries no CTA. */}
+      <section className="relative overflow-hidden bg-sky-600">
+        <ContourArcs className="absolute -top-52 -right-44 w-[520px] h-[520px]" />
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6 [font-variant-numeric:tabular-nums]">
+            03 — How the number is made
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-50 [text-wrap:balance] mb-6">
+            Where the number comes from.
+          </h2>
+          <p className="text-lg text-sky-100 leading-relaxed mb-10">
+            Five inputs, weighted. Out comes one number, one to nine. At seven
+            and above, Jarvis flags the day before you commit and offers a
+            lighter version of the same day.
+          </p>
+          <ul className="border-t border-white/15">
+            {FI_INPUTS.map((input) => (
+              <li
+                key={input.name}
+                className="grid sm:grid-cols-[180px_1fr] gap-1 sm:gap-6 py-4 border-b border-white/15"
+              >
+                <span className="font-medium text-gray-50">{input.name}</span>
+                <span className="text-sky-200">{input.desc}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 text-sm text-sky-200">
+            It describes what the day costs, not what it cures — a pacing
+            model, not medical advice.
+          </p>
+        </div>
+      </section>
+
+      {/* 04 — Restraints. The honest replacement for the old stat bar. */}
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-700 mb-6 [font-variant-numeric:tabular-nums]">
+            04 — Restraints
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-10">
+            Three things it will never do.
+          </h2>
+          <ul className="border-t border-gray-200">
+            {RESTRAINTS.map((item) => (
+              <li key={item.name} className="py-6 border-b border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.name}</h3>
+                <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+              </li>
+            ))}
+          </ul>
+          {/* Routes to the interest form until the app/payment flow is live. */}
+          <Link
+            to="/contact"
+            className="inline-block mt-10 px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+          >
+            Sign up
+          </Link>
+        </div>
+      </section>
+
+      {/* 05 — What's in the product. Shipped features only; the app's icon
+          row recipe (tinted voice container, glyph in the voice color). */}
+      <section className="bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-700 mb-6 [font-variant-numeric:tabular-nums]">
+            05 — What&rsquo;s in the product
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-10">
+            What Jarvis does today.
+          </h2>
+          <ul className="border-t border-gray-200">
+            {PRODUCT_ROWS.map((row) => {
+              const Icon = row.icon;
               return (
-                <div
-                  key={i}
-                  className="group p-8 rounded-3xl bg-gray-50 hover:bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100"
-                >
-                  <div
-                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}
+                <li key={row.name} className="flex items-start gap-4 py-5 border-b border-gray-200">
+                  <span
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      row.voice === 'journal'
+                        ? 'bg-coral-600/10 text-coral-600'
+                        : 'bg-sky-600/10 text-sky-600'
+                    }`}
                   >
-                    <IconComponent className="w-7 h-7 text-white" />
+                    <Icon className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{row.name}</h3>
+                    <p className="text-gray-600">{row.desc}</p>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </div>
       </section>
 
-      {/* Fatigue Index Feature */}
-      <section className="py-24 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-sky-500/10 to-transparent" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center px-4 py-2 bg-emerald-500/20 rounded-full mb-6 border border-emerald-500/30">
-                <Award className="w-4 h-4 text-emerald-400 mr-2" />
-                <span className="text-emerald-300 text-sm font-medium">Patent Pending Technology</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Introducing the<br />
-                <span className="text-emerald-400">Fatigue Index™</span>
-              </h2>
-              <p className="text-xl text-white/70 mb-8 leading-relaxed">
-                Our proprietary algorithm analyzes jet lag, sleep patterns, activity intensity, and
-                travel time to optimize your itinerary for maximum enjoyment and minimum exhaustion.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Personalized energy predictions',
-                  'Smart activity scheduling',
-                  'Recovery time recommendations',
-                  'Real-time adjustments',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center text-white/80">
-                    <CheckCircle className="w-5 h-5 text-emerald-400 mr-3 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                onClick={() => navigate('/features')}
-                className="px-6 py-3 bg-emerald-500 text-white rounded-full font-medium hover:bg-emerald-600 transition-all"
-              >
-                Learn More About FI™
-              </button>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="text-center mb-6">
-                <div className="text-6xl font-bold text-emerald-400 mb-2">72</div>
-                <div className="text-white/60">Current Fatigue Index</div>
-              </div>
-              <div className="h-4 bg-white/10 rounded-full overflow-hidden mb-6">
-                <div className="h-full w-3/4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                {[
-                  { label: 'Jet Lag', value: '+8' },
-                  { label: 'Sleep Debt', value: '2h' },
-                  { label: 'Activity', value: 'Med' },
-                ].map((item, i) => (
-                  <div key={i} className="bg-white/5 rounded-xl p-3">
-                    <div className="text-lg font-semibold text-white">{item.value}</div>
-                    <div className="text-xs text-white/50">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials removed (JAR-429): the previous roster was fabricated,
-          and early-access quotes are held back by brand-owner decision so no
-          published review needs a material-connection disclosure. Reintroduce
-          only post-launch, from arm's-length users. */}
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-sky-600 to-indigo-600 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Travel Smarter?</h2>
-          <p className="text-xl text-white/80 mb-10">
+      {/* The invitation — deliberately unnumbered: it is not a chapter, and
+          ending the count on nine (our own definition of a hard day) would
+          teach the wrong thing. The only centered section on the page. */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <ContourArcs className="absolute -top-40 -left-48 w-[520px] h-[520px]" />
+        <ContourArcs className="absolute -bottom-52 -right-44 w-[520px] h-[520px]" />
+        <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
+            Early access
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-50 [text-wrap:balance] mb-4">
+            Come plan something slow.
+          </h2>
+          <p className="text-lg text-sky-100 mb-10">
             Sign up to be the first to know when we launch.
           </p>
           {/* Routes to the interest form until the app/payment flow is live. */}
-          <button
-            type="button"
-            onClick={() => navigate('/contact')}
-            className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
+          <Link
+            to="/contact"
+            className="inline-block px-10 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
             Sign up
-          </button>
+          </Link>
         </div>
       </section>
     </div>
