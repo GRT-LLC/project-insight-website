@@ -13,8 +13,12 @@ import { DataSecurityPage } from '../pages/DataSecurityPage';
 function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      {/* Keyboard users land here first; jumps past the nav to the content. */}
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <Navigation />
-      {children}
+      <main id="main">{children}</main>
       <Footer />
     </>
   );
