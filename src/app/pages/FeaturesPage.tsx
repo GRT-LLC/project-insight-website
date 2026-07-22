@@ -1,43 +1,63 @@
 import { Link } from 'react-router-dom';
 
-// "How it works" (JAR-432) — five named traveler moments replace the eight
-// identical feature rows with placeholder icon-boxes and unbuilt claims
-// (bank sync, receipt scanning, group voting, multi-property, E2E/2FA all
-// removed). Every moment below corresponds to shipped code: the planner and
-// walk-between-stops, the FI >= 7 flag with the lighter-day offer, the
-// day-numbered map, budget categories/totals/remaining, and the journal.
+// "How it works" (JAR-432, reworked per brand-owner direction 2026-07-21):
+// the Fatigue Index deep-dive lives HERE (the home page tells the story;
+// this page shows the machinery). FI numbers are always numeric digits.
+// The scale graphic mirrors how the app itself displays FI — numbered day
+// chips tinted by the shipped band colors (utils/fi.ts light tokens:
+// 1-3 #0EA5E9 chill, 4-6 #059669 balanced, 7-8 #CA8A04 elevated,
+// 9 #D35446 packed) with the app's ring treatment on the active reading.
+// Each moment below ends with its "so what" — the benefit, not the feature.
+
+interface FiBand {
+  color: string;
+  days: number[];
+}
+
+const FI_SCALE: FiBand[] = [
+  { color: '#0EA5E9', days: [1, 2, 3] },
+  { color: '#059669', days: [4, 5, 6] },
+  { color: '#CA8A04', days: [7, 8] },
+  { color: '#D35446', days: [9] },
+];
 
 interface Moment {
   numeral: string;
   name: string;
   desc: string;
+  soWhat: string;
 }
 
 const MOMENTS: Moment[] = [
   {
-    numeral: '01',
+    numeral: '1',
     name: 'The week before you go',
     desc: 'Jarvis drafts the days — pacing, order, and the walk between stops — with the forecast and your budget sitting inside the same plan. You move things; the numbers move with them.',
+    soWhat: 'So the plan gets finished, and you get your evenings back.',
   },
   {
-    numeral: '02',
-    name: 'The day that reads seven',
-    desc: 'When a day scores seven or above, the plan says so before you commit — and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
+    numeral: '2',
+    name: 'The day that reads 7',
+    desc: 'When a day rates 7 or above, the plan says so before you commit — and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
+    soWhat: 'So you fix Tuesday at home, not mid-afternoon in a crowded plaza.',
   },
   {
-    numeral: '03',
+    numeral: '3',
     name: 'The ground',
     desc: 'Your trip on one map, numbered by day. The route you would actually walk, not a cloud of pins.',
+    soWhat: 'So you see the whole day before your feet commit to it.',
   },
   {
-    numeral: '04',
+    numeral: '4',
     name: 'What it costs',
     desc: 'A budget that lives inside the plan: categories, running totals, and what is left — visible while you decide, not after.',
+    soWhat: 'So the budget is a decision you make, not news you get.',
   },
   {
-    numeral: '05',
+    numeral: '5',
     name: 'The flight home',
     desc: 'Notes, photos, receipts and places, assembled into a journal worth rereading — yours to keep after the trip ends.',
+    soWhat: 'So the trip doesn’t evaporate when the tan does.',
   },
 ];
 
@@ -60,14 +80,60 @@ export function FeaturesPage() {
         </div>
       </section>
 
-      {/* The five moments — hairline rows on Moonlight, numerals on the left. */}
+      {/* The Fatigue Index — the machinery, shown the way the app shows it. */}
+      <section className="bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
+            The Fatigue Index: every day rated 1&ndash;9.
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed mb-8">
+            As you build a plan, each day gets a number from 1 to 9 — computed
+            from how far your body clock moves, how long you&rsquo;re in
+            transit, how far you walk, how much is packed in, and how much
+            downtime is left. 1 is easy. 9 you will feel.
+          </p>
+
+          {/* The scale, as the app displays it: numbered chips tinted by the
+              shipped band colors; the current reading carries the ring. */}
+          <figure className="mb-8">
+            <div className="flex flex-wrap gap-2">
+              {FI_SCALE.flatMap((band) =>
+                band.days.map((day) => (
+                  <span
+                    key={day}
+                    style={{ color: band.color, backgroundColor: `${band.color}1A` }}
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold [font-variant-numeric:tabular-nums] ${
+                      day === 7 ? 'ring-2 ring-current' : ''
+                    }`}
+                  >
+                    {day}
+                  </span>
+                ))
+              )}
+            </div>
+            <figcaption className="mt-4 text-[13px] text-gray-500">
+              The scale as it reads in the app: 1&ndash;3 easy, 4&ndash;6
+              balanced, 7&ndash;8 heavy, 9 the peak. A day rated 7 gets flagged
+              before you commit.
+            </figcaption>
+          </figure>
+
+          <p className="text-gray-600 leading-relaxed">
+            At 7 and above, Jarvis offers a lighter version of the same day so
+            you can see what dropping one thing buys you. It describes what a
+            day costs — it&rsquo;s a pacing model, not medical advice.
+          </p>
+        </div>
+      </section>
+
+      {/* The five moments — each one ends with its "so what". */}
       <section className="bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <ol className="border-t border-gray-200 list-none m-0 p-0">
             {MOMENTS.map((moment) => (
               <li
                 key={moment.numeral}
-                className="grid grid-cols-[48px_1fr] gap-x-5 py-8 border-b border-gray-200"
+                className="grid grid-cols-[40px_1fr] gap-x-5 py-8 border-b border-gray-200"
               >
                 <span
                   aria-hidden="true"
@@ -79,7 +145,8 @@ export function FeaturesPage() {
                   <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">
                     {moment.name}
                   </h2>
-                  <p className="text-gray-600 leading-relaxed">{moment.desc}</p>
+                  <p className="text-gray-600 leading-relaxed mb-3">{moment.desc}</p>
+                  <p className="font-medium text-gray-900">{moment.soWhat}</p>
                 </div>
               </li>
             ))}

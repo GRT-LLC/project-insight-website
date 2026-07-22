@@ -35,8 +35,8 @@ export function Footer() {
               <span className="text-xl font-bold">JarvisTravel</span>
             </div>
             <p className="text-sky-100 leading-relaxed max-w-sm">
-              A travel planner that scores the pace of your trip. Planning only
-              — we&rsquo;re not a seller of travel.
+              JarvisTravel plans the pace, the budget and the memories — so you
+              can enjoy your vacation.
             </p>
           </div>
 
