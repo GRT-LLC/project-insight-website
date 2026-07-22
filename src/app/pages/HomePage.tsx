@@ -267,7 +267,7 @@ export function HomePage() {
           </h2>
           <p className="text-lg text-sky-100 mb-10">
             Planning is hard. Jarvis does the heavy lifting. Sign up and be
-            first in when we launch.
+            the first to know when we launch.
           </p>
           {/* Routes to the interest form until the app/payment flow is live. */}
           <Link
