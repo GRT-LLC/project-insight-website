@@ -1,184 +1,263 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
+  BookOpen,
+  CloudSun,
+  Map as MapIcon,
   Sparkles,
   TrendingUp,
-  CreditCard,
-  Users,
-  Camera,
-  MessageCircle,
-  ChevronDown,
-  Award,
-  CheckCircle,
+  Wallet,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
+import { useImage, imageSrcSet } from '../utils/imagery';
+
+// Home (JAR-431). Benefit-led story per the jarvistravel-copy voice skill:
+// what a traveler misses without JarvisTravel and what planning wrong costs.
+// The Fatigue Index deep-dive lives on /features; FI appears here only as a
+// benefit, in the app's band words (chill, balanced, packed) since raw
+// numbers mean nothing to a first-time visitor. Digits appear only on the
+// How it works explainer. No em dashes anywhere (brand rule).
+//
+// The hero rotates: one of five approved headline pairs is picked per visit,
+// so two visitors may see different messaging (lightweight A/B signal).
+// The pick is client-side; if prerendering lands (plan phase 3), move the
+// pick to a post-hydration effect to avoid a server/client mismatch.
+
+interface Hero {
+  headline: string;
+  sub: string;
+}
+
+const HEROES: Hero[] = [
+  {
+    headline: 'Your vacation should be a break, not a second job.',
+    sub: 'JarvisTravel plans the pace, the budget and the map in one place, so the trip you take feels like the trip you imagined.',
+  },
+  {
+    headline: 'Travel smarter, not harder.',
+    sub: 'One plan for the days, the money and the memories. Jarvis does the homework; you take the trip.',
+  },
+  {
+    headline: 'Enjoy your vacation.',
+    sub: 'Planning is hard. Jarvis does the heavy lifting: the pace, the budget, the map, all in one place.',
+  },
+  {
+    headline: 'Come home with stories, not exhaustion.',
+    sub: 'Jarvis reads every day of your plan as chill, balanced, or packed, so the tough ones show up before you do.',
+  },
+  {
+    headline: 'Twelve tabs is not a travel plan.',
+    sub: 'The days, the budget, the map and the journal, together in one place that thinks about pacing.',
+  },
+];
+
+// The "Not just the big trip" band pulls a golden-hour travel photo the same
+// way the app does - the Pexels integration (see utils/imagery). With no
+// VITE_PEXELS_API_KEY the lookup returns nothing and the band renders its
+// designed navy-and-motif fallback, so the site never ships an empty frame.
+const BREADTH_QUERY = 'golden hour city travel walking';
+const BREADTH_ALT =
+  'Travelers walking a sunlit street at golden hour.';
 
 interface Feature {
   icon: LucideIcon;
-  title: string;
+  name: string;
   desc: string;
-  color: string;
+  voice: 'accent' | 'journal';
 }
 
-interface Stat {
-  value: string;
-  label: string;
+// Shipped features only, written as benefits. Icons follow the app's row
+// recipe. Coral belongs to the journal and appears nowhere else.
+const FEATURES: Feature[] = [
+  {
+    icon: Sparkles,
+    name: 'Trip planning',
+    desc: 'Jarvis drafts your days around your pace and the daylight you actually have. You decide; it does the homework.',
+    voice: 'accent',
+  },
+  {
+    icon: TrendingUp,
+    name: 'The Fatigue Index',
+    desc: 'Every day reads chill, balanced, or packed before you commit, so the tough days show up while you can still fix them.',
+    voice: 'accent',
+  },
+  {
+    icon: Wallet,
+    name: 'Budget',
+    desc: 'Totals that move while you plan, not a surprise after you land back home.',
+    voice: 'accent',
+  },
+  {
+    icon: BookOpen,
+    name: 'Trip journal',
+    desc: 'Notes, photos, receipts and places become a story worth rereading. Yours to keep.',
+    voice: 'journal',
+  },
+  {
+    icon: MapIcon,
+    name: 'The map',
+    desc: 'Your whole trip on one map, numbered by day, with the walk between stops visible.',
+    voice: 'accent',
+  },
+  {
+    icon: CloudSun,
+    name: 'Weather & flights',
+    desc: 'The forecast and your flights sit inside the plan. Fewer surprises, fewer tabs.',
+    voice: 'accent',
+  },
+];
+
+/** Concentric contour rings, the Meridian motif: Moonlight at 13% on navy.
+ *  pointer-events-none so the overlay can never intercept clicks on content. */
+function ContourArcs({ className }: { className: string }) {
+  return (
+    <svg
+      className={`pointer-events-none ${className}`}
+      viewBox="0 0 520 520"
+      fill="none"
+      aria-hidden="true"
+    >
+      {[130, 170, 210, 250].map((r) => (
+        <circle
+          key={r}
+          cx="260"
+          cy="260"
+          r={r}
+          stroke="#F0EEEB"
+          strokeOpacity="0.13"
+          strokeWidth="1"
+        />
+      ))}
+    </svg>
+  );
 }
 
 export function HomePage() {
-  const navigate = useNavigate();
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => setShowScrollIndicator(window.scrollY < 100);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const features: Feature[] = [
-    {
-      icon: Sparkles,
-      title: 'AI-Powered Planning',
-      desc: 'Smart recommendations tailored to your travel style and preferences',
-      color: 'from-mauve-500 to-mauve-600',
-    },
-    {
-      icon: TrendingUp,
-      title: 'Fatigue Index™',
-      desc: 'Proprietary system that optimizes your itinerary for energy and enjoyment',
-      color: 'from-emerald-500 to-teal-600',
-    },
-    {
-      icon: CreditCard,
-      title: 'Smart Budgeting',
-      desc: 'Real-time expense tracking with bank sync and receipt scanning',
-      color: 'from-amber-600 to-amber-700',
-    },
-    {
-      icon: Users,
-      title: 'Group Travel',
-      desc: 'Coordinate plans and split expenses effortlessly with travel companions',
-      color: 'from-sky-500 to-blue-600',
-    },
-    {
-      icon: Camera,
-      title: 'Trip Journal',
-      desc: 'Capture memories with location-verified photos and AI captions',
-      color: 'from-coral-500 to-coral-600',
-    },
-    {
-      icon: MessageCircle,
-      title: '24/7 AI Concierge',
-      desc: 'Get instant help with your plans, translations, and local tips',
-      color: 'from-sky-600 to-sky-700',
-    },
-  ];
-
-  const stats: Stat[] = [
-    { value: '50K+', label: 'Happy Travelers' },
-    { value: '120+', label: 'Countries' },
-    { value: '4.9', label: 'App Rating' },
-    { value: '24/7', label: 'AI Support' },
-  ];
+  // Picked once per mount so the message is stable while the visitor reads.
+  const [hero] = useState<Hero>(
+    () => HEROES[Math.floor(Math.random() * HEROES.length)]
+  );
+  // Undefined until (and unless) a Pexels key yields a photo; the band falls
+  // back to its navy treatment when this stays undefined.
+  const breadthPhoto = useImage(BREADTH_QUERY, undefined);
 
   return (
-    <div className="overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" />
-          <div
-            className="absolute inset-0 opacity-30"
-            style={{
-              backgroundImage:
-                'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.15"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-            }}
-          />
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/20">
-              <Sparkles className="w-4 h-4 text-amber-400 mr-2" />
-              <span className="text-white/90 text-sm font-medium">
-                Introducing Fatigue Index™ Technology
-              </span>
-            </div>
-
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Travel Smarter,<br />
-              <span className="text-sky-300">
-                Not Harder
-              </span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed">
-              Your AI travel assistant that plans perfect itineraries, tracks budgets, and keeps you
-              energized throughout your journey.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <button
-                type="button"
-                onClick={() => navigate('/contact')}
-                className="group px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold text-lg shadow-xl shadow-amber-400/25 hover:shadow-2xl hover:shadow-amber-400/30 transition-all"
-              >
-                Sign up
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-              {stats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-white/50 text-sm">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-500 ${
-            showScrollIndicator ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <div className="animate-bounce">
-            <ChevronDown className="w-8 h-8 text-white/50" />
-          </div>
+    <div>
+      {/* Hero: the story, not the mechanics. */}
+      <section className="relative overflow-hidden bg-sky-600">
+        <ContourArcs className="absolute -top-44 -left-44 w-[520px] h-[520px]" />
+        <ContourArcs className="absolute -bottom-56 -right-40 w-[520px] h-[520px]" />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24 md:pt-44 md:pb-32 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] mb-6">
+            {hero.headline}
+          </h1>
+          <p className="text-lg md:text-xl text-sky-100 leading-relaxed max-w-2xl mx-auto mb-10">
+            {hero.sub}
+          </p>
+          {/* Routes to the interest form until the app/payment flow is live. */}
+          <Link
+            to="/contact"
+            className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+          >
+            Join Now
+          </Link>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Everything You Need to Travel Better
+      {/* The cost of planning wrong: what you miss without it. */}
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
+            The trip you waited a year for shouldn&rsquo;t wear you out by
+            Tuesday.
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed mb-6">
+            Twelve tabs and a shared spreadsheet will get you a plan. What they
+            won&rsquo;t tell you is that day 2 has six hours of walking after a
+            red-eye, or that the museum, the market and the dinner across town
+            don&rsquo;t fit in the same afternoon. That&rsquo;s the trip where
+            you come home needing a vacation from the vacation.
+          </p>
+          <p className="text-lg text-gray-600 leading-relaxed mb-8">
+            Jarvis reads every day of your plan while you build it and calls it
+            what it is: chill, balanced, or packed. When a day comes up packed,
+            you&rsquo;ll know before you&rsquo;re standing in it, and Jarvis
+            offers a lighter version of the same day. Fixing it takes one tap
+            instead of a family argument.
+          </p>
+          <Link
+            to="/features"
+            className="font-medium text-sky-600 underline underline-offset-4 decoration-1 hover:text-sky-700 transition-colors"
+          >
+            See how it works
+          </Link>
+        </div>
+      </section>
+
+      {/* Every trip counts, as a full-bleed editorial band. A Pexels photo
+          loads under the ratified Neverything scrim when a key is set;
+          otherwise the band is the designed navy-and-motif fallback. */}
+      <section className="relative overflow-hidden bg-sky-600 min-h-[46vh] flex items-center">
+        {breadthPhoto ? (
+          <>
+            <img
+              src={breadthPhoto}
+              srcSet={imageSrcSet(breadthPhoto)}
+              sizes="100vw"
+              alt={BREADTH_ALT}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* The one ratified gradient: single-hue Neverything scrim. */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#13181B]/85 via-[#13181B]/45 to-[#13181B]/35" />
+          </>
+        ) : (
+          <>
+            <ContourArcs className="absolute -top-40 -left-40 w-[520px] h-[520px]" />
+            <ContourArcs className="absolute -bottom-52 -right-36 w-[520px] h-[520px]" />
+          </>
+        )}
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-50 [text-wrap:balance] mb-6">
+            Not just the big trip.
+          </h2>
+          <p className="text-lg md:text-xl text-sky-100 leading-relaxed max-w-2xl">
+            A long weekend, a staycation, two weeks abroad, a road trip an hour
+            from home. Jarvis plans them all: the pace, the budget, the map, the
+            memories.
+          </p>
+        </div>
+      </section>
+
+      {/* What you get: the product, in benefit language. */}
+      <section className="bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <div className="max-w-2xl mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-4">
+              One plan, instead of twelve tabs.
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Powerful features designed to make every trip unforgettable
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Everything that makes a trip work, and everything you&rsquo;d
+              rather not juggle, in one place.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, i) => {
-              const IconComponent = feature.icon;
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {FEATURES.map((feature) => {
+              const Icon = feature.icon;
               return (
                 <div
-                  key={i}
-                  className="group p-8 rounded-3xl bg-gray-50 hover:bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100"
+                  key={feature.name}
+                  className="bg-gray-50 border border-gray-200 rounded-[14px] p-6"
                 >
-                  <div
-                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}
+                  <span
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center mb-4 ${
+                      feature.voice === 'journal'
+                        ? 'bg-coral-600/10 text-coral-600'
+                        : 'bg-sky-600/10 text-sky-600'
+                    }`}
                   >
-                    <IconComponent className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                    <Icon className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+                  </span>
+                  <h3 className="font-semibold text-gray-900 mb-2">{feature.name}</h3>
                   <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
                 </div>
               );
@@ -187,90 +266,61 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Fatigue Index Feature */}
-      <section className="py-24 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-sky-500/10 to-transparent" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center px-4 py-2 bg-emerald-500/20 rounded-full mb-6 border border-emerald-500/30">
-                <Award className="w-4 h-4 text-emerald-400 mr-2" />
-                <span className="text-emerald-300 text-sm font-medium">Patent Pending Technology</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Introducing the<br />
-                <span className="text-emerald-400">Fatigue Index™</span>
-              </h2>
-              <p className="text-xl text-white/70 mb-8 leading-relaxed">
-                Our proprietary algorithm analyzes jet lag, sleep patterns, activity intensity, and
-                travel time to optimize your itinerary for maximum enjoyment and minimum exhaustion.
+      {/* Why you can trust the plan: three promises, in plain speak. */}
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-10">
+            Three promises.
+          </h2>
+          <ul className="border-t border-gray-200">
+            <li className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nobody pays to be in your plan.
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Every suggestion is there because it fits your trip, never
+                because a hotel or tour paid us.
               </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Personalized energy predictions',
-                  'Smart activity scheduling',
-                  'Recovery time recommendations',
-                  'Real-time adjustments',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center text-white/80">
-                    <CheckCircle className="w-5 h-5 text-emerald-400 mr-3 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                onClick={() => navigate('/features')}
-                className="px-6 py-3 bg-emerald-500 text-white rounded-full font-medium hover:bg-emerald-600 transition-all"
-              >
-                Learn More About FI™
-              </button>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="text-center mb-6">
-                <div className="text-6xl font-bold text-emerald-400 mb-2">72</div>
-                <div className="text-white/60">Current Fatigue Index</div>
-              </div>
-              <div className="h-4 bg-white/10 rounded-full overflow-hidden mb-6">
-                <div className="h-full w-3/4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                {[
-                  { label: 'Jet Lag', value: '+8' },
-                  { label: 'Sleep Debt', value: '2h' },
-                  { label: 'Activity', value: 'Med' },
-                ].map((item, i) => (
-                  <div key={i} className="bg-white/5 rounded-xl p-3">
-                    <div className="text-lg font-semibold text-white">{item.value}</div>
-                    <div className="text-xs text-white/50">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+            </li>
+            <li className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No ads, ever.
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Your plan isn&rsquo;t a billboard.
+              </p>
+            </li>
+            <li className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Your memories belong to you.
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Your journal is yours: the notes, the photos, the places. We
+                never sell it.
+              </p>
+            </li>
+          </ul>
         </div>
       </section>
 
-      {/* Testimonials removed (JAR-429): the previous roster was fabricated,
-          and early-access quotes are held back by brand-owner decision so no
-          published review needs a material-connection disclosure. Reintroduce
-          only post-launch, from arm's-length users. */}
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-sky-600 to-indigo-600 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Travel Smarter?</h2>
-          <p className="text-xl text-white/80 mb-10">
-            Sign up to be the first to know when we launch.
+      {/* The invitation. */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <ContourArcs className="absolute -top-40 -left-48 w-[520px] h-[520px]" />
+        <ContourArcs className="absolute -bottom-52 -right-44 w-[520px] h-[520px]" />
+        <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-50 [text-wrap:balance] mb-4">
+            Enjoy your vacation.
+          </h2>
+          <p className="text-lg text-sky-100 mb-10">
+            Planning is hard. Jarvis does the heavy lifting.
           </p>
           {/* Routes to the interest form until the app/payment flow is live. */}
-          <button
-            type="button"
-            onClick={() => navigate('/contact')}
-            className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
+          <Link
+            to="/contact"
+            className="inline-block px-10 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
-            Sign up
-          </button>
+            Join Now
+          </Link>
         </div>
       </section>
     </div>
