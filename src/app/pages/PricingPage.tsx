@@ -31,7 +31,7 @@ interface Cadence {
   best?: boolean;
 }
 
-// Single source of truth for Explore pricing — rows and the summary price
+// Single source of truth for Explore pricing - rows and the summary price
 // both render from here.
 const CADENCES: Cadence[] = [
   { key: 'annual', label: 'Annual', amount: '$99', per: 'year', best: true },
@@ -44,7 +44,7 @@ export function PricingPage() {
 
   return (
     <div className="pt-20">
-      {/* Header — flat Ateneo band. The h1 is the approved positioning line;
+      {/* Header - flat Ateneo band. The h1 is the approved positioning line;
           the subhead is the handoff's approved pricing message. */}
       <section className="bg-sky-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
@@ -61,11 +61,11 @@ export function PricingPage() {
         </div>
       </section>
 
-      {/* The two offers — Moonlight ground, Explore is the hero. */}
+      {/* The two offers - Moonlight ground, Explore is the hero. */}
       <section className="bg-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="grid md:grid-cols-5 gap-6 items-stretch">
-            {/* Trip Pass — the entry offer. Simpler panel, secondary action. */}
+            {/* Trip Pass - the entry offer. Simpler panel, secondary action. */}
             <div className="md:col-span-2 bg-white border border-gray-200 rounded-[14px] p-8 flex flex-col">
               <h2 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-700 mb-4">
                 Trip Pass
@@ -99,7 +99,7 @@ export function PricingPage() {
               </Link>
             </div>
 
-            {/* Explore — the hero offer, on the Ateneo panel. */}
+            {/* Explore - the hero offer, on the Ateneo panel. */}
             <div className="md:col-span-3 bg-sky-600 rounded-[14px] p-8 flex flex-col">
               <h2 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-4">
                 Explore
@@ -109,7 +109,7 @@ export function PricingPage() {
                 ongoing access.
               </p>
 
-              {/* Billing cadence — two ways to pay for the same subscription. */}
+              {/* Billing cadence - two ways to pay for the same subscription. */}
               <div
                 role="group"
                 aria-label="Explore billing options"
@@ -171,7 +171,7 @@ export function PricingPage() {
             </div>
           </div>
 
-          {/* The upgrade path, framed simply — and the honesty line. */}
+          {/* The upgrade path, framed simply - and the honesty line. */}
           <div className="max-w-2xl mx-auto text-center mt-14">
             <p className="text-gray-900 font-medium mb-3">
               Start with Trip Pass, then move to Explore when you're ready to
