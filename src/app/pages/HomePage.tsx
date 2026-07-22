@@ -183,18 +183,41 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Why you can trust the plan — differentiation as benefit. */}
+      {/* Why you can trust the plan — three promises, in plain speak
+          (voice per the jarvistravel-copy skill). */}
       <section className="bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
-            Advice that&rsquo;s on your side.
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-10">
+            Three promises.
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            When Jarvis suggests a place, it&rsquo;s because it fits your day —
-            never because someone paid for the spot. No ads, no commissions, no
-            sponsored detours. And the trip you take stays yours: the journal,
-            the photos and the places belong to you, not to an algorithm.
-          </p>
+          <ul className="border-t border-gray-200">
+            <li className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nobody pays to be in your plan.
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Every suggestion is there because it fits your trip — never
+                because a hotel or tour paid us.
+              </p>
+            </li>
+            <li className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No ads, ever.
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Your plan isn&rsquo;t a billboard.
+              </p>
+            </li>
+            <li className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Your memories belong to you.
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Your journal — the notes, the photos, the places — is yours. We
+                never sell it.
+              </p>
+            </li>
+          </ul>
         </div>
       </section>
 
