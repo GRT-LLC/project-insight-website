@@ -21,6 +21,24 @@ const FI_SCALE: FiBand[] = [
   { color: '#D35446', days: [9] },
 ];
 
+// Band dot colors (shipped FI ramp, light tokens).
+const BAND_COLOR: Record<string, string> = {
+  chill: '#0EA5E9',
+  balanced: '#059669',
+  packed: '#D35446',
+};
+
+// Day 1 of the shipped Rome demo trip, verbatim from the app's sample data
+// (name, time, and fatigueImpact) - so the product visual shows real content,
+// not invented copy.
+const DAY_ONE: { time: string; name: string; band: 'chill' | 'balanced' | 'packed' }[] = [
+  { time: '09:30', name: 'Arrival at FCO', band: 'balanced' },
+  { time: '10:30', name: 'Transfer to hotel', band: 'chill' },
+  { time: '14:00', name: 'Check in at Hotel de Russie', band: 'chill' },
+  { time: '15:30', name: 'Walk around Piazza del Popolo', band: 'balanced' },
+  { time: '19:30', name: 'Welcome dinner at Roscioli', band: 'chill' },
+];
+
 interface Moment {
   numeral: string;
   name: string;
@@ -126,6 +144,83 @@ export function FeaturesPage() {
             When a day comes up packed, one tap shows you a lighter version of
             it. And that&rsquo;s all the Fatigue Index is: a read on how each
             day will feel, not medical advice.
+          </p>
+        </div>
+      </section>
+
+      {/* A real plan, on a ledge. The screen is a faithful view of the app's
+          Trip Plan (Day 1, Rome) built from the shipped demo data and the
+          Meridian FI ramp - an honest illustration until automated captures
+          land (see the web-app capture-prep ticket). */}
+      <section className="bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <div className="max-w-2xl mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-4">
+              This is what a day looks like.
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Every stop, timed and paced, with the day&rsquo;s read right at
+              the top. Here&rsquo;s day one of a week in Rome.
+            </p>
+          </div>
+
+          {/* The ledge: the screen sits frameless on a solid Ateneo plane with
+              one contour arc behind it. No device chrome. */}
+          <div className="relative overflow-hidden rounded-[20px] bg-sky-600 p-6 sm:p-10 md:p-14">
+            <svg
+              className="pointer-events-none absolute -bottom-40 -right-32 w-[440px] h-[440px]"
+              viewBox="0 0 440 440"
+              fill="none"
+              aria-hidden="true"
+            >
+              {[110, 145, 180, 215].map((r) => (
+                <circle key={r} cx="220" cy="220" r={r} stroke="#F0EEEB" strokeOpacity="0.13" strokeWidth="1" />
+              ))}
+            </svg>
+
+            <div
+              role="img"
+              aria-label="A JarvisTravel trip plan for day one in Rome: the day reads balanced, and five stops are laid out from a nine-thirty airport arrival to a seven-thirty welcome dinner, each tagged chill or balanced."
+              className="relative mx-auto max-w-md bg-white rounded-[14px] p-6 shadow-[0_24px_48px_-12px_rgba(4,16,30,0.45)]"
+            >
+              <div className="flex items-baseline justify-between mb-1">
+                <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-gray-500">
+                  Day 1 &middot; Rome
+                </p>
+                <span
+                  className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full"
+                  style={{ color: '#059669', backgroundColor: '#0596691A' }}
+                >
+                  Balanced
+                </span>
+              </div>
+              <p className="text-lg font-semibold text-gray-900 mb-5">Monday, July 28</p>
+
+              <ul className="space-y-0">
+                {DAY_ONE.map((stop, i) => (
+                  <li
+                    key={stop.name}
+                    className={`flex items-center gap-3 py-3 ${
+                      i > 0 ? 'border-t border-gray-100' : ''
+                    }`}
+                  >
+                    <span className="text-sm text-gray-500 [font-variant-numeric:tabular-nums] w-12 flex-shrink-0">
+                      {stop.time}
+                    </span>
+                    <span className="flex-1 text-gray-900">{stop.name}</span>
+                    <span
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: BAND_COLOR[stop.band] }}
+                      title={stop.band}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-[13px] text-gray-500 mt-4 text-center">
+            A view of the JarvisTravel app.
           </p>
         </div>
       </section>
