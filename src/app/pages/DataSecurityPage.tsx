@@ -14,7 +14,7 @@ const PROTECTIONS = [
   },
   {
     name: 'Minimal collection',
-    desc: 'We collect what planning a trip requires (account details, preferences, and the trips you build) and nothing else.',
+    desc: 'We collect what planning a trip requires: account details, preferences, the trips you build, and basic usage data. Nothing else.',
   },
   {
     name: 'Payments, when they launch, run through Stripe',

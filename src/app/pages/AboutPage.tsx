@@ -32,12 +32,11 @@ export function AboutPage() {
               hours, in miles, in energy.
             </p>
             <p>
-              So we built the pacing model first. Every day of a plan gets a
-              score from one to nine, computed from the things that genuinely
-              drain you: how far your body clock moves, how long you sit in
-              transit, how far you walk, how much is packed in, and how much
-              downtime is left. The itinerary hangs off that number, not the
-              other way around.
+              So we built the pacing model first. Jarvis reads every day of a
+              plan as chill, balanced, or packed, based on what actually
+              drains you: the time-zone shift, the transit, the walking, and
+              the downtime you have left. The itinerary hangs off that read,
+              not the other way around.
             </p>
             <p>
               Two commitments have shaped everything since. JarvisTravel plans;

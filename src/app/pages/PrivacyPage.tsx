@@ -22,8 +22,8 @@ export function PrivacyPage() {
               2. How We Use Your Information
             </h2>
             <p>
-              Your data powers personalized travel recommendations, Fatigue Index™ calculations, and
-              budget tracking. We never sell your personal information to third parties.
+              We use your data to plan your trips: the suggestions you see, each day's Fatigue Index
+              read, and your budget. We never sell your personal information.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">3. Data Security</h2>
@@ -34,8 +34,8 @@ export function PrivacyPage() {
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">4. Your Rights</h2>
             <p>
-              You can export, modify, or delete your data at any time from your account settings.
-              Contact us at privacy@jarvistravel.com for assistance.
+              You can request a copy of your data, delete your account and its data, or update your
+              information at any time. Write to privacy@jarvistravel.com and we'll take care of it.
             </p>
           </div>
         </div>

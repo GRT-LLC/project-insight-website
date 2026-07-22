@@ -103,7 +103,7 @@ export function FeaturesPage() {
               provided to screen readers via the aria-label. */}
           <div
             role="img"
-            aria-label="The Fatigue Index scale: days 1 to 3 are chill, 4 to 6 balanced, 7 to 9 packed. The example shows a day reading 7."
+            aria-label="The Fatigue Index scale: days 1 to 3 read chill, 4 to 6 balanced, and 7 to 9 packed, with 9 the peak. The example shows a day reading 7."
             className="flex flex-wrap gap-2 mb-8"
           >
             {FI_SCALE.flatMap((band) =>

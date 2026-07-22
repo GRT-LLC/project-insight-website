@@ -6,7 +6,7 @@ export function TermsPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-8">Terms of Service</h1>
           <div className="prose prose-lg max-w-none text-gray-600">
-            <p className="text-xl mb-8">Last updated: January 2025</p>
+            <p className="text-xl mb-8">Last updated: July 2026</p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">1. Acceptance of Terms</h2>
             <p>
@@ -17,7 +17,7 @@ export function TermsPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">2. Service Description</h2>
             <p>
               JarvisTravel provides AI-powered travel planning, trip intelligence, budget tracking,
-              and the Fatigue Index™ system. Features may vary by subscription tier.
+              and the Fatigue Index™ system. Features may vary by plan.
             </p>
             <p>
               JarvisTravel is a software service. It is not a travel agency and is not a seller of

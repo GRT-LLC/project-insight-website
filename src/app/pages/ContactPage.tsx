@@ -20,8 +20,8 @@ export function ContactPage() {
             Get in touch.
           </h1>
           <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
-            For early access, the fastest path is the signup below. For
-            everything else, email reaches a person.
+            Want early access? Sign up below. For everything else, email
+            reaches a person.
           </p>
         </div>
       </section>
