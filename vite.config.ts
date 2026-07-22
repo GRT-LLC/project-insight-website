@@ -16,6 +16,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    // No sourcemaps in the production bundle - don't ship source to visitors.
+    sourcemap: false,
   },
 });
