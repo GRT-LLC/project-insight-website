@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
+import { useImage, imageSrcSet } from '../utils/imagery';
 
 // Home (JAR-431). Benefit-led story per the jarvistravel-copy voice skill:
 // what a traveler misses without JarvisTravel and what planning wrong costs.
@@ -50,12 +51,13 @@ const HEROES: Hero[] = [
   },
 ];
 
-// Photography slot for the "Not just the big trip" band. Set this to a real
-// golden-hour, people-in-place frame (self-hosted in public/) once a shoot or
-// licensed image lands - see the photography sourcing decision. Leaving it
-// null renders the designed navy-and-motif fallback, so the site never ships
-// an empty frame or off-brand stock.
-const BREADTH_PHOTO: { src: string; alt: string } | null = null;
+// The "Not just the big trip" band pulls a golden-hour travel photo the same
+// way the app does - the Pexels integration (see utils/imagery). With no
+// VITE_PEXELS_API_KEY the lookup returns nothing and the band renders its
+// designed navy-and-motif fallback, so the site never ships an empty frame.
+const BREADTH_QUERY = 'golden hour city travel walking';
+const BREADTH_ALT =
+  'Travelers walking a sunlit street at golden hour.';
 
 interface Feature {
   icon: LucideIcon;
@@ -135,6 +137,9 @@ export function HomePage() {
   const [hero] = useState<Hero>(
     () => HEROES[Math.floor(Math.random() * HEROES.length)]
   );
+  // Undefined until (and unless) a Pexels key yields a photo; the band falls
+  // back to its navy treatment when this stays undefined.
+  const breadthPhoto = useImage(BREADTH_QUERY, undefined);
 
   return (
     <div>
@@ -189,23 +194,23 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Every trip counts, as a full-bleed editorial band. Photo-ready: drop
-          a golden-hour frame into BREADTH_PHOTO and it renders full-bleed
-          under the ratified Neverything scrim. Until then the band stands on
-          its own as the designed navy-and-motif fallback. */}
+      {/* Every trip counts, as a full-bleed editorial band. A Pexels photo
+          loads under the ratified Neverything scrim when a key is set;
+          otherwise the band is the designed navy-and-motif fallback. */}
       <section className="relative overflow-hidden bg-sky-600 min-h-[46vh] flex items-center">
-        {BREADTH_PHOTO && (
+        {breadthPhoto ? (
           <>
             <img
-              src={BREADTH_PHOTO.src}
-              alt={BREADTH_PHOTO.alt}
+              src={breadthPhoto}
+              srcSet={imageSrcSet(breadthPhoto)}
+              sizes="100vw"
+              alt={BREADTH_ALT}
               className="absolute inset-0 w-full h-full object-cover"
             />
             {/* The one ratified gradient: single-hue Neverything scrim. */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#13181B]/85 via-[#13181B]/45 to-[#13181B]/35" />
           </>
-        )}
-        {!BREADTH_PHOTO && (
+        ) : (
           <>
             <ContourArcs className="absolute -top-40 -left-40 w-[520px] h-[520px]" />
             <ContourArcs className="absolute -bottom-52 -right-36 w-[520px] h-[520px]" />
