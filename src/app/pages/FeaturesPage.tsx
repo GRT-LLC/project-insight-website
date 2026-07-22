@@ -218,10 +218,6 @@ export function FeaturesPage() {
               </ul>
             </div>
           </div>
-
-          <p className="text-[13px] text-gray-500 mt-4 text-center">
-            A view of the JarvisTravel app.
-          </p>
         </div>
       </section>
 
