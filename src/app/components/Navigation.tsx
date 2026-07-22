@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MapPin, Menu, X } from 'lucide-react';
-import { useAuth } from '../context/useAuth';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
 const NAV_LINKS: { name: string; path: string }[] = [
-  { name: 'Features', path: '/features' },
+  { name: 'How it works', path: '/features' },
   { name: 'Pricing', path: '/pricing' },
   { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' },
 ];
 
 export function Navigation() {
-  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -36,20 +33,14 @@ export function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
+          {/* Wordmark stands alone until the commissioned mark lands (JAR-354). */}
           <Link
             to="/"
-            className="flex items-center cursor-pointer group"
+            className={`text-xl font-bold tracking-tight ${
+              isLightNav ? 'text-white' : 'text-gray-900'
+            }`}
           >
-            <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
-              <MapPin className="w-5 h-5 text-white" />
-            </div>
-            <span
-              className={`ml-3 text-xl font-bold tracking-tight ${
-                isLightNav ? 'text-white' : 'text-gray-900'
-              }`}
-            >
-              JarvisTravel
-            </span>
+            JarvisTravel
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
@@ -72,37 +63,12 @@ export function Navigation() {
               </Link>
             ))}
 
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/app"
-                  className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg transition-all"
-                >
-                  Open App
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    logout();
-                    navigate('/');
-                  }}
-                  className={`font-medium ${
-                    isLightNav ? 'text-white/80' : 'text-gray-500'
-                  }`}
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link
-                  to="/contact"
-                  className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
-                >
-                  Join The Waitlist
-                </Link>
-              </div>
-            )}
+            <Link
+              to="/contact"
+              className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
+            >
+              Join Now
+            </Link>
           </div>
 
           <button
@@ -138,7 +104,7 @@ export function Navigation() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full py-3 bg-amber-400 text-gray-900 rounded-xl font-medium block text-center"
               >
-                Join The Waitlist
+                Join Now
               </Link>
             </div>
           </div>

@@ -34,22 +34,34 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
   }
+
+  /* A visible, consistent focus ring on every interactive element - the
+     Ateneo accent, offset so it reads on any ground. */
+  :where(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid #003a6c;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
 }
 
 @layer components {
-  /* Card hover animation */
-  .card-hover {
-    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+  /* Skip link: off-screen until focused, then a solid amber pill top-left. */
+  .skip-link {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 100;
+    padding: 0.625rem 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    background: #ffbf65;
+    color: #13181b;
+    transform: translateY(-150%);
+    transition: transform 150ms ease;
   }
 
-  /* Display emphasis — solid Ateneo (Meridian bans gradient text). */
-  .gradient-text {
-    @apply text-sky-600;
-  }
-
-  /* Glass effect */
-  .glass {
-    @apply bg-white/80 backdrop-blur-lg;
+  .skip-link:focus {
+    transform: translateY(0);
   }
 }
 

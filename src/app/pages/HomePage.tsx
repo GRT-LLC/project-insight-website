@@ -9,8 +9,6 @@ import {
   ChevronDown,
   Award,
   CheckCircle,
-  Star,
-  Quote,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
@@ -25,13 +23,6 @@ interface Feature {
 interface Stat {
   value: string;
   label: string;
-}
-
-interface Review {
-  name: string;
-  role: string;
-  text: string;
-  rating: number;
 }
 
 export function HomePage() {
@@ -90,27 +81,6 @@ export function HomePage() {
     { value: '24/7', label: 'AI Support' },
   ];
 
-  const reviews: Review[] = [
-    {
-      name: 'Sarah Chen',
-      role: 'Digital Nomad',
-      text: 'The Fatigue Index changed how I plan trips. No more exhausting first days trying to do everything at once.',
-      rating: 5,
-    },
-    {
-      name: 'Marcus Johnson',
-      role: 'Family Traveler',
-      text: 'Finally an app that understands traveling with kids. The budget tracking saved us hundreds on our Europe trip.',
-      rating: 5,
-    },
-    {
-      name: 'Elena Rodriguez',
-      role: 'Business Traveler',
-      text: "Jarvis keeps my whole trip plan in one place and keeps me on schedule. It's like having a personal travel assistant 24/7.",
-      rating: 5,
-    },
-  ];
-
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
@@ -155,7 +125,7 @@ export function HomePage() {
                 onClick={() => navigate('/contact')}
                 className="group px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold text-lg shadow-xl shadow-amber-400/25 hover:shadow-2xl hover:shadow-amber-400/30 transition-all"
               >
-                Join The Waitlist
+                Sign up
               </button>
             </div>
 
@@ -281,57 +251,25 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Loved by Travelers Worldwide</h2>
-            <p className="text-xl text-gray-600">
-              Join thousands who've transformed their travel experience
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {reviews.map((review, i) => (
-              <div key={i} className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all">
-                <div className="flex mb-4">
-                  {[...Array(review.rating)].map((_, j) => (
-                    <Star key={j} className="w-5 h-5 text-amber-400 fill-current" />
-                  ))}
-                </div>
-                <Quote className="w-8 h-8 text-gray-200 mb-4" />
-                <p className="text-gray-700 mb-6 leading-relaxed">{review.text}</p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-sky-600 flex items-center justify-center text-white font-semibold">
-                    {review.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-gray-900">{review.name}</div>
-                    <div className="text-sm text-gray-500">{review.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Testimonials removed (JAR-429): the previous roster was fabricated,
+          and early-access quotes are held back by brand-owner decision so no
+          published review needs a material-connection disclosure. Reintroduce
+          only post-launch, from arm's-length users. */}
 
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-r from-sky-600 to-indigo-600 text-white">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Travel Smarter?</h2>
           <p className="text-xl text-white/80 mb-10">
-            Join the waitlist to be the first to know when we launch.
+            Sign up to be the first to know when we launch.
           </p>
+          {/* Routes to the interest form until the app/payment flow is live. */}
           <button
             type="button"
             onClick={() => navigate('/contact')}
             className="px-10 py-5 bg-white text-indigo-600 rounded-full font-semibold text-lg hover:shadow-2xl transition-all"
           >
-            Join The Waitlist
+            Sign up
           </button>
         </div>
       </section>
