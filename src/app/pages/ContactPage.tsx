@@ -1,152 +1,99 @@
-import { useState } from 'react';
-import { Check, Mail, ArrowRight } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
-// TODO: Add FAQ page, connect to email service
-
-interface FormData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
+// Contact (JAR-432) - the previous form called setSubmitted(true), transmitted
+// nothing, and told the visitor "Message Sent! We'll get back to you within
+// 24 hours." Every path below is real: the signup link goes to the live
+// waitlist capture on jarvistravel.com (verified POST /api/waitlist), and the
+// addresses are the ones already published on this site. A real contact form
+// returns when the form endpoint exists (phase 1 of the redesign plan).
 
 export function ContactPage() {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
-
   return (
     <div className="pt-20">
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Get in Touch
+      {/* Header - flat Ateneo band. */}
+      <section className="bg-sky-600">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
+            Contact
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl mb-6">
+            Get in touch.
           </h1>
-          <p className="text-xl text-gray-600">
-            Have questions? We'd love to hear from you.
+          <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
+            Ready to plan your next trip? Join now below. For everything else,
+            email reaches a person.
           </p>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              {submitted ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Check className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                  <p className="text-gray-600">We'll get back to you within 24 hours.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
-                    <select
-                      value={formData.subject}
-                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select a topic</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="waitlist">Waitlist Questions</option>
-                      <option value="partnership">Partnership Opportunities</option>
-                      <option value="press">Press & Media</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
-                    <textarea
-                      value={formData.message}
-                      onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-amber-400 text-gray-900 rounded-xl font-semibold hover:bg-amber-300 transition-all"
+      <section className="bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 space-y-6">
+          {/* Signup panel - links to the live signup flow. */}
+          <div className="bg-white border border-gray-200 rounded-[14px] p-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Start planning
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              Join now and plan your next trip with Jarvis.
+            </p>
+            {/* External on purpose: the waitlist capture at jarvistravel.com is
+                live; this page's own form endpoint is not built yet. Points at
+                the app/payment flow when that is hooked up. */}
+            <a
+              href="https://www.jarvistravel.com/"
+              className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Join Now
+            </a>
+          </div>
+
+          {/* Email - the app's icon row recipe. */}
+          <div className="bg-white border border-gray-200 rounded-[14px] p-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Email</h2>
+            <ul className="space-y-5">
+              <li className="flex items-center gap-4">
+                <span className="w-9 h-9 rounded-lg bg-sky-600/10 text-sky-600 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-medium text-gray-900">General</p>
+                  <a
+                    href="mailto:hello@jarvistravel.com"
+                    className="text-sky-600 underline underline-offset-4 decoration-1 hover:text-sky-700"
                   >
-                    Send Message
-                  </button>
-                </form>
-              )}
-            </div>
-
-            {/* Contact Info */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Other Ways to Reach Us</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
-                      <Mail className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Email</div>
-                      <a href="mailto:hello@jarvistravel.com" className="text-blue-600 hover:text-blue-800">hello@jarvistravel.com</a>
-                    </div>
-                  </div>
+                    hello@jarvistravel.com
+                  </a>
                 </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
-                <h4 className="font-semibold text-gray-900 mb-4">Looking for Support?</h4>
-                <p className="text-gray-600 mb-4">
-                  Check out our FAQ section for quick answers to common questions.
-                </p>
-                <a href="/faq" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
-                  Visit FAQ
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </a>
-              </div>
-
-              <div className="bg-gray-900 text-white rounded-2xl p-8">
-                <h4 className="font-semibold mb-4">For Press & Media</h4>
-                <p className="text-gray-300 mb-4">
-                  For press inquiries, interviews, or media resources, please contact our media team.
-                </p>
-                <a href="mailto:press@jarvistravel.com" className="text-blue-400 hover:text-blue-300 font-medium">
-                  press@jarvistravel.com
-                </a>
-              </div>
-            </div>
+              </li>
+              <li className="flex items-center gap-4">
+                <span className="w-9 h-9 rounded-lg bg-sky-600/10 text-sky-600 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-medium text-gray-900">Press</p>
+                  <a
+                    href="mailto:press@jarvistravel.com"
+                    className="text-sky-600 underline underline-offset-4 decoration-1 hover:text-sky-700"
+                  >
+                    press@jarvistravel.com
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-center gap-4">
+                <span className="w-9 h-9 rounded-lg bg-sky-600/10 text-sky-600 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-medium text-gray-900">Privacy</p>
+                  <a
+                    href="mailto:privacy@jarvistravel.com"
+                    className="text-sky-600 underline underline-offset-4 decoration-1 hover:text-sky-700"
+                  >
+                    privacy@jarvistravel.com
+                  </a>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
       </section>
