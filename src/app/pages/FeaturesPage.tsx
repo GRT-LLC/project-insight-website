@@ -84,17 +84,17 @@ export function FeaturesPage() {
       <section className="bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-2">
-            The Fatigue Index: every day rated 1 to 9.
+            The Fatigue Index: chill, balanced, or packed.
           </h2>
           {/* Filed; attached to the feature itself, never a site-wide badge.
               Diarize the provisional's 12-month expiry: the line comes down
               if the filing lapses. */}
           <p className="text-sm font-medium text-gray-500 mb-6">Patent pending</p>
           <p className="text-lg text-gray-600 leading-relaxed mb-8">
-            As you build a plan, each day gets a number from 1 to 9, computed
-            from how far your body clock moves, how long you&rsquo;re in
-            transit, how far you walk, how much is packed in, and how much
-            downtime is left. 1 is easy. 9 you will feel.
+            As you build a plan, Jarvis reads each day and calls it chill,
+            balanced, or packed. The read comes from how far your body clock
+            moves, how long you&rsquo;re in transit, how far you walk, how much
+            is packed in, and how much downtime is left.
           </p>
 
           {/* The scale, as the app displays it: numbered chips tinted by the
@@ -123,10 +123,11 @@ export function FeaturesPage() {
           </figure>
 
           <p className="text-gray-600 leading-relaxed">
-            When a day lands in packed territory (7 and above), Jarvis offers a
-            lighter version of the same day so you can see what dropping one
-            thing buys you. It describes what a
-            day costs. It&rsquo;s a pacing model, not medical advice.
+            Under the words sits a 1 to 9 rating, and 9 is a day you will
+            feel. When a day lands in packed territory (7 and above), Jarvis
+            offers a lighter version of the same day so you can see what
+            dropping one thing buys you. It describes what a day costs.
+            It&rsquo;s a pacing model, not medical advice.
           </p>
         </div>
       </section>
