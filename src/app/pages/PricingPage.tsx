@@ -149,7 +149,7 @@ export function PricingPage() {
                     : 'bg-transparent border-gray-300'
                 }`}
               >
-                Sign up
+                Join Now
               </Link>
             </div>
 
@@ -290,7 +290,7 @@ export function PricingPage() {
                     : 'bg-transparent border-gray-300'
                 }`}
               >
-                Sign up
+                Join Now
               </Link>
             </div>
           </div>
