@@ -52,7 +52,7 @@ export function PricingPage() {
             Pricing
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl mb-6">
-            One trip at a time, or a year of ease?
+            Pick the plan that fits the way you travel.
           </h1>
           <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
             Trip Pass covers one trip, start to finish. Explore covers every
