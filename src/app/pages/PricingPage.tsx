@@ -52,11 +52,11 @@ export function PricingPage() {
             Pricing
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl mb-6">
-            Plan one trip your way, or subscribe for your next one too.
+            One trip at a time, or a year of ease?
           </h1>
           <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
-            Pay for a single trip with Trip Pass, or subscribe with Explore for
-            ongoing access and the best value.
+            Trip Pass covers one trip, start to finish. Explore covers every
+            trip, all year.
           </p>
         </div>
       </section>
@@ -176,10 +176,6 @@ export function PricingPage() {
             <p className="text-gray-900 font-medium mb-3">
               Start with Trip Pass, then move to Explore when you're ready to
               travel more.
-            </p>
-            <p className="text-gray-500 text-sm">
-              When pricing opens, choose the one-trip option or unlock full-year
-              access with Explore.
             </p>
           </div>
         </div>
