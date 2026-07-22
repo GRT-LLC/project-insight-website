@@ -188,13 +188,16 @@ export function PricingPage() {
               >
                 {CADENCES.map((option) => {
                   const selected = cadenceKey === option.key;
+                  // Both states give a clear hover fill (Meridian sky tints),
+                  // so the unselected cadence responds when the visitor moves
+                  // over it - not just a border change.
                   const rowClass = exploreHot
                     ? selected
                       ? 'border-sky-300 bg-sky-500/30'
-                      : 'border-sky-400 hover:border-sky-300'
+                      : 'border-sky-400 bg-sky-500/0 hover:border-sky-300 hover:bg-sky-500/20'
                     : selected
                       ? 'border-sky-600 bg-sky-600/10'
-                      : 'border-gray-300 hover:border-sky-600';
+                      : 'border-gray-300 bg-sky-600/0 hover:border-sky-600 hover:bg-sky-600/[0.06]';
                   return (
                     <button
                       key={option.key}
