@@ -154,7 +154,7 @@ export function HomePage() {
             to="/contact"
             className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
-            Sign up
+            Join Now
           </Link>
         </div>
       </section>
@@ -314,7 +314,7 @@ export function HomePage() {
             to="/contact"
             className="inline-block px-10 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
-            Sign up
+            Join Now
           </Link>
         </div>
       </section>
