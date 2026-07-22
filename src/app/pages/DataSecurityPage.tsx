@@ -17,8 +17,8 @@ const PROTECTIONS = [
     desc: 'We collect what planning a trip requires: account details, preferences, the trips you build, and basic usage data. Nothing else.',
   },
   {
-    name: 'Payments, when they launch, run through Stripe',
-    desc: 'Card details will be handled by Stripe, a dedicated payment processor. They will never touch our servers.',
+    name: 'Payments run through Stripe',
+    desc: 'Card details are handled by Stripe, a dedicated payment processor. They never touch our servers.',
   },
 ];
 

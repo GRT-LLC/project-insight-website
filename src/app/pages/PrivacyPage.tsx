@@ -13,9 +13,9 @@ export function PrivacyPage() {
             </h2>
             <p>
               We collect information you provide directly, including name, email, and travel
-              preferences. We also collect usage data to improve our service. We do not collect
-              payment information; when payments launch, they will be processed by Stripe and card
-              details will not touch our servers.
+              preferences. We also collect usage data to improve our service. We don&rsquo;t collect
+              card details; payments are processed by Stripe, and card details never touch our
+              servers.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">

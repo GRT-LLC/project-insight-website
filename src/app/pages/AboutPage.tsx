@@ -46,9 +46,8 @@ export function AboutPage() {
               belong to you.
             </p>
             <p>
-              The app is nearly ready, and we&rsquo;re building it carefully. If
-              planning a trip has ever felt like a second job, I&rsquo;d love
-              for you to try it.
+              We&rsquo;re building it carefully. If planning a trip has ever
+              felt like a second job, I&rsquo;d love for you to try it.
             </p>
           </div>
           <div className="mt-10 pt-8 border-t border-gray-200">
