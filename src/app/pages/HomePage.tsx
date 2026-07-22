@@ -190,8 +190,8 @@ export function HomePage() {
           </h2>
           <p className="text-lg text-gray-600 leading-relaxed">
             A long weekend, a staycation, two weeks abroad, a road trip an hour
-            from home. If it has days, Jarvis plans them: the pace, the budget,
-            the map, the memories.
+            from home. Jarvis plans them all: the pace, the budget, the map, the
+            memories.
           </p>
         </div>
       </section>
