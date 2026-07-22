@@ -182,6 +182,20 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Every trip counts: the app is not just for the one big trip a year. */}
+      <section className="bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
+            Not just the big trip.
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            A long weekend, a staycation, two weeks abroad, a road trip an hour
+            from home. If it has days, Jarvis plans them: the pace, the budget,
+            the map, the memories.
+          </p>
+        </div>
+      </section>
+
       {/* What you get: the product, in benefit language. */}
       <section className="bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
