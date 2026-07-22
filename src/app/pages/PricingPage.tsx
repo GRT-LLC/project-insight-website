@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
@@ -65,37 +65,40 @@ export function PricingPage() {
       <section className="bg-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="grid md:grid-cols-5 gap-6 items-stretch">
-            {/* Trip Pass - the entry offer. Simpler panel, secondary action. */}
-            <div className="md:col-span-2 bg-white border border-gray-200 rounded-[14px] p-8 flex flex-col">
-              <h2 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-700 mb-4">
+            {/* Trip Pass - the entry offer. Explore is pre-highlighted as the
+                hero; when a visitor hovers (or keyboard-focuses into) this
+                tile, it takes on the full Explore treatment and its Sign up
+                becomes the same amber pill. Touch devices keep the quiet
+                default. */}
+            <div className="group md:col-span-2 bg-white border border-gray-200 rounded-[14px] p-8 flex flex-col transition-colors duration-200 hover:bg-sky-600 hover:border-sky-600 focus-within:bg-sky-600 focus-within:border-sky-600">
+              <h2 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-700 mb-4 transition-colors group-hover:text-amber-400 group-focus-within:text-amber-400">
                 Trip Pass
               </h2>
               <div className="mb-2 [font-variant-numeric:tabular-nums]">
-                <span className="text-4xl font-bold text-gray-900">$24.95</span>
-                <span className="text-gray-500 ml-2">per trip</span>
+                <span className="text-4xl font-bold text-gray-900 transition-colors group-hover:text-gray-50 group-focus-within:text-gray-50">$24.95</span>
+                <span className="text-gray-500 ml-2 transition-colors group-hover:text-sky-200 group-focus-within:text-sky-200">per trip</span>
               </div>
-              <p className="text-lg font-semibold text-gray-900 mb-6">
+              <p className="text-lg font-semibold text-gray-900 mb-6 transition-colors group-hover:text-gray-50 group-focus-within:text-gray-50">
                 One trip. Full access. No subscription required.
               </p>
               <ul className="space-y-3 mb-8">
                 {TRIP_PASS_POINTS.map((point) => (
                   <li key={point} className="flex items-start gap-3">
                     <Check
-                      className="w-4 h-4 text-sky-600 flex-shrink-0 mt-1"
+                      className="w-4 h-4 text-sky-600 flex-shrink-0 mt-1 transition-colors group-hover:text-sky-300 group-focus-within:text-sky-300"
                       strokeWidth={2}
                       aria-hidden="true"
                     />
-                    <span className="text-gray-600">{point}</span>
+                    <span className="text-gray-600 transition-colors group-hover:text-sky-100 group-focus-within:text-sky-100">{point}</span>
                   </li>
                 ))}
               </ul>
               {/* Routes to the interest form until the app/payment flow is live. */}
               <Link
                 to="/contact"
-                className="mt-auto self-start inline-flex items-center gap-1.5 py-2 font-medium text-sky-600 underline underline-offset-4 decoration-1 hover:text-sky-700 transition-colors"
+                className="mt-auto self-start px-8 py-3.5 rounded-full font-semibold border border-gray-300 text-gray-900 transition-colors group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-gray-900 group-focus-within:bg-amber-400 group-focus-within:border-amber-400 group-focus-within:text-gray-900 hover:bg-amber-300 hover:border-amber-300"
               >
                 Sign up
-                <ArrowRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
               </Link>
             </div>
 
