@@ -32,7 +32,7 @@ const MOMENTS: Moment[] = [
   {
     numeral: '1',
     name: 'The week before you go',
-    desc: 'Jarvis drafts the days (pacing, order, and the walk between stops) with the forecast and your budget sitting inside the same plan. You move things; the numbers move with them.',
+    desc: 'Jarvis drafts the days (pacing, order, and the walk between stops) with the forecast and your budget sitting inside the same plan. You move things; the numbers move with them. And it works the same for a staycation, a long weekend, or two weeks abroad.',
     soWhat: 'So the plan gets finished, and you get your evenings back.',
   },
   {

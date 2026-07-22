@@ -1,9 +1,7 @@
-// About (JAR-432) - the founder letter replaces the fabricated company page
-// ("our founders" plural, "In 2023", the distributed-team claim, the empty
-// team section, the four abstract values cards - all deleted; none were true).
-//
-// LETTER STATUS: DRAFT in the founder's voice, written for his edit. Do not
-// merge until Brent has read and revised it - flagged on the PR.
+// About (JAR-432) - the company story, in "we" voice by brand-owner
+// direction (no founder name, no first person singular, no signature).
+// Replaces the fabricated company page; every claim maps to the shipped
+// product or the Terms.
 
 export function AboutPage() {
   return (
@@ -15,21 +13,20 @@ export function AboutPage() {
             About
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] max-w-3xl">
-            Who&rsquo;s building JarvisTravel.
+            Why we built JarvisTravel.
           </h1>
         </div>
       </section>
 
-      {/* The letter - one voice, signed and dated. */}
+      {/* The story - one company voice. */}
       <section className="bg-gray-50">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
             <p>
-              I started JarvisTravel after coming home from trips that looked
-              perfect on paper, and feeling like I needed a vacation from the
-              vacation. The tools I had were good at collecting places and
-              terrible at telling me what a day would actually cost me: in
-              hours, in miles, in energy.
+              We started JarvisTravel after too many trips that looked perfect
+              on paper and felt like work in person. The tools we had were good
+              at collecting places and terrible at telling us what a day would
+              actually cost: in hours, in miles, in energy.
             </p>
             <p>
               So we built the pacing model first. Jarvis reads every day of a
@@ -46,14 +43,10 @@ export function AboutPage() {
               belong to you.
             </p>
             <p>
-              We&rsquo;re building it carefully. If planning a trip has ever
-              felt like a second job, I&rsquo;d love for you to try it.
-            </p>
-          </div>
-          <div className="mt-10 pt-8 border-t border-gray-200">
-            <p className="font-semibold text-gray-900">Brent Bailey</p>
-            <p className="text-gray-500 text-sm">
-              Founder, JarvisTravel · San Diego · July 2026
+              And &ldquo;trip&rdquo; means any trip. The long weekend, the
+              staycation, the two weeks abroad, the drive down the coast. If
+              planning one has ever felt like a second job, we built
+              JarvisTravel for you.
             </p>
           </div>
         </div>
