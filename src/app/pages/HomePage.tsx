@@ -50,6 +50,13 @@ const HEROES: Hero[] = [
   },
 ];
 
+// Photography slot for the "Not just the big trip" band. Set this to a real
+// golden-hour, people-in-place frame (self-hosted in public/) once a shoot or
+// licensed image lands - see the photography sourcing decision. Leaving it
+// null renders the designed navy-and-motif fallback, so the site never ships
+// an empty frame or off-brand stock.
+const BREADTH_PHOTO: { src: string; alt: string } | null = null;
+
 interface Feature {
   icon: LucideIcon;
   name: string;
@@ -182,13 +189,33 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Every trip counts: the app is not just for the one big trip a year. */}
-      <section className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
+      {/* Every trip counts, as a full-bleed editorial band. Photo-ready: drop
+          a golden-hour frame into BREADTH_PHOTO and it renders full-bleed
+          under the ratified Neverything scrim. Until then the band stands on
+          its own as the designed navy-and-motif fallback. */}
+      <section className="relative overflow-hidden bg-sky-600 min-h-[46vh] flex items-center">
+        {BREADTH_PHOTO && (
+          <>
+            <img
+              src={BREADTH_PHOTO.src}
+              alt={BREADTH_PHOTO.alt}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* The one ratified gradient: single-hue Neverything scrim. */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#13181B]/85 via-[#13181B]/45 to-[#13181B]/35" />
+          </>
+        )}
+        {!BREADTH_PHOTO && (
+          <>
+            <ContourArcs className="absolute -top-40 -left-40 w-[520px] h-[520px]" />
+            <ContourArcs className="absolute -bottom-52 -right-36 w-[520px] h-[520px]" />
+          </>
+        )}
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-50 [text-wrap:balance] mb-6">
             Not just the big trip.
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-lg md:text-xl text-sky-100 leading-relaxed max-w-2xl">
             A long weekend, a staycation, two weeks abroad, a road trip an hour
             from home. Jarvis plans them all: the pace, the budget, the map, the
             memories.
