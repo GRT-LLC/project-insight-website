@@ -20,7 +20,7 @@ export function ContactPage() {
             Get in touch.
           </h1>
           <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
-            Ready to plan your next trip? Sign up below. For everything else,
+            Ready to plan your next trip? Join now below. For everything else,
             email reaches a person.
           </p>
         </div>
@@ -34,7 +34,7 @@ export function ContactPage() {
               Start planning
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
-              Sign up and plan your next trip with Jarvis.
+              Join now and plan your next trip with Jarvis.
             </p>
             {/* External on purpose: the waitlist capture at jarvistravel.com is
                 live; this page's own form endpoint is not built yet. Points at
@@ -43,7 +43,7 @@ export function ContactPage() {
               href="https://www.jarvistravel.com/"
               className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
             >
-              Sign up
+              Join Now
             </a>
           </div>
 
