@@ -4,7 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 
 const NAV_LINKS: { name: string; path: string }[] = [
-  { name: 'Features', path: '/features' },
+  { name: 'How it works', path: '/features' },
   { name: 'Pricing', path: '/pricing' },
   { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' },
