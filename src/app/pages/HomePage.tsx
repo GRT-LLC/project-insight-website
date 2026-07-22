@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   BookOpen,
   CloudSun,
@@ -9,13 +10,43 @@ import {
 import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 
-// Home (JAR-431, reworked per brand-owner direction 2026-07-21): this page
-// tells the story — what a traveler misses without JarvisTravel and what
-// planning wrong costs — in benefit language. The Fatigue Index deep-dive
-// (mechanics, inputs, the dial) lives on /features; here FI appears only as
-// a benefit, always written with numeric digits (1–9, 7), never spelled out.
-// The numbered section eyebrows were retired sitewide: they read like slides.
-// Every factual claim still maps to shipped code.
+// Home (JAR-431). Benefit-led story per the jarvistravel-copy voice skill:
+// what a traveler misses without JarvisTravel and what planning wrong costs.
+// The Fatigue Index deep-dive lives on /features; FI appears here only as a
+// benefit, always in digits (1 to 9). No em dashes anywhere (brand rule).
+//
+// The hero rotates: one of five approved headline pairs is picked per visit,
+// so two visitors may see different messaging (lightweight A/B signal).
+// The pick is client-side; if prerendering lands (plan phase 3), move the
+// pick to a post-hydration effect to avoid a server/client mismatch.
+
+interface Hero {
+  headline: string;
+  sub: string;
+}
+
+const HEROES: Hero[] = [
+  {
+    headline: 'Your vacation should be a break, not a second job.',
+    sub: 'JarvisTravel plans the pace, the budget and the map in one place, so the trip you take feels like the trip you imagined.',
+  },
+  {
+    headline: 'Travel smarter, not harder.',
+    sub: 'One plan for the days, the money and the memories. Jarvis does the homework; you take the trip.',
+  },
+  {
+    headline: 'Enjoy your vacation.',
+    sub: 'Planning is hard. Jarvis does the heavy lifting: the pace, the budget, the map, all in one place.',
+  },
+  {
+    headline: 'Come home with stories, not exhaustion.',
+    sub: 'Jarvis rates every day of your plan 1 to 9, so the hard days show up before you do.',
+  },
+  {
+    headline: 'Twelve tabs is not a travel plan.',
+    sub: 'The days, the budget, the map and the journal, together in one place that thinks about pacing.',
+  },
+];
 
 interface Feature {
   icon: LucideIcon;
@@ -25,8 +56,7 @@ interface Feature {
 }
 
 // Shipped features only, written as benefits. Icons follow the app's row
-// recipe — tinted voice containers, glyph in the voice color; coral belongs
-// to the journal and appears nowhere else.
+// recipe. Coral belongs to the journal and appears nowhere else.
 const FEATURES: Feature[] = [
   {
     icon: Sparkles,
@@ -37,19 +67,19 @@ const FEATURES: Feature[] = [
   {
     icon: TrendingUp,
     name: 'The Fatigue Index',
-    desc: 'Every day rated 1–9 before you commit, so the hard days show up while you can still fix them.',
+    desc: 'Every day rated 1 to 9 before you commit, so the hard days show up while you can still fix them.',
     voice: 'accent',
   },
   {
     icon: Wallet,
     name: 'Budget',
-    desc: 'Totals that move while you plan — not a surprise after you land back home.',
+    desc: 'Totals that move while you plan, not a surprise after you land back home.',
     voice: 'accent',
   },
   {
     icon: BookOpen,
     name: 'Trip journal',
-    desc: 'Notes, photos, receipts and places become a story worth rereading — yours to keep.',
+    desc: 'Notes, photos, receipts and places become a story worth rereading. Yours to keep.',
     voice: 'journal',
   },
   {
@@ -61,12 +91,12 @@ const FEATURES: Feature[] = [
   {
     icon: CloudSun,
     name: 'Weather & flights',
-    desc: 'The forecast and your flights sit inside the plan — fewer surprises, fewer tabs.',
+    desc: 'The forecast and your flights sit inside the plan. Fewer surprises, fewer tabs.',
     voice: 'accent',
   },
 ];
 
-/** Concentric contour rings — the Meridian motif, Moonlight at 13% on navy.
+/** Concentric contour rings, the Meridian motif: Moonlight at 13% on navy.
  *  pointer-events-none so the overlay can never intercept clicks on content. */
 function ContourArcs({ className }: { className: string }) {
   return (
@@ -92,19 +122,23 @@ function ContourArcs({ className }: { className: string }) {
 }
 
 export function HomePage() {
+  // Picked once per mount so the message is stable while the visitor reads.
+  const [hero] = useState<Hero>(
+    () => HEROES[Math.floor(Math.random() * HEROES.length)]
+  );
+
   return (
     <div>
-      {/* Hero — the story, not the mechanics. */}
+      {/* Hero: the story, not the mechanics. */}
       <section className="relative overflow-hidden bg-sky-600">
         <ContourArcs className="absolute -top-44 -left-44 w-[520px] h-[520px]" />
         <ContourArcs className="absolute -bottom-56 -right-40 w-[520px] h-[520px]" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24 md:pt-44 md:pb-32 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance] mb-6">
-            Your vacation should be a break, not a second job.
+            {hero.headline}
           </h1>
           <p className="text-lg md:text-xl text-sky-100 leading-relaxed max-w-2xl mx-auto mb-10">
-            JarvisTravel plans the pace, the budget and the map in one place —
-            so the trip you take feels like the trip you imagined.
+            {hero.sub}
           </p>
           {/* Routes to the interest form until the app/payment flow is live. */}
           <Link
@@ -116,7 +150,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* The cost of planning wrong — what you miss without it. */}
+      {/* The cost of planning wrong: what you miss without it. */}
       <section className="bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
@@ -124,8 +158,8 @@ export function HomePage() {
             Tuesday.
           </h2>
           <p className="text-lg text-gray-600 leading-relaxed mb-6">
-            Twelve tabs and a shared spreadsheet will get you a plan — but they
-            won&rsquo;t tell you that day 2 has six hours of walking after a
+            Twelve tabs and a shared spreadsheet will get you a plan. What they
+            won&rsquo;t tell you is that day 2 has six hours of walking after a
             red-eye, or that the museum, the market and the dinner across town
             don&rsquo;t fit in the same afternoon. That&rsquo;s the trip where
             you come home needing a vacation from the vacation.
@@ -133,8 +167,8 @@ export function HomePage() {
           <p className="text-lg text-gray-600 leading-relaxed mb-8">
             Jarvis rates every day of your plan from 1 to 9 while you build it.
             When a day hits 7, you&rsquo;ll know before you&rsquo;re standing in
-            it — and Jarvis offers a lighter version of the same day, so fixing
-            it takes one tap instead of a family argument.
+            it, and Jarvis offers a lighter version of the same day. Fixing it
+            takes one tap instead of a family argument.
           </p>
           <Link
             to="/features"
@@ -145,7 +179,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* What you get — the product, in benefit language. */}
+      {/* What you get: the product, in benefit language. */}
       <section className="bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="max-w-2xl mb-12">
@@ -153,8 +187,8 @@ export function HomePage() {
               One plan, instead of twelve tabs.
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Everything that makes a trip work — and everything you&rsquo;d
-              rather not juggle — in one place.
+              Everything that makes a trip work, and everything you&rsquo;d
+              rather not juggle, in one place.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -183,8 +217,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Why you can trust the plan — three promises, in plain speak
-          (voice per the jarvistravel-copy skill). */}
+      {/* Why you can trust the plan: three promises, in plain speak. */}
       <section className="bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-10">
@@ -196,7 +229,7 @@ export function HomePage() {
                 Nobody pays to be in your plan.
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Every suggestion is there because it fits your trip — never
+                Every suggestion is there because it fits your trip, never
                 because a hotel or tour paid us.
               </p>
             </li>
@@ -213,7 +246,7 @@ export function HomePage() {
                 Your memories belong to you.
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Your journal — the notes, the photos, the places — is yours. We
+                Your journal is yours: the notes, the photos, the places. We
                 never sell it.
               </p>
             </li>
@@ -230,7 +263,7 @@ export function HomePage() {
             Enjoy your vacation.
           </h2>
           <p className="text-lg text-sky-100 mb-10">
-            Planning is hard. Jarvis does the heavy lifting — sign up and be
+            Planning is hard. Jarvis does the heavy lifting. Sign up and be
             first in when we launch.
           </p>
           {/* Routes to the interest form until the app/payment flow is live. */}
