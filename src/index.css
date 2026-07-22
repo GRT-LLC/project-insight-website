@@ -36,23 +36,6 @@
   }
 }
 
-@layer components {
-  /* Card hover animation */
-  .card-hover {
-    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
-  }
-
-  /* Display emphasis — solid Ateneo (Meridian bans gradient text). */
-  .gradient-text {
-    @apply text-sky-600;
-  }
-
-  /* Glass effect */
-  .glass {
-    @apply bg-white/80 backdrop-blur-lg;
-  }
-}
-
 @layer utilities {
   /* Hide scrollbar */
   .no-scrollbar::-webkit-scrollbar {

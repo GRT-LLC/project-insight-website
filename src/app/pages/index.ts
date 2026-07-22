@@ -5,7 +5,3 @@ export { AboutPage } from './AboutPage';
 export { ContactPage } from './ContactPage';
 export { PrivacyPage } from './PrivacyPage';
 export { TermsPage } from './TermsPage';
-export { SignInPage } from './SignInPage';
-export { SignUpPage } from './SignUpPage';
-export { ForgotPasswordPage } from './ForgotPasswordPage';
-export { AppDashboard } from './AppDashboard';

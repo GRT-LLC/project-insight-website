@@ -14,8 +14,8 @@ binding work contract for its subtree.
 ## Purpose
 
 React TypeScript marketing website for JarvisTravel — a standalone SPA deployed
-to the production Droplet (mktg.jarvistravel.com) and GitHub Pages. Serves as the public-facing landing experience: marketing pages,
-sign-up/sign-in flows, and a placeholder app dashboard.
+to the production Droplet (mktg.jarvistravel.com) and GitHub Pages. Serves as the public-facing landing experience: marketing pages for a
+pre-launch product (no auth; "Sign up" routes to contact).
 
 ## Ownership
 
@@ -57,7 +57,7 @@ npm run lint         # eslint with zero-warnings policy
 
 - **SPA** — no server-side rendering. All pages are client-rendered React.
 - **Marketing layout** — `MarketingLayout` in `PageRouter.tsx` wraps all public-facing pages with `<Navigation />` + `<Footer />`. New marketing routes should follow the same pattern.
-- **Auth is simulated** — `AuthContext` provides a client-side `login`/`logout` cycle with no backend. The `ProtectedRoute` component redirects unauthenticated users.
+- **No auth** — pre-launch marketing site; the simulated client-side auth stack was removed as dead code (JAR-429). "Sign up" routes to `/contact`.
 - **Static output** — `npm run build` produces `dist/`. The GitHub Actions workflow uploads `dist/` to GitHub Pages or rsyncs it to the Droplet.
 - **Sourcemaps enabled** in production builds (`vite.config.ts` `sourcemap: true`).
 
@@ -66,10 +66,9 @@ npm run lint         # eslint with zero-warnings policy
 1. **Stale README** — The README references `src/marketing/` but the code lives in `src/app/`. Update it when making other changes.
 2. **Barrel exports** — `src/app/components/index.ts` and `src/app/pages/index.ts` re-export their contents. Follow the same pattern.
 3. **New pages** — create the page component in `src/app/pages/`, add a barrel export to `src/app/pages/index.ts`, and wire the route in `src/app/router/PageRouter.tsx` inside a `MarketingLayout` wrapper.
-4. **Auth pages** — `SignInPage`, `SignUpPage`, `ForgotPasswordPage`, and `AppDashboard` are defined but not yet wired into `PageRouter.tsx`. If activating them, create routes with or without `MarketingLayout` as appropriate.
-5. **Lint discipline** — `npm run lint` enforces `--max-warnings 0`. Zero warnings is the bar.
-6. **Before editing any file in `src/app/`**, read `src/app/AGENTS.md` first.
-7. **Before any code editing**, load the `code-workflow` skill and follow its standard engineering workflow (branching, TDD, conventional commits, quality gates, PRs)
+4. **Lint discipline** — `npm run lint` enforces `--max-warnings 0`. Zero warnings is the bar.
+5. **Before editing any file in `src/app/`**, read `src/app/AGENTS.md` first.
+6. **Before any code editing**, load the `code-workflow` skill and follow its standard engineering workflow (branching, TDD, conventional commits, quality gates, PRs)
 
 ## Verification
 
@@ -84,10 +83,10 @@ Before merging to `main`:
 
 | Path | Scope |
 |------|-------|
-| `src/app/AGENTS.md` | Application source code: components, pages, router, context |
+| `src/app/AGENTS.md` | Application source code: components, pages, router |
 
 ## User Preferences
 
 - Routes are served at the domain root (`/`); the old `/project-insight-website/` GitHub Pages prefix is deprecated
-- React Router is the routing library; the legacy custom router in `RouterContext.tsx` is deprecated
+- React Router is the routing library; use its hooks directly
 - Tailwind CSS is the only styling approach — no CSS modules, no styled-components

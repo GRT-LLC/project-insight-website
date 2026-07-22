@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { useAuth } from '../context/useAuth';
 
 const NAV_LINKS: { name: string; path: string }[] = [
   { name: 'How it works', path: '/features' },
@@ -11,9 +10,7 @@ const NAV_LINKS: { name: string; path: string }[] = [
 ];
 
 export function Navigation() {
-  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -66,37 +63,12 @@ export function Navigation() {
               </Link>
             ))}
 
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/app"
-                  className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg transition-all"
-                >
-                  Open App
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    logout();
-                    navigate('/');
-                  }}
-                  className={`font-medium ${
-                    isLightNav ? 'text-white/80' : 'text-gray-500'
-                  }`}
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link
-                  to="/contact"
-                  className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
-                >
-                  Sign up
-                </Link>
-              </div>
-            )}
+            <Link
+              to="/contact"
+              className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
+            >
+              Sign up
+            </Link>
           </div>
 
           <button
