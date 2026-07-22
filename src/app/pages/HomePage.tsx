@@ -13,7 +13,9 @@ import type { LucideIcon } from 'lucide-react';
 // Home (JAR-431). Benefit-led story per the jarvistravel-copy voice skill:
 // what a traveler misses without JarvisTravel and what planning wrong costs.
 // The Fatigue Index deep-dive lives on /features; FI appears here only as a
-// benefit, always in digits (1 to 9). No em dashes anywhere (brand rule).
+// benefit, in the app's band words (chill, balanced, packed) since raw
+// numbers mean nothing to a first-time visitor. Digits appear only on the
+// How it works explainer. No em dashes anywhere (brand rule).
 //
 // The hero rotates: one of five approved headline pairs is picked per visit,
 // so two visitors may see different messaging (lightweight A/B signal).
@@ -40,7 +42,7 @@ const HEROES: Hero[] = [
   },
   {
     headline: 'Come home with stories, not exhaustion.',
-    sub: 'Jarvis rates every day of your plan 1 to 9, so the hard days show up before you do.',
+    sub: 'Jarvis reads every day of your plan as chill, balanced, or packed, so the tough ones show up before you do.',
   },
   {
     headline: 'Twelve tabs is not a travel plan.',
@@ -67,7 +69,7 @@ const FEATURES: Feature[] = [
   {
     icon: TrendingUp,
     name: 'The Fatigue Index',
-    desc: 'Every day rated 1 to 9 before you commit, so the hard days show up while you can still fix them.',
+    desc: 'Every day reads chill, balanced, or packed before you commit, so the tough days show up while you can still fix them.',
     voice: 'accent',
   },
   {
@@ -165,10 +167,11 @@ export function HomePage() {
             you come home needing a vacation from the vacation.
           </p>
           <p className="text-lg text-gray-600 leading-relaxed mb-8">
-            Jarvis rates every day of your plan from 1 to 9 while you build it.
-            When a day hits 7, you&rsquo;ll know before you&rsquo;re standing in
-            it, and Jarvis offers a lighter version of the same day. Fixing it
-            takes one tap instead of a family argument.
+            Jarvis reads every day of your plan while you build it and calls it
+            what it is: chill, balanced, or packed. When a day comes up packed,
+            you&rsquo;ll know before you&rsquo;re standing in it, and Jarvis
+            offers a lighter version of the same day. Fixing it takes one tap
+            instead of a family argument.
           </p>
           <Link
             to="/features"
