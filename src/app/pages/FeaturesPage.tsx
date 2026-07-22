@@ -98,36 +98,34 @@ export function FeaturesPage() {
           </p>
 
           {/* The scale, as the app displays it: numbered chips tinted by the
-              shipped band colors; the current reading carries the ring. */}
-          <figure className="mb-8">
-            <div className="flex flex-wrap gap-2">
-              {FI_SCALE.flatMap((band) =>
-                band.days.map((day) => (
-                  <span
-                    key={day}
-                    style={{ color: band.color, backgroundColor: `${band.color}1A` }}
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold [font-variant-numeric:tabular-nums] ${
-                      day === 7 ? 'ring-2 ring-current' : ''
-                    }`}
-                  >
-                    {day}
-                  </span>
-                ))
-              )}
-            </div>
-            <figcaption className="mt-4 text-[13px] text-gray-500">
-              The scale as it reads in the app: 1-3 chill, 4-6 balanced, 7-9
-              packed (9 is the peak). A packed day gets flagged before you
-              commit.
-            </figcaption>
-          </figure>
+              shipped band colors; the current reading carries the ring. The
+              words above carry the meaning, so no caption; the mapping is
+              provided to screen readers via the aria-label. */}
+          <div
+            role="img"
+            aria-label="The Fatigue Index scale: days 1 to 3 are chill, 4 to 6 balanced, 7 to 9 packed. The example shows a day reading 7."
+            className="flex flex-wrap gap-2 mb-8"
+          >
+            {FI_SCALE.flatMap((band) =>
+              band.days.map((day) => (
+                <span
+                  key={day}
+                  aria-hidden="true"
+                  style={{ color: band.color, backgroundColor: `${band.color}1A` }}
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold [font-variant-numeric:tabular-nums] ${
+                    day === 7 ? 'ring-2 ring-current' : ''
+                  }`}
+                >
+                  {day}
+                </span>
+              ))
+            )}
+          </div>
 
           <p className="text-gray-600 leading-relaxed">
-            Under the words sits a 1 to 9 rating, and 9 is a day you will
-            feel. When a day lands in packed territory (7 and above), Jarvis
-            offers a lighter version of the same day so you can see what
-            dropping one thing buys you. It describes what a day costs.
-            It&rsquo;s a pacing model, not medical advice.
+            When a day comes up packed, one tap shows you a lighter version of
+            it. And that&rsquo;s all the Fatigue Index is: a read on how each
+            day will feel, not medical advice.
           </p>
         </div>
       </section>
