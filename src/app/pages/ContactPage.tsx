@@ -1,6 +1,6 @@
 import { Mail } from 'lucide-react';
 
-// Contact (JAR-432) — the previous form called setSubmitted(true), transmitted
+// Contact (JAR-432) - the previous form called setSubmitted(true), transmitted
 // nothing, and told the visitor "Message Sent! We'll get back to you within
 // 24 hours." Every path below is real: the signup link goes to the live
 // waitlist capture on jarvistravel.com (verified POST /api/waitlist), and the
@@ -10,7 +10,7 @@ import { Mail } from 'lucide-react';
 export function ContactPage() {
   return (
     <div className="pt-20">
-      {/* Header — flat Ateneo band. */}
+      {/* Header - flat Ateneo band. */}
       <section className="bg-sky-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
           <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
@@ -28,7 +28,7 @@ export function ContactPage() {
 
       <section className="bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 space-y-6">
-          {/* Early access — the one real capture mechanism live today. */}
+          {/* Early access - the one real capture mechanism live today. */}
           <div className="bg-white border border-gray-200 rounded-[14px] p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Early access
@@ -47,7 +47,7 @@ export function ContactPage() {
             </a>
           </div>
 
-          {/* Email — the app's icon row recipe. */}
+          {/* Email - the app's icon row recipe. */}
           <div className="bg-white border border-gray-200 rounded-[14px] p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Email</h2>
             <ul className="space-y-5">

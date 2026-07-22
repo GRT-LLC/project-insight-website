@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-// Footer (JAR-432) — Ateneo ground per Meridian (the old bg-gray-900 was
+// Footer (JAR-432) - Ateneo ground per Meridian (the old bg-gray-900 was
 // Neverything ink used as a web surface, which the brand bans). Every link
 // resolves to a page that exists: Careers, Press and the duplicate Cookie
 // Policy pointed nowhere and are gone until they have real destinations.
@@ -35,7 +35,7 @@ export function Footer() {
               <span className="text-xl font-bold">JarvisTravel</span>
             </div>
             <p className="text-sky-100 leading-relaxed max-w-sm">
-              JarvisTravel plans the pace, the budget and the memories — so you
+              JarvisTravel plans the pace, the budget and the memories, so you
               can enjoy your vacation.
             </p>
           </div>

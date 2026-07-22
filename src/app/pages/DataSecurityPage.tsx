@@ -1,8 +1,8 @@
 import { Check } from 'lucide-react';
 
-// Data Security (JAR-432) — every claim here is either true today or clearly
+// Data Security (JAR-432) - every claim here is either true today or clearly
 // framed as a forward commitment. Removed (audit findings): "PCI DSS
-// Compliant" (an attested status we do not hold — payments, when live, are
+// Compliant" (an attested status we do not hold - payments, when live, are
 // processed by Stripe), "third-party security experts regularly audit our
 // systems" (the only audit on record was internal), and the "256-bit /
 // bank-level" specifics. Payment information is not collected today.
@@ -14,7 +14,7 @@ const PROTECTIONS = [
   },
   {
     name: 'Minimal collection',
-    desc: 'We collect what planning a trip requires — account details, preferences, and the trips you build — and nothing else.',
+    desc: 'We collect what planning a trip requires (account details, preferences, and the trips you build) and nothing else.',
   },
   {
     name: 'Payments, when they launch, run through Stripe',
@@ -38,7 +38,7 @@ const RIGHTS = [
 export function DataSecurityPage() {
   return (
     <div className="pt-20">
-      {/* Header — flat Ateneo band. */}
+      {/* Header - flat Ateneo band. */}
       <section className="bg-sky-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
           <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">

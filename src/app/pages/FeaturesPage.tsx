@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 // "How it works" (JAR-432, reworked per brand-owner direction 2026-07-21):
 // the Fatigue Index deep-dive lives HERE (the home page tells the story;
 // this page shows the machinery). FI numbers are always numeric digits.
-// The scale graphic mirrors how the app itself displays FI — numbered day
+// The scale graphic mirrors how the app itself displays FI - numbered day
 // chips tinted by the shipped band colors (utils/fi.ts light tokens:
 // 1-3 #0EA5E9 chill, 4-6 #059669 balanced, 7-8 #CA8A04 elevated,
 // 9 #D35446 packed) with the app's ring treatment on the active reading.
-// Each moment below ends with its "so what" — the benefit, not the feature.
+// Each moment below ends with its "so what" - the benefit, not the feature.
 
 interface FiBand {
   color: string;
@@ -32,13 +32,13 @@ const MOMENTS: Moment[] = [
   {
     numeral: '1',
     name: 'The week before you go',
-    desc: 'Jarvis drafts the days — pacing, order, and the walk between stops — with the forecast and your budget sitting inside the same plan. You move things; the numbers move with them.',
+    desc: 'Jarvis drafts the days (pacing, order, and the walk between stops) with the forecast and your budget sitting inside the same plan. You move things; the numbers move with them.',
     soWhat: 'So the plan gets finished, and you get your evenings back.',
   },
   {
     numeral: '2',
     name: 'The day that reads 7',
-    desc: 'When a day rates 7 or above, the plan says so before you commit — and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
+    desc: 'When a day rates 7 or above, the plan says so before you commit, and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
     soWhat: 'So you fix Tuesday at home, not mid-afternoon in a crowded plaza.',
   },
   {
@@ -50,13 +50,13 @@ const MOMENTS: Moment[] = [
   {
     numeral: '4',
     name: 'What it costs',
-    desc: 'A budget that lives inside the plan: categories, running totals, and what is left — visible while you decide, not after.',
+    desc: 'A budget that lives inside the plan: categories, running totals, and what is left, visible while you decide, not after.',
     soWhat: 'So the budget is a decision you make, not news you get.',
   },
   {
     numeral: '5',
     name: 'The flight home',
-    desc: 'Notes, photos, receipts and places, assembled into a journal worth rereading — yours to keep after the trip ends.',
+    desc: 'Notes, photos, receipts and places, assembled into a journal worth rereading. Yours to keep after the trip ends.',
     soWhat: 'So the trip doesn’t evaporate when the tan does.',
   },
 ];
@@ -64,7 +64,7 @@ const MOMENTS: Moment[] = [
 export function FeaturesPage() {
   return (
     <div className="pt-20">
-      {/* Header — flat Ateneo band. */}
+      {/* Header - flat Ateneo band. */}
       <section className="bg-sky-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
           <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-400 mb-6">
@@ -74,20 +74,24 @@ export function FeaturesPage() {
             Five moments a plan has to survive.
           </h1>
           <p className="text-lg text-sky-100 max-w-2xl leading-relaxed">
-            Not a feature list — the points in a real trip where most plans
+            Not a feature list: the points in a real trip where most plans
             quietly fail, and what Jarvis does at each one.
           </p>
         </div>
       </section>
 
-      {/* The Fatigue Index — the machinery, shown the way the app shows it. */}
+      {/* The Fatigue Index - the machinery, shown the way the app shows it. */}
       <section className="bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-6">
-            The Fatigue Index: every day rated 1&ndash;9.
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-2">
+            The Fatigue Index: every day rated 1 to 9.
           </h2>
+          {/* Filed; attached to the feature itself, never a site-wide badge.
+              Diarize the provisional's 12-month expiry: the line comes down
+              if the filing lapses. */}
+          <p className="text-sm font-medium text-gray-500 mb-6">Patent pending</p>
           <p className="text-lg text-gray-600 leading-relaxed mb-8">
-            As you build a plan, each day gets a number from 1 to 9 — computed
+            As you build a plan, each day gets a number from 1 to 9, computed
             from how far your body clock moves, how long you&rsquo;re in
             transit, how far you walk, how much is packed in, and how much
             downtime is left. 1 is easy. 9 you will feel.
@@ -112,8 +116,8 @@ export function FeaturesPage() {
               )}
             </div>
             <figcaption className="mt-4 text-[13px] text-gray-500">
-              The scale as it reads in the app: 1&ndash;3 easy, 4&ndash;6
-              balanced, 7&ndash;8 heavy, 9 the peak. A day rated 7 gets flagged
+              The scale as it reads in the app: 1-3 easy, 4-6
+              balanced, 7-8 heavy, 9 the peak. A day rated 7 gets flagged
               before you commit.
             </figcaption>
           </figure>
@@ -121,12 +125,12 @@ export function FeaturesPage() {
           <p className="text-gray-600 leading-relaxed">
             At 7 and above, Jarvis offers a lighter version of the same day so
             you can see what dropping one thing buys you. It describes what a
-            day costs — it&rsquo;s a pacing model, not medical advice.
+            day costs. It&rsquo;s a pacing model, not medical advice.
           </p>
         </div>
       </section>
 
-      {/* The five moments — each one ends with its "so what". */}
+      {/* The five moments - each one ends with its "so what". */}
       <section className="bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <ol className="border-t border-gray-200 list-none m-0 p-0">
