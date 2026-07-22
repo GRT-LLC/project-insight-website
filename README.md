@@ -1,87 +1,49 @@
 # JarvisTravel Marketing Website
 
-A modern, standalone React TypeScript marketing website for JarvisTravel.
+The public marketing site for JarvisTravel, a standalone React + TypeScript SPA.
 
-## Features
+## Stack
 
-- ✅ **Modern React 18** with TypeScript
-- ✅ **Vite** for fast development and optimized builds
-- ✅ **Tailwind CSS** for styling
-- ✅ **Fully Typed** - Zero TypeScript errors
-- ✅ **Component-Based Architecture** - Modular and reusable
-- ✅ **Responsive Design** - Mobile-first approach
-- ✅ **Context-Based Routing** - Simple navigation system
-- ✅ **Lucide Icons** - Beautiful icon library
+- **React 18** + **TypeScript** (strict)
+- **Vite 5** for dev and builds
+- **Tailwind CSS 3** (utility-first, Meridian design tokens)
+- **react-router-dom v7** for client-side routing
+- **lucide-react** for icons
 
-## Getting Started
-
-### Install Dependencies
+## Getting started
 
 ```bash
 npm install
+npm run dev          # dev server
+npm run build        # tsc + vite build -> dist/
+npm run preview      # preview the production build
+npm run type-check   # tsc --noEmit
+npm run lint         # eslint, zero-warnings policy
+npm run lint:plan-not-book   # brand lexicon guard
 ```
 
-### Development
-
-```bash
-npm run dev
-```
-
-The app will start at `http://localhost:3000`
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-### Preview Production Build
-
-```bash
-npm run preview
-```
-
-### Type Check
-
-```bash
-npm run type-check
-```
-
-## Project Structure
+## Project structure
 
 ```
 src/
-├── marketing/
-│   ├── components/       # Layout components (Navigation, Footer)
-│   ├── pages/            # All marketing pages
-│   ├── router/           # Routing logic
-│   └── index.tsx         # Main export
-├── main.tsx              # Entry point
-└── index.css             # Global styles
+├── app/
+│   ├── components/   # Shared layout (Navigation, Footer)
+│   ├── pages/        # One file per marketing page
+│   └── router/       # PageRouter, ScrollToTop
+├── main.tsx          # Entry point
+└── index.css         # Tailwind directives + global styles
 ```
 
 ## Pages
 
-- **Home** - Hero section, features, testimonials, CTA
-- **Features** - Feature showcase
-- **Pricing** - Pricing plans with monthly/annual toggle
-- **About** - Team and company values
-- **Contact** - Contact form
-- **Privacy** - Privacy policy
-- **Terms** - Terms of service
-- **Sign In** - Authentication
-- **Sign Up** - 3-step registration flow
-- **Forgot Password** - Password reset flow
-- **App Dashboard** - Main application (after login)
+Home, How it works (`/features`), Pricing, About, Contact, Privacy, Terms,
+Data Security. This is a pre-launch marketing site with no authentication;
+"Sign up" routes to Contact until the app and payment flow are live.
 
-## Technologies
+## Contributing
 
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **Lucide React** - Icons
+Read the `AGENTS.md` chain (root and `src/app/AGENTS.md`) before editing.
+All copy follows the JarvisTravel brand voice; the plan-not-book lexicon is
+enforced in CI.
 
-## License
-
-Private - JarvisTravel
+Private. JarvisTravel.
