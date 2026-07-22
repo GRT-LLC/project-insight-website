@@ -37,8 +37,8 @@ const MOMENTS: Moment[] = [
   },
   {
     numeral: '2',
-    name: 'The day that reads 7',
-    desc: 'When a day rates 7 or above, the plan says so before you commit, and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
+    name: 'The day that comes up packed',
+    desc: 'When a day reads packed, the plan says so before you commit, and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
     soWhat: 'So you fix Tuesday at home, not mid-afternoon in a crowded plaza.',
   },
   {
@@ -116,15 +116,16 @@ export function FeaturesPage() {
               )}
             </div>
             <figcaption className="mt-4 text-[13px] text-gray-500">
-              The scale as it reads in the app: 1-3 easy, 4-6
-              balanced, 7-8 heavy, 9 the peak. A day rated 7 gets flagged
-              before you commit.
+              The scale as it reads in the app: 1-3 chill, 4-6 balanced, 7-9
+              packed (9 is the peak). A packed day gets flagged before you
+              commit.
             </figcaption>
           </figure>
 
           <p className="text-gray-600 leading-relaxed">
-            At 7 and above, Jarvis offers a lighter version of the same day so
-            you can see what dropping one thing buys you. It describes what a
+            When a day lands in packed territory (7 and above), Jarvis offers a
+            lighter version of the same day so you can see what dropping one
+            thing buys you. It describes what a
             day costs. It&rsquo;s a pacing model, not medical advice.
           </p>
         </div>
