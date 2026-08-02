@@ -94,7 +94,7 @@ export function Footer() {
             © 2026 JarvisTravel, Inc. All rights reserved.
           </p>
           <p className="text-sky-200/80 text-xs leading-relaxed">
-            JARVISTRAVEL is a trademark of JarvisTravel, Inc. The Fatigue Index
+            JARVISTRAVEL is a trademark of JarvisTravel, Inc. Fatigue Index
             is patent pending.
           </p>
         </div>
