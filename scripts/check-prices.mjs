@@ -90,6 +90,16 @@ console.log(`prices: ok — no amount literals in ${scanned.size} component file
 
 // ── half two: the constants match Stripe ────────────────────────────────────
 
+// The one Stripe account this catalogue belongs to. Same id in test and live
+// mode — the mode comes from which key you hand it — so pinning the account
+// survives the toggle that pinning price ids would not.
+//
+// This is not paranoia: a second account once held prices under the same
+// lookup keys at the same amounts, and nothing here could tell them apart,
+// because everything below resolves by lookup key (JAR-659). Right prices,
+// wrong Stripe, green check.
+const EXPECTED_ACCOUNT = 'acct_1ToBJsPDaNqc0Lek';
+
 const KEY = process.env.STRIPE_API_KEY;
 if (!KEY) {
   console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_API_KEY is not set.');
@@ -118,6 +128,23 @@ for (const m of block[0].matchAll(
 }
 if (local.size === 0) fail('could not parse any prices out of pricing.ts');
 
+async function assertAccount() {
+  const res = await fetch('https://api.stripe.com/v1/account', {
+    headers: { Authorization: `Bearer ${KEY}` },
+  });
+  const body = await res.json();
+  if (!res.ok) {
+    // Not knowing which account we are reading is itself the failure.
+    fail(`cannot read /v1/account (${body?.error?.message ?? res.status}).\n` +
+      `       Add the "Account" read permission to this restricted key.\n` +
+      `       Without it this check cannot confirm it is reading ${EXPECTED_ACCOUNT}.`);
+  }
+  if (body.id !== EXPECTED_ACCOUNT) {
+    fail(`key belongs to ${body.id}, expected ${EXPECTED_ACCOUNT} — comparing against the wrong Stripe account`);
+  }
+  console.log(`prices: reading ${body.id} (${body.livemode ? 'LIVE' : 'test'} mode)`);
+}
+
 async function stripePrices() {
   const res = await fetch('https://api.stripe.com/v1/prices?limit=100&active=true', {
     headers: { Authorization: `Bearer ${KEY}` },
@@ -126,6 +153,8 @@ async function stripePrices() {
   if (!res.ok) fail(`Stripe error (${res.status}): ${body?.error?.message ?? 'unknown'}`);
   return body.data ?? [];
 }
+
+await assertAccount();
 
 const remote = new Map();
 for (const price of await stripePrices()) {

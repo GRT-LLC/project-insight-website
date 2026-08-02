@@ -1,10 +1,13 @@
 // ============================================================================
 // PRICING — the only place on this site that knows what anything costs.
 //
-// Amounts live in Stripe. This file mirrors them, keyed by the same lookup_key
-// the backend resolves at checkout (core: config/stripe/setup.js, migration
-// 063, JAR-658/659). A lookup key is a stable handle: Stripe Prices are
-// immutable, so a price change mints a new Price and the key transfers to it.
+// Amounts live in Stripe, in account acct_1ToBJsPDaNqc0Lek — test mode today,
+// the same account in live mode at launch. This file mirrors them, keyed by the
+// same lookup_key the backend resolves at checkout (core: config/stripe/setup.js,
+// migration 063, JAR-658/659). A lookup key is a stable handle: Stripe Prices
+// are immutable, so a price change mints a new Price and the key transfers to
+// it — and it is per-mode, so the live catalogue must be created with the same
+// keys before the toggle.
 //
 // Regenerate rather than hand-edit:
 //
