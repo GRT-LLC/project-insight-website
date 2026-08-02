@@ -15,7 +15,9 @@
     "logo:check": "node scripts/gen-logo-component.mjs --check",
     "logo:vendor": "node scripts/vendor-logo.mjs",
     "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint:prices": "node scripts/check-prices.mjs",
+    "sync:prices": "node scripts/check-prices.mjs --write"
   },
   "dependencies": {
     "lucide-react": "^0.460.0",

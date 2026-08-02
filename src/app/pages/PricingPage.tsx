@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { priceOf } from '../data/pricing';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
 // Trip Pass is a real single-trip product, not a trial. Explore is the hero
@@ -25,7 +26,7 @@ const TRIP_PASS_POINTS = [
 const EXPLORE_POINTS = [
   'Full subscription access',
   'Best choice for travelers planning more than one trip',
-  'Explore Annual is the best value at $99 per year',
+  `Explore Annual is the best value at ${priceOf('jt_explore_annual')} per year`,
 ];
 
 type CadenceKey = 'annual' | 'monthly';
@@ -38,11 +39,12 @@ interface Cadence {
   best?: boolean;
 }
 
-// Single source of truth for Explore pricing - rows and the summary price
-// both render from here.
+// Cadences of ONE subscription, not separate tiers. The amounts come from
+// src/app/data/pricing.ts, which mirrors Stripe by lookup key — a price change
+// there reaches this page with no edit here (JAR-660).
 const CADENCES: Cadence[] = [
-  { key: 'annual', label: 'Annual', amount: '$99', per: 'year', best: true },
-  { key: 'monthly', label: 'Monthly', amount: '$11.95', per: 'month' },
+  { key: 'annual', label: 'Annual', amount: priceOf('jt_explore_annual'), per: 'year', best: true },
+  { key: 'monthly', label: 'Monthly', amount: priceOf('jt_explore_monthly'), per: 'month' },
 ];
 
 // The two visual states a card can be in. Both keep a 1px border so nothing
@@ -103,7 +105,7 @@ export function PricingPage() {
                     tripActive ? 'text-gray-50' : 'text-gray-900'
                   }`}
                 >
-                  $24.99
+                  {priceOf('jt_trip_pass')}
                 </span>
                 <span
                   className={`ml-2 transition-colors ${
@@ -143,7 +145,7 @@ export function PricingPage() {
               {/* Routes to the interest form until the app/payment flow is live. */}
               <Link
                 to="/contact"
-                className={`mt-auto self-start px-8 py-3.5 rounded-sm font-semibold border transition-colors text-gray-900 ${
+                className={`mt-auto self-start px-8 py-3.5 rounded-full font-semibold border transition-colors text-gray-900 ${
                   tripActive
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'
                     : 'bg-transparent border-gray-300'
@@ -216,7 +218,7 @@ export function PricingPage() {
                         </span>
                         {option.best && (
                           <span
-                            className={`text-[11px] font-semibold tracking-wide uppercase bg-amber-400/[0.12] border border-amber-400/30 px-2 py-0.5 rounded-sm transition-colors ${
+                            className={`text-[11px] font-semibold tracking-wide uppercase bg-amber-400/[0.12] border border-amber-400/30 px-2 py-0.5 rounded-full transition-colors ${
                               exploreHot ? 'text-amber-400' : 'text-amber-700'
                             }`}
                           >
@@ -284,7 +286,7 @@ export function PricingPage() {
               {/* Routes to the interest form until the app/payment flow is live. */}
               <Link
                 to="/contact"
-                className={`mt-auto w-full py-3.5 rounded-sm font-semibold text-center border transition-colors text-gray-900 ${
+                className={`mt-auto w-full py-3.5 rounded-full font-semibold text-center border transition-colors text-gray-900 ${
                   exploreHot
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'
                     : 'bg-transparent border-gray-300'
