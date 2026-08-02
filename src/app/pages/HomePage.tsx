@@ -157,7 +157,7 @@ export function HomePage() {
           {/* Routes to the interest form until the app/payment flow is live. */}
           <Link
             to="/contact"
-            className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
           >
             Join Now
           </Link>
@@ -317,7 +317,7 @@ export function HomePage() {
           {/* Routes to the interest form until the app/payment flow is live. */}
           <Link
             to="/contact"
-            className="inline-block px-10 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            className="inline-block px-10 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
           >
             Join Now
           </Link>

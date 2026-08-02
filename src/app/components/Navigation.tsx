@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Logo } from './Logo';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
@@ -33,14 +34,20 @@ export function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          {/* Wordmark stands alone until the commissioned mark lands (JAR-354). */}
+          {/* The lockup is inlined so fill="currentColor" inherits the text colour
+              here, which is how one file stays correct on both grounds. Colour
+              follows the surface, never #fff: gray-50 is Moonlight, gray-900 is
+              Neverything. No TM in the header (brand owner, 2026-08-02): the
+              footer copyright line carries it, which is the conventional place
+              for it and keeps the lockup clean. */}
           <Link
             to="/"
-            className={`text-xl font-bold tracking-tight ${
-              isLightNav ? 'text-white' : 'text-gray-900'
+            aria-label="JarvisTravel home"
+            className={`flex items-center ${
+              isLightNav ? 'text-gray-50' : 'text-gray-900'
             }`}
           >
-            JarvisTravel
+            <Logo variant="lockup" className="h-16 w-auto" title={null} />
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
@@ -52,20 +59,20 @@ export function Navigation() {
                   currentPath === link.path
                     ? 'text-sky-500'
                     : isLightNav
-                      ? 'text-white/90 hover:text-white'
+                      ? 'text-gray-50/90 hover:text-gray-50'
                       : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {link.name}
                 {currentPath === link.path && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-sky-500 rounded-full" />
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-sky-500" />
                 )}
               </Link>
             ))}
 
             <Link
               to="/contact"
-              className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-full font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
+              className="px-5 py-2.5 bg-amber-400 text-gray-900 rounded-sm font-medium hover:shadow-lg hover:shadow-amber-400/25 transition-all"
             >
               Join Now
             </Link>
@@ -75,7 +82,7 @@ export function Navigation() {
             type="button"
             onClick={() => setIsMobileMenuOpen((open) => !open)}
             className={`md:hidden p-2 rounded-lg ${
-              isLightNav ? 'text-white' : 'text-gray-900'
+              isLightNav ? 'text-gray-50' : 'text-gray-900'
             }`}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
