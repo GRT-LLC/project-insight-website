@@ -240,6 +240,11 @@ for (const [key, want] of local) {
   if (got.unit_amount !== want.amountCents) {
     mismatches.push(`${key}: site says ${money(want.amountCents)}, Stripe says ${money(got.unit_amount)}`);
   }
+  // interval_count, not just interval: a quarterly price is interval=month
+  // with count=3, and the page would render it as "per month" (L2).
+  if ((got.recurring?.interval_count ?? 1) !== 1) {
+    mismatches.push(`${key}: Stripe bills every ${got.recurring.interval_count} ${got.recurring.interval}s — the site renders a simple "per ${got.recurring.interval}"`);
+  }
   const gotInterval = got.recurring?.interval ?? null;
   if (gotInterval !== (want.interval === 'null' ? null : want.interval)) {
     mismatches.push(`${key}: site says interval ${want.interval}, Stripe says ${gotInterval}`);

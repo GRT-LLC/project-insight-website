@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { priceOf } from '../data/pricing';
+import { priceOf, type PriceLookupKey } from '../data/pricing';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
 // Trip Pass is a real single-trip product, not a trial. Explore is the hero
@@ -34,17 +34,23 @@ type CadenceKey = 'annual' | 'monthly';
 interface Cadence {
   key: CadenceKey;
   label: string;
-  amount: string;
+  // The Stripe lookup key, not a rendered string. Carrying a pre-formatted
+  // amount meant CadenceKey and PriceLookupKey were parallel namespaces with
+  // nothing tying them together, so a new cadence pointing at the wrong key
+  // would compile cleanly and render a wrong price — the exact failure this
+  // ticket exists to kill, one level up (core#36 review, M4). Typed this way,
+  // a mismatch is a compile error.
+  lookupKey: PriceLookupKey;
   per: string;
   best?: boolean;
 }
 
-// Cadences of ONE subscription, not separate tiers. The amounts come from
+// Cadences of ONE subscription, not separate tiers. Amounts come from
 // src/app/data/pricing.ts, which mirrors Stripe by lookup key — a price change
 // there reaches this page with no edit here (JAR-660).
 const CADENCES: Cadence[] = [
-  { key: 'annual', label: 'Annual', amount: priceOf('jt_explore_annual'), per: 'year', best: true },
-  { key: 'monthly', label: 'Monthly', amount: priceOf('jt_explore_monthly'), per: 'month' },
+  { key: 'annual', label: 'Annual', lookupKey: 'jt_explore_annual', per: 'year', best: true },
+  { key: 'monthly', label: 'Monthly', lookupKey: 'jt_explore_monthly', per: 'month' },
 ];
 
 // The two visual states a card can be in. Both keep a 1px border so nothing
@@ -231,7 +237,7 @@ export function PricingPage() {
                           exploreHot ? 'text-sky-100' : 'text-gray-600'
                         }`}
                       >
-                        {option.amount}
+                        {priceOf(option.lookupKey)}
                         <span
                           className={`transition-colors ${
                             exploreHot ? 'text-sky-200' : 'text-gray-500'
@@ -251,7 +257,7 @@ export function PricingPage() {
                     exploreHot ? 'text-gray-50' : 'text-gray-900'
                   }`}
                 >
-                  {cadence.amount}
+                  {priceOf(cadence.lookupKey)}
                 </span>
                 <span
                   className={`ml-2 transition-colors ${
