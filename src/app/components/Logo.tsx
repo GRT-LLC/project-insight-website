@@ -86,12 +86,12 @@ export function LogoWordmark({ className, title = 'JarvisTravel' }: LogoProps) {
   );
 }
 
-/** the swift alone */
+/** the swift alone, cropped to its own extents */
 export function LogoIcon({ className, title = 'JarvisTravel' }: LogoProps) {
   const decorative = title === null;
   return (
     <svg
-      viewBox="0 0 1920 598.08"
+      viewBox="97.21 105.7 1675.87 383.4"
       fill="currentColor"
       className={className}
       role={decorative ? undefined : 'img'}

@@ -72,7 +72,139 @@ function parse(name) {
     );
   }
 
-  return { viewBox: vb[1], inner };
+  assertSafeMarkup(file, inner);
+  return { viewBox: vb[1], inner, bounds: contentBounds(raw) };
+}
+
+// ── Source-mark validation ───────────────────────────────────────────────────
+// The generator is the ONLY gate between a design-library SVG and markup that
+// gets inlined into every visitor's DOM. Inlining is deliberate — it is what
+// makes fill="currentColor" work — and it is also what makes an unvalidated
+// mark an XSS vector: a <script> rendered through JSX executes on insertion,
+// an <image href> is an external fetch, and a `{` in a text node becomes an
+// evaluated JSX expression at module scope.
+//
+// Reviewers proved all four against the previous version by crafting a source
+// SVG. "The source is trusted" is not a control; this is (review H1).
+
+/** The only elements a normalised mark may contain. */
+const ALLOWED_TAGS = new Set(['path', 'g']);
+
+/** The only attributes those elements may carry. */
+const ALLOWED_ATTRS = new Set([
+  'd', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin',
+  'fill-rule', 'clip-rule', 'transform', 'opacity', 'class',
+]);
+
+/** Constructs that are never acceptable, checked before the structural pass so
+ *  the error names the actual danger rather than an incidental tag mismatch. */
+const FORBIDDEN = [
+  [/<\s*script/i, '<script> — executes on insertion when rendered through JSX'],
+  [/<\s*foreignObject/i, '<foreignObject> — arbitrary HTML inside the SVG'],
+  [/<\s*image/i, '<image> — fetches an external resource from every visitor'],
+  [/<\s*use\b/i, '<use> — dereferences a URL, including cross-document'],
+  [/\son[a-z]+\s*=/i, 'an on* event handler attribute'],
+  [/xlink:/i, 'an xlink: reference'],
+  [/javascript:/i, 'a javascript: URL'],
+  [/[{}]/, 'a brace — inside JSX this is an evaluated expression, not a character'],
+];
+
+export function assertSafeMarkup(file, inner) {
+  for (const [pattern, why] of FORBIDDEN) {
+    const hit = pattern.exec(inner);
+    if (hit) {
+      throw new Error(`${file} contains ${why}\n  at: ${excerpt(inner, hit.index)}`);
+    }
+  }
+
+  for (const tag of inner.matchAll(/<\s*\/?\s*([a-zA-Z][\w:-]*)/g)) {
+    if (!ALLOWED_TAGS.has(tag[1].toLowerCase())) {
+      throw new Error(
+        `${file} contains <${tag[1]}>, which is not one of: ${[...ALLOWED_TAGS].join(', ')}\n` +
+          `  Add it here only after deciding it is safe to inline into the DOM.`
+      );
+    }
+  }
+
+  for (const attr of inner.matchAll(/\s([a-zA-Z][\w:-]*)\s*=\s*["']/g)) {
+    if (!ALLOWED_ATTRS.has(attr[1].toLowerCase())) {
+      throw new Error(`${file} carries the attribute "${attr[1]}", which is not on the allowlist.`);
+    }
+  }
+
+  // ids are stripped from the markup, but url(#…) references are not — so a
+  // gradient, mask, clip-path or filter would survive as a reference to a
+  // definition that no longer exists and render as nothing, silently (review).
+  const reference = /url\(\s*#([\w-]+)\s*\)/.exec(inner);
+  if (reference) {
+    throw new Error(
+      `${file} references url(#${reference[1]}), but ids are stripped from the markup —\n` +
+        `  the definition it points at will not exist and the mark will render blank.\n` +
+        `  Flatten the gradient/mask/clip-path upstream, or teach this script to keep the id.`
+    );
+  }
+}
+
+function excerpt(s, at) {
+  return JSON.stringify(s.slice(Math.max(0, at - 20), at + 60));
+}
+
+
+// ── Content bounds ──────────────────────────────────────────────────────────
+// All three source marks carry the same wide canvas, so the icon rendered in a
+// square slot scaled the whole thing down and left the swift letterboxed. The
+// favicon squares its own viewBox, but the LogoIcon component did not.
+
+// Walk an SVG path's commands and return the bounding box of every point it
+// touches. Bezier control points are included rather than the true curve
+// extrema: the curve lies inside the convex hull of its control points, so the
+// box is conservative — it can be a hair generous, never clipping.
+function pathBounds(d) {
+  const tokens = d.match(/[MmLlHhVvCcSsQqTtAaZz]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? [];
+  let x = 0, y = 0, startX = 0, startY = 0, cmd = '';
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const see = (px, py) => {
+    if (px < minX) minX = px; if (px > maxX) maxX = px;
+    if (py < minY) minY = py; if (py > maxY) maxY = py;
+  };
+  let i = 0;
+  const num = () => Number(tokens[i++]);
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (/[MmLlHhVvCcSsQqTtAaZz]/.test(t)) { cmd = t; i++; }
+    const rel = cmd === cmd.toLowerCase();
+    switch (cmd.toUpperCase()) {
+      case 'M': { const nx = num(), ny = num(); x = rel ? x + nx : nx; y = rel ? y + ny : ny; startX = x; startY = y; see(x, y); cmd = rel ? 'l' : 'L'; break; }
+      case 'L': { const nx = num(), ny = num(); x = rel ? x + nx : nx; y = rel ? y + ny : ny; see(x, y); break; }
+      case 'H': { const nx = num(); x = rel ? x + nx : nx; see(x, y); break; }
+      case 'V': { const ny = num(); y = rel ? y + ny : ny; see(x, y); break; }
+      case 'C': { for (let k = 0; k < 3; k++) { const cx = num(), cy = num(); const ax = rel ? x + cx : cx, ay = rel ? y + cy : cy; see(ax, ay); if (k === 2) { x = ax; y = ay; } } break; }
+      case 'S': case 'Q': { for (let k = 0; k < 2; k++) { const cx = num(), cy = num(); const ax = rel ? x + cx : cx, ay = rel ? y + cy : cy; see(ax, ay); if (k === 1) { x = ax; y = ay; } } break; }
+      case 'T': { const cx = num(), cy = num(); x = rel ? x + cx : cx; y = rel ? y + cy : cy; see(x, y); break; }
+      case 'A': { num(); num(); num(); num(); num(); const cx = num(), cy = num(); x = rel ? x + cx : cx; y = rel ? y + cy : cy; see(x, y); break; }
+      case 'Z': { x = startX; y = startY; break; }
+      default: i++;
+    }
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+
+/** The box every path in this SVG actually occupies, with a little air. */
+function contentBounds(raw) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const d of raw.matchAll(/\sd\s*=\s*["']([^"']+)["']/g)) {
+    const b = pathBounds(d[1]);
+    minX = Math.min(minX, b.minX); minY = Math.min(minY, b.minY);
+    maxX = Math.max(maxX, b.maxX); maxY = Math.max(maxY, b.maxY);
+  }
+  if (!Number.isFinite(minX)) return null;
+  const pad = Math.max(maxX - minX, maxY - minY) * 0.01;
+  return {
+    viewBox: [minX - pad, minY - pad, maxX - minX + pad * 2, maxY - minY + pad * 2]
+      .map((n) => Math.round(n * 100) / 100)
+      .join(' '),
+  };
 }
 
 const lockup = parse('lockup');
@@ -82,7 +214,7 @@ const icon = parse('icon');
 const VARIANTS = [
   ['LogoLockup', 'lockup', lockup, 'wordmark + swift — the attribution mark'],
   ['LogoWordmark', 'wordmark', wordmark, 'type only'],
-  ['LogoIcon', 'icon', icon, 'the swift alone'],
+  ['LogoIcon', 'icon', { ...icon, viewBox: icon.bounds?.viewBox ?? icon.viewBox }, 'the swift alone, cropped to its own extents'],
 ];
 
 const component = `// GENERATED by scripts/gen-logo-component.mjs — do not hand-edit.

@@ -13,6 +13,7 @@
     "logo:gen": "node scripts/gen-logo-component.mjs",
     "logo:check": "node scripts/gen-logo-component.mjs --check",
     "logo:vendor": "node scripts/vendor-logo.mjs",
+    "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

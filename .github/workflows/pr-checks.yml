@@ -32,8 +32,14 @@ jobs:
         run: npm run lint:plan-not-book
       - name: Social meta guard
         run: npm run lint:social-meta
-      - name: Brand mark is in sync with brand/logo/
-        run: npm run logo:check
+      - name: Brand mark is in sync, and the generator refuses hostile sources
+        # Two things: the committed Logo.tsx and favicon.svg must still match
+        # brand/logo/, and the generator's allowlist must still refuse a source
+        # SVG carrying <script>, on*, <image>, <use> or a JSX brace — it is the
+        # only gate between a mark and every visitor's DOM.
+        run: |
+          npm run logo:check
+          npm run test:scripts
       - name: Lint
         run: npm run lint
       - name: Build
