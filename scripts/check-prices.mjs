@@ -19,12 +19,14 @@
 // a failure, never a pass.
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { join, extname, sep } from 'node:path';
 
 const ROOT = process.cwd();
 const PRICING_FILE = join(ROOT, 'src/app/data/pricing.ts');
 const COMPONENT_DIRS = ['src/app/pages', 'src/app/components', 'src/app'];
 const WRITE = process.argv.includes('--write');
+// Skipping the Stripe half has to be asked for. See the STRIPE_API_KEY branch.
+const ALLOW_SKIP = process.argv.includes('--allow-skip');
 
 const fail = (msg) => {
   console.error(`prices: ${msg}`);
@@ -65,7 +67,9 @@ for (const dir of COMPONENT_DIRS) {
   for (const rel of sourceFiles(dir)) {
     if (scanned.has(rel)) continue;
     scanned.add(rel);
-    if (rel === 'src/app/data/pricing.ts') continue; // the one place amounts belong
+    // Normalise separators: join() yields backslashes on Windows, so comparing
+    // against a forward-slash literal silently failed to exclude the file.
+    if (rel.split(sep).join('/') === 'src/app/data/pricing.ts') continue; // the one place amounts belong
 
     const text = readFileSync(join(ROOT, rel), 'utf8');
     text.split('\n').forEach((line, i) => {
@@ -100,10 +104,31 @@ console.log(`prices: ok — no amount literals in ${scanned.size} component file
 // wrong Stripe, green check.
 const EXPECTED_ACCOUNT = 'acct_1ToBJsPDaNqc0Lek';
 
+// The three keys this catalogue is defined as having. Asserted as an exact set
+// below, so a key *deleted* from pricing.ts fails here rather than at runtime
+// when priceOf() reaches into undefined.
+const EXPECTED_KEYS = ['jt_trip_pass', 'jt_explore_annual', 'jt_explore_monthly'];
+
 const KEY = process.env.STRIPE_API_KEY;
 if (!KEY) {
-  console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_API_KEY is not set.');
-  console.log('        Set a restricted, read-only key to verify the amounts really match.');
+  // Fail closed. A guard whose whole promise is "fail when it drifts" must not
+  // report success when it did not check — and it did exactly that in CI,
+  // because the repo secret was never configured: every PR got a green
+  // "SKIPPED the Stripe reconciliation" and nobody looked again.
+  //
+  // Local runs without a key are legitimate, so they can opt out explicitly.
+  // CI cannot: there is no reading of an unset secret that means "verified".
+  if (!ALLOW_SKIP) {
+    console.error('prices: STRIPE_API_KEY is not set, so the Stripe reconciliation did not run.');
+    console.error('');
+    console.error('  In CI: configure the STRIPE_API_KEY repo secret (restricted, read-only, test mode).');
+    console.error('  Locally: pass --allow-skip to run only the literal scan.');
+    console.error('');
+    console.error('Exiting non-zero rather than passing as if the amounts had been checked.');
+    process.exit(1);
+  }
+  console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_API_KEY is not set (--allow-skip).');
+  console.log('        The literal scan above still ran. Amounts were NOT verified against Stripe.');
   process.exit(0);
 }
 if (KEY.includes('_live_')) fail('refusing to run against a live key — use a restricted test key');
@@ -120,13 +145,55 @@ const BLOCK = /\/\/ BEGIN GENERATED PRICES[\s\S]*?\/\/ END GENERATED PRICES/;
 const block = module_.match(BLOCK);
 if (!block) fail('pricing.ts has no BEGIN/END GENERATED PRICES block to reconcile');
 
+// Parsing has to be all-or-nothing. Anything this regex fails to understand is
+// an amount rendered on the site that nothing compared against Stripe, and the
+// old `local.size === 0` check only caught the case where *every* entry broke.
+// One malformed entry — reordered fields, a numeric separator like 2_499 — was
+// silently dropped and the guard still reported ok.
+const ENTRY =
+  /(\w+):\s*\{\s*lookupKey:\s*'([^']+)',\s*amountCents:\s*(\d+),\s*currency:\s*'([^']+)',\s*interval:\s*(null|'[^']+')\s*\}/g;
+
 const local = new Map();
-for (const m of block[0].matchAll(
-  /(\w+):\s*\{\s*lookupKey:\s*'([^']+)',\s*amountCents:\s*(\d+),\s*currency:\s*'([^']+)',\s*interval:\s*(null|'[^']+')/g,
-)) {
-  local.set(m[2], { amountCents: Number(m[3]), currency: m[4], interval: m[5].replace(/'/g, '') });
+for (const m of block[0].matchAll(ENTRY)) {
+  const [, propName, lookupKey, amount, currency, interval] = m;
+  // Key by the property name, and require the lookupKey to agree with it.
+  // Keying by the lookupKey value let a typo'd entry — jt_trip_pass pointing at
+  // 'jt_explore_annual' — collapse two entries into one. Both survivors matched
+  // Stripe, the guard passed, and the site rendered an unverified $24.99.
+  if (propName !== lookupKey) {
+    fail(`pricing.ts: entry '${propName}' has lookupKey '${lookupKey}' — they must be identical`);
+  }
+  if (local.has(propName)) fail(`pricing.ts: '${propName}' is defined more than once`);
+  local.set(propName, {
+    amountCents: Number(amount),
+    currency,
+    interval: interval.replace(/'/g, ''),
+  });
 }
-if (local.size === 0) fail('could not parse any prices out of pricing.ts');
+
+// Every top-level `name: {` in the block must have been understood above.
+const declared = [...block[0].matchAll(/^\s{2}(\w+):\s*\{/gm)].map((m) => m[1]);
+const unparsed = declared.filter((name) => !local.has(name));
+if (unparsed.length) {
+  fail(
+    `pricing.ts: could not parse ${unparsed.join(', ')} — the guard would have skipped ` +
+      'them and reported ok. Fix the entry, or the parser if the shape changed.',
+  );
+}
+
+// And the set has to be exactly what we expect: a *deleted* key used to pass,
+// because the remaining entries still matched Stripe. priceOf() then hit
+// undefined.amountCents and took the pricing page down at runtime.
+const missing = EXPECTED_KEYS.filter((k) => !local.has(k));
+const extra = [...local.keys()].filter((k) => !EXPECTED_KEYS.includes(k));
+if (missing.length || extra.length) {
+  fail(
+    'pricing.ts does not define exactly the expected catalogue' +
+      (missing.length ? `\n  missing: ${missing.join(', ')}` : '') +
+      (extra.length ? `\n  unexpected: ${extra.join(', ')}` : '') +
+      '\n  If the catalogue really changed, update EXPECTED_KEYS and PriceLookupKey together.',
+  );
+}
 
 async function assertAccount() {
   const res = await fetch('https://api.stripe.com/v1/account', {
@@ -177,18 +244,45 @@ for (const [key, want] of local) {
   if (gotInterval !== (want.interval === 'null' ? null : want.interval)) {
     mismatches.push(`${key}: site says interval ${want.interval}, Stripe says ${gotInterval}`);
   }
+  // currency was parsed and then never compared, so a price flipped to another
+  // currency in Stripe passed green while the site kept rendering a $ sign.
+  if (got.currency !== want.currency) {
+    mismatches.push(`${key}: site says ${want.currency}, Stripe says ${got.currency}`);
+  }
 }
 
 if (WRITE) {
+  // Everything below is interpolated into a committed .ts file, so every field
+  // is validated before it gets there. Values arriving from an API are not
+  // trusted source code: a leaked restricted key plus `npm run sync:prices`
+  // would otherwise be enough to write arbitrary TypeScript into the repo via
+  // a currency of `usd' }, evil: {`. The guard would then pass, because it
+  // checks that the file agrees with Stripe, not that Stripe is sane.
+  const STRIPE_INTERVALS = ['day', 'week', 'month', 'year'];
   const lines = [...local.keys()].map((key) => {
     const got = remote.get(key);
     if (!got) fail(`cannot rewrite: Stripe has no active price with lookup_key ${key}`);
-    const interval = got.recurring?.interval ? `'${got.recurring.interval}'` : 'null';
+
+    if (!/^[a-z0-9_]+$/.test(got.lookup_key ?? '')) {
+      fail(`cannot rewrite: Stripe lookup_key ${JSON.stringify(got.lookup_key)} is not [a-z0-9_]`);
+    }
+    if (!Number.isSafeInteger(got.unit_amount) || got.unit_amount <= 0) {
+      fail(`cannot rewrite: ${key} has unit_amount ${JSON.stringify(got.unit_amount)}`);
+    }
+    if (got.currency !== 'usd') {
+      fail(`cannot rewrite: ${key} is ${JSON.stringify(got.currency)}, expected usd`);
+    }
+    const rawInterval = got.recurring?.interval ?? null;
+    if (rawInterval !== null && !STRIPE_INTERVALS.includes(rawInterval)) {
+      fail(`cannot rewrite: ${key} has interval ${JSON.stringify(rawInterval)}`);
+    }
+
+    const interval = rawInterval ? `'${rawInterval}'` : 'null';
     return `  ${key}: { lookupKey: '${key}', amountCents: ${got.unit_amount}, currency: '${got.currency}', interval: ${interval} },`;
   });
   const rebuilt = [
     '// BEGIN GENERATED PRICES — npm run sync:prices',
-    'export const PRICES: Record<PriceLookupKey, Price> = {',
+    'export const PRICES: Readonly<Record<PriceLookupKey, Price>> = {',
     ...lines,
     '};',
     '// END GENERATED PRICES',

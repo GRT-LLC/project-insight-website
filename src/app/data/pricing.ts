@@ -25,16 +25,16 @@
 export type PriceLookupKey = 'jt_trip_pass' | 'jt_explore_annual' | 'jt_explore_monthly';
 
 export interface Price {
-  lookupKey: PriceLookupKey;
+  readonly lookupKey: PriceLookupKey;
   /** Minor units, exactly as Stripe stores them. */
-  amountCents: number;
-  currency: 'usd';
+  readonly amountCents: number;
+  readonly currency: 'usd';
   /** Billing period, or null for a one-time purchase. */
-  interval: 'month' | 'year' | null;
+  readonly interval: 'month' | 'year' | null;
 }
 
 // BEGIN GENERATED PRICES — npm run sync:prices
-export const PRICES: Record<PriceLookupKey, Price> = {
+export const PRICES: Readonly<Record<PriceLookupKey, Price>> = {
   jt_trip_pass: { lookupKey: 'jt_trip_pass', amountCents: 2499, currency: 'usd', interval: null },
   jt_explore_annual: { lookupKey: 'jt_explore_annual', amountCents: 9900, currency: 'usd', interval: 'year' },
   jt_explore_monthly: { lookupKey: 'jt_explore_monthly', amountCents: 1195, currency: 'usd', interval: 'month' },
