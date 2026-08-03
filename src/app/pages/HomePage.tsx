@@ -233,7 +233,7 @@ export function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="max-w-2xl mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 [text-wrap:balance] mb-4">
-              One plan, instead of twelve tabs.
+              One plan, not twelve tabs.
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
               Everything that makes a trip work, and everything you&rsquo;d
@@ -287,7 +287,7 @@ export function HomePage() {
                 No ads, ever.
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Your plan isn&rsquo;t a billboard.
+                Your plan doesn&rsquo;t need billboards.
               </p>
             </li>
             <li className="py-6 border-b border-gray-200">
