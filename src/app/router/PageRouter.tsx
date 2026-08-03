@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useRouteMeta } from '../seo/useRouteMeta';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { HomePage } from '../pages/HomePage';
@@ -11,6 +12,9 @@ import { TermsPage } from '../pages/TermsPage';
 import { DataSecurityPage } from '../pages/DataSecurityPage';
 
 function MarketingLayout({ children }: { children: React.ReactNode }) {
+  // Sync the document head (title, description, canonical, social tags) to the
+  // active route. Runs here because this layout wraps every marketing page.
+  useRouteMeta();
   return (
     <>
       {/* Keyboard users land here first; jumps past the nav to the content. */}

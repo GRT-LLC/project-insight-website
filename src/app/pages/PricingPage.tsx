@@ -103,7 +103,7 @@ export function PricingPage() {
                     tripActive ? 'text-gray-50' : 'text-gray-900'
                   }`}
                 >
-                  $24.95
+                  $24.99
                 </span>
                 <span
                   className={`ml-2 transition-colors ${

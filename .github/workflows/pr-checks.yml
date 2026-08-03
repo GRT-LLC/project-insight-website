@@ -30,6 +30,8 @@ jobs:
         run: npm i
       - name: Plan-not-book language guard
         run: npm run lint:plan-not-book
+      - name: Social meta guard
+        run: npm run lint:social-meta
       - name: Lint
         run: npm run lint
       - name: Build
