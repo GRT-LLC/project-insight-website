@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { priceOf, type PriceLookupKey } from '../data/pricing';
+import { priceOf, annualSavingPercent, type PriceLookupKey } from '../data/pricing';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
 // Trip Pass is a real single-trip product, not a trial. Explore is the hero
@@ -23,10 +23,16 @@ const TRIP_PASS_POINTS = [
   'Good for travelers who have one trip in mind right now',
 ];
 
+// Derived from the generated PRICES block, so the badge and this bullet can
+// never disagree with the amounts rendered beside them.
+const SAVING_PCT = annualSavingPercent();
+
 const EXPLORE_POINTS = [
   'Full subscription access',
   'Best choice for travelers planning more than one trip',
-  `Explore Annual is the best value at ${priceOf('jt_explore_annual')} per year`,
+  SAVING_PCT !== null
+    ? `Explore Annual is ${priceOf('jt_explore_annual')} per year, ${SAVING_PCT}% less than paying monthly`
+    : `Explore Annual is ${priceOf('jt_explore_annual')} per year`,
 ];
 
 type CadenceKey = 'annual' | 'monthly';
@@ -222,13 +228,13 @@ export function PricingPage() {
                         >
                           {option.label}
                         </span>
-                        {option.best && (
+                        {option.best && SAVING_PCT !== null && (
                           <span
                             className={`text-[11px] font-semibold tracking-wide uppercase bg-amber-400/[0.12] border border-amber-400/30 px-2 py-0.5 rounded-full transition-colors ${
                               exploreHot ? 'text-amber-400' : 'text-amber-700'
                             }`}
                           >
-                            Best value
+                            Save {SAVING_PCT}%
                           </span>
                         )}
                       </span>

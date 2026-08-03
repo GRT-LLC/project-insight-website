@@ -60,3 +60,21 @@ export function priceOf(key: PriceLookupKey): string {
   const price = PRICES[key];
   return formatPrice(price.amountCents, price.currency);
 }
+
+/** What paying annually saves against paying monthly, as a whole percent, or
+ *  null when the comparison cannot honestly be made.
+ *
+ *  Replaces a hardcoded "Best value" badge. That claim is only true relative to
+ *  something, and stating it without the number invites the reader to wonder
+ *  what it beats. Derived from PRICES — which is the generated block, synced
+ *  from Stripe — so the figure cannot drift from the amounts rendered beside it.
+ *
+ *  Returns null rather than guessing when annual is not actually cheaper, which
+ *  keeps the badge honest if the catalogue ever changes shape. */
+export function annualSavingPercent(): number | null {
+  const year = PRICES.jt_explore_annual.amountCents;
+  const month = PRICES.jt_explore_monthly.amountCents;
+  if (!Number.isFinite(year) || !Number.isFinite(month) || month <= 0) return null;
+  const pct = Math.round((1 - year / (month * 12)) * 100);
+  return pct > 0 ? pct : null;
+}
