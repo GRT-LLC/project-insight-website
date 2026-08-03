@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Logo } from './Logo';
+import { LogoLockup } from './Logo';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
@@ -47,7 +47,7 @@ export function Navigation() {
               isLightNav ? 'text-gray-50' : 'text-gray-900'
             }`}
           >
-            <Logo variant="lockup" className="h-16 w-auto" title={null} />
+            <LogoLockup className="h-16 w-auto" title={null} />
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">

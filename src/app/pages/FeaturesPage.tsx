@@ -209,7 +209,10 @@ export function FeaturesPage() {
                     </span>
                     <span className="flex-1 text-gray-900">{stop.name}</span>
                     <span
-                      className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+                      // A circle, not a pill. The de-pilling sweep replaced
+                      // every rounded-full in the file, but this one is a 10px
+                      // band-status dot — the shape IS the affordance (review L8).
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: BAND_COLOR[stop.band] }}
                       title={stop.band}
                     />

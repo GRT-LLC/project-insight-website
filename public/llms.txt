@@ -5,7 +5,7 @@
 ## Key pages
 
 - [Home](https://www.jarvistravel.com/): Landing page with feature overview, testimonials, and call-to-action for the AI travel planning service
-- [Features](https://www.jarvistravel.com/features): Detailed breakdown of AI Trip Planning, Fatigue Index™ itinerary optimization, real-time weather integration, receipt scanning, expense tracking, and hotel price comparison
+- [Features](https://www.jarvistravel.com/features): Detailed breakdown of AI Trip Planning, Fatigue Index itinerary optimization, real-time weather integration, receipt scanning, expense tracking, and hotel price comparison
 - [Pricing](https://www.jarvistravel.com/pricing): Subscription plans and Early Access pricing tiers for the JarvisTravel platform
 - [About](https://www.jarvistravel.com/about): Company background and mission for JarvisTravel
 - [Contact](https://www.jarvistravel.com/contact): Support contact form and inquiry submission
@@ -18,7 +18,7 @@
 ## Core features
 
 - **AI Trip Planning**: Personalized itineraries built from natural-language preferences, considering weather, local events, interests, and optimal timing
-- **Fatigue Index™**: Proprietary system that scores and optimizes itineraries to balance activity and rest for maximum enjoyment
+- **Fatigue Index**: Proprietary system that scores and optimizes itineraries to balance activity and rest for maximum enjoyment
 - **Real-time Weather Integration**: Live weather data integrated into trip planning and itinerary recommendations
 - **Receipt Scanning**: Automatic receipt processing and expense categorization using AI-powered OCR
 - **Expense Tracking**: Multi-trip expense management with categorization, budgets, and export capabilities
