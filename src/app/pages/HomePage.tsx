@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { useImage, imageSrcSet } from '../utils/imagery';
 
 // Home (JAR-431). Benefit-led story per the jarvistravel-copy voice skill:
 // what a traveler misses without JarvisTravel and what planning wrong costs.
@@ -50,14 +49,6 @@ const HEROES: Hero[] = [
     sub: 'The days, the budget, the map and the journal, together in one place that thinks about pacing.',
   },
 ];
-
-// The "Not just the big trip" band pulls a golden-hour travel photo the same
-// way the app does - the Pexels integration (see utils/imagery). With no
-// VITE_PEXELS_API_KEY the lookup returns nothing and the band renders its
-// designed navy-and-motif fallback, so the site never ships an empty frame.
-const BREADTH_QUERY = 'golden hour city travel walking';
-const BREADTH_ALT =
-  'Travelers walking a sunlit street at golden hour.';
 
 interface Feature {
   icon: LucideIcon;
@@ -137,10 +128,6 @@ export function HomePage() {
   const [hero] = useState<Hero>(
     () => HEROES[Math.floor(Math.random() * HEROES.length)]
   );
-  // Undefined until (and unless) a Pexels key yields a photo; the band falls
-  // back to its navy treatment when this stays undefined.
-  const breadthPhoto = useImage(BREADTH_QUERY, undefined);
-
   return (
     <div>
       {/* Hero: the story, not the mechanics. */}
@@ -194,28 +181,12 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Every trip counts, as a full-bleed editorial band. A Pexels photo
-          loads under the ratified Neverything scrim when a key is set;
-          otherwise the band is the designed navy-and-motif fallback. */}
+      {/* Every trip counts, as a full-bleed editorial band: the designed navy
+          and motif treatment (JAR-437 — photography returns post-launch as
+          JAR-647, self-hosted rather than fetched). */}
       <section className="relative overflow-hidden bg-sky-600 min-h-[46vh] flex items-center">
-        {breadthPhoto ? (
-          <>
-            <img
-              src={breadthPhoto}
-              srcSet={imageSrcSet(breadthPhoto)}
-              sizes="100vw"
-              alt={BREADTH_ALT}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            {/* The one ratified gradient: single-hue Neverything scrim. */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#13181B]/85 via-[#13181B]/45 to-[#13181B]/35" />
-          </>
-        ) : (
-          <>
-            <ContourArcs className="absolute -top-40 -left-40 w-[520px] h-[520px]" />
-            <ContourArcs className="absolute -bottom-52 -right-36 w-[520px] h-[520px]" />
-          </>
-        )}
+        <ContourArcs className="absolute -top-40 -left-40 w-[520px] h-[520px]" />
+        <ContourArcs className="absolute -bottom-52 -right-36 w-[520px] h-[520px]" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-50 [text-wrap:balance] mb-6">
             Not just the big trip.
