@@ -23,7 +23,7 @@ const SECTIONS: Section[] = [
     paragraphs: [
       <>
         JarvisTravel provides AI-powered travel planning, trip intelligence,
-        budget tracking, and the Fatigue Index&trade; system. Features may vary
+        budget tracking, and the Fatigue Index system. Features may vary
         by plan.
       </>,
       <>

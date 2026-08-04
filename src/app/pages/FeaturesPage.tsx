@@ -188,7 +188,7 @@ export function FeaturesPage() {
                   Day 1 &middot; Rome
                 </p>
                 <span
-                  className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full"
+                  className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-sm"
                   style={{ color: '#059669', backgroundColor: '#0596691A' }}
                 >
                   Balanced
@@ -209,6 +209,9 @@ export function FeaturesPage() {
                     </span>
                     <span className="flex-1 text-gray-900">{stop.name}</span>
                     <span
+                      // A circle, not a pill. The de-pilling sweep replaced
+                      // every rounded-full in the file, but this one is a 10px
+                      // band-status dot — the shape IS the affordance (review L8).
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: BAND_COLOR[stop.band] }}
                       title={stop.band}
@@ -251,7 +254,7 @@ export function FeaturesPage() {
           <div className="text-center mt-12">
             <Link
               to="/contact"
-              className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+              className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
             >
               Join Now
             </Link>

@@ -50,6 +50,9 @@ jobs:
         run: npm run lint:plan-not-book
       - name: Social meta guard
         run: npm run lint:social-meta
+
+      - name: OG card is the real lockup
+        run: npm run lint:og-card
       - name: Build
         run: npm run build
       - name: Setup Pages

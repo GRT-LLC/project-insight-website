@@ -10,6 +10,11 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:plan-not-book": "node scripts/check-plan-not-book.mjs",
     "lint:social-meta": "node scripts/check-social-meta.mjs",
+    "lint:og-card": "node scripts/check-og-card.mjs",
+    "logo:gen": "node scripts/gen-logo-component.mjs",
+    "logo:check": "node scripts/gen-logo-component.mjs --check",
+    "logo:vendor": "node scripts/vendor-logo.mjs",
+    "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

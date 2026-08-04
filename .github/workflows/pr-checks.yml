@@ -32,6 +32,22 @@ jobs:
         run: npm run lint:plan-not-book
       - name: Social meta guard
         run: npm run lint:social-meta
+      - name: OG card is the real lockup
+        # JAR-628 said marketing#32 "must be closed, not merged" because it
+        # installed a card drawing a placeholder "JT" tile. It was merged, and
+        # main shipped that placeholder on every link preview. A checksum is
+        # blunt, but the card is a binary this repo does not generate — there is
+        # nothing subtler to assert, and blunt would have caught it.
+        run: npm run lint:og-card
+
+      - name: Brand mark is in sync, and the generator refuses hostile sources
+        # Two things: the committed Logo.tsx and favicon.svg must still match
+        # brand/logo/, and the generator's allowlist must still refuse a source
+        # SVG carrying <script>, on*, <image>, <use> or a JSX brace — it is the
+        # only gate between a mark and every visitor's DOM.
+        run: |
+          npm run logo:check
+          npm run test:scripts
       - name: Lint
         run: npm run lint
       - name: Build

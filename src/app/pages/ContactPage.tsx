@@ -41,7 +41,7 @@ export function ContactPage() {
                 the app/payment flow when that is hooked up. */}
             <a
               href="https://www.jarvistravel.com/"
-              className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+              className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
             >
               Join Now
             </a>
