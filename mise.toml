@@ -1,0 +1,6 @@
+# mise.toml — JarvisTravel marketing website
+# Pins the Node toolchain for local dev and CI (JAR-748).
+# CI (deploy-droplet.yml) uses Node 22.x — keep in sync.
+
+[tools]
+node = "22"
