@@ -1,0 +1,8 @@
+# mise.toml — JarvisTravel marketing website
+# Pins the Node toolchain for local dev and CI (JAR-748).
+# deploy-droplet.yml uses Node 22.x — keep in sync.
+# node.js.yml + pr-checks.yml ran 23.x (EOL); pr-checks aligned to 22.x here,
+# node.js.yml tracked in JAR-755.
+
+[tools]
+node = "22"
