@@ -53,6 +53,25 @@ jobs:
 
       - name: OG card is the real lockup
         run: npm run lint:og-card
+      # Pricing guard — this is the Pages shipping path, so it must carry the
+      # same drift gate as the droplet deploy (review deleg_dd2f886e Sec-M1 /
+      # Design-F4: previously the guard only gated deploy-droplet, so drifted
+      # prices shipped unguarded to the Pages URL). --network-warn: a Stripe
+      # outage must not block shipping; a verified mismatch still fails.
+      - name: Assert the pricing secret is configured
+        run: |
+          if [ -z "$STRIPE_API_KEY" ]; then
+            echo "::error::STRIPE_API_KEY repo secret is not configured. The pricing guard"
+            echo "::error::cannot reconcile against Stripe without it, and a green check here"
+            echo "::error::would mean nothing. Add a restricted, read-only test-mode key."
+            exit 1
+          fi
+        env:
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+      - name: Pricing guard
+        run: npm run lint:prices -- --network-warn
+        env:
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
       - name: Build
         run: npm run build
       - name: Setup Pages

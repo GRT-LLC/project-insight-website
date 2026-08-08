@@ -61,6 +61,17 @@ export function priceOf(key: PriceLookupKey): string {
   return formatPrice(price.amountCents, price.currency);
 }
 
+/**
+ * The billing period rendered next to an amount, derived from the interval
+ * Stripe verifies — "per year", "per month", or "per trip" for a one-time
+ * purchase. Deriving kills the parallel "per" namespace: a cadence whose
+ * rendered period disagreed with its interval used to compile cleanly and
+ * pass every guard while showing "$99 per month" (review deleg_dd2f886e).
+ */
+export function periodOf(key: PriceLookupKey): string {
+  return PRICES[key].interval ?? 'trip';
+}
+
 /** What paying annually saves against paying monthly, as a whole percent, or
  *  null when the comparison cannot honestly be made.
  *

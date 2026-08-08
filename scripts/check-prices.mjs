@@ -27,6 +27,9 @@ const COMPONENT_DIRS = ['src/app/pages', 'src/app/components', 'src/app'];
 const WRITE = process.argv.includes('--write');
 // Skipping the Stripe half has to be asked for. See the STRIPE_API_KEY branch.
 const ALLOW_SKIP = process.argv.includes('--allow-skip');
+// Deploy-time mode: a network/API outage warns instead of failing the deploy
+// (pr-checks stays strict). A verified mismatch still fails in both modes.
+const NETWORK_WARN = process.argv.includes('--network-warn');
 
 const fail = (msg) => {
   console.error(`prices: ${msg}`);
@@ -39,6 +42,11 @@ const fail = (msg) => {
 // a false positive is a five-second conversation, a false negative is a wrong
 // price on the public site.
 const MONEY = /\$\s?\d[\d,]*(?:\.\d{2})?/g;
+
+// The "doing it right" escape hatch: formatPrice(2499) renders $24.99 with no
+// $ literal in the file — the natural next move for a dev reintroducing a
+// hardcoded amount (review deleg_dd2f886e). Flag it too.
+const HARDCODED_FORMAT = /formatPrice\s*\(\s*['"\d]/;
 
 function sourceFiles(dir) {
   const out = [];
@@ -72,11 +80,35 @@ for (const dir of COMPONENT_DIRS) {
     if (rel.split(sep).join('/') === 'src/app/data/pricing.ts') continue; // the one place amounts belong
 
     const text = readFileSync(join(ROOT, rel), 'utf8');
+    let inBlockComment = false;
     text.split('\n').forEach((line, i) => {
       // Comments explaining the history are allowed to name old prices.
-      const code = line.replace(/\/\/.*$/, '').replace(/\/\*.*?\*\//g, '');
+      // Stateful: a multi-line /* ... */ block is stripped across lines, not
+      // just per-line (review deleg_dd2f886e — a $24.95 in a narrative block
+      // comment was a false positive).
+      let code = line;
+      if (inBlockComment) {
+        const end = code.indexOf('*/');
+        if (end === -1) return; // still inside the block
+        code = code.slice(end + 2);
+        inBlockComment = false;
+      }
+      const start = code.indexOf('/*');
+      if (start !== -1) {
+        const end = code.indexOf('*/', start + 2);
+        if (end === -1) {
+          code = code.slice(0, start);
+          inBlockComment = true;
+        } else {
+          code = code.slice(0, start) + code.slice(end + 2);
+        }
+      }
+      code = code.replace(/\/\/.*$/, '');
       for (const hit of code.match(MONEY) ?? []) {
         literalHits.push(`${rel}:${i + 1}  ${hit}  ${line.trim().slice(0, 80)}`);
+      }
+      if (HARDCODED_FORMAT.test(code)) {
+        literalHits.push(`${rel}:${i + 1}  formatPrice(<literal>)  ${line.trim().slice(0, 80)}`);
       }
     });
   }
@@ -131,7 +163,13 @@ if (!KEY) {
   console.log('        The literal scan above still ran. Amounts were NOT verified against Stripe.');
   process.exit(0);
 }
-if (KEY.includes('_live_')) fail('refusing to run against a live key — use a restricted test key');
+if (KEY.includes('_live_') && WRITE) {
+  fail('refusing to write from a live key — use a restricted test key');
+}
+// Check-only mode may use a live restricted key: the account pin survives the
+// test→live toggle (same acct id), and launch-time catalogue verification is
+// exactly what the guard is for (review deleg_dd2f886e F1). Writing is still
+// banned — regenerate only from test.
 
 let module_;
 try {
@@ -195,15 +233,54 @@ if (missing.length || extra.length) {
   );
 }
 
+// Fetch with a 10s timeout and 2 retries with backoff. A Stripe incident or
+// blackholed connection must not hang a job or fail every PR/deploy on a
+// transient (review deleg_dd2f886e Sec-M2 / Design-F5). With --network-warn
+// (deploy time) an unreachable Stripe warns and exits 0 — pr-checks stays
+// strict, so drift still fails the PR; a deploy is not blocked by an outage
+// for a copy-fix unrelated to pricing.
+async function stripeFetch(path) {
+  const attempts = 3;
+  for (let i = 0; i < attempts; i++) {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 10_000);
+    try {
+      const res = await fetch(`https://api.stripe.com${path}`, {
+        headers: { Authorization: `Bearer ${KEY}` },
+        signal: ac.signal,
+      });
+      clearTimeout(timer);
+      if (res.status === 429 || res.status >= 500) {
+        throw new Error(`Stripe transient error ${res.status}`);
+      }
+      return res;
+    } catch (err) {
+      clearTimeout(timer);
+      if (i < attempts - 1) {
+        await new Promise((r) => setTimeout(r, 500 * 2 ** i));
+        continue;
+      }
+      if (NETWORK_WARN) {
+        console.error(
+          `prices: WARNING — could not verify against Stripe (${err.message}). ` +
+            'Deploy continues; pr-checks will fail on the next push.',
+        );
+        process.exit(0);
+      }
+      fail(`cannot reach Stripe (${err.message}) after ${attempts} attempts`);
+    }
+  }
+  fail('unreachable');
+}
+
 async function assertAccount() {
-  const res = await fetch('https://api.stripe.com/v1/account', {
-    headers: { Authorization: `Bearer ${KEY}` },
-  });
+  const res = await stripeFetch('/v1/account');
   const body = await res.json();
   if (!res.ok) {
     // Not knowing which account we are reading is itself the failure.
     fail(`cannot read /v1/account (${body?.error?.message ?? res.status}).\n` +
-      `       Add the "Account" read permission to this restricted key.\n` +
+      `       Add the "Basic Business Contact Information Read" permission\n` +
+      `       (accounts_kyc_basic_read) to this restricted key.\n` +
       `       Without it this check cannot confirm it is reading ${EXPECTED_ACCOUNT}.`);
   }
   if (body.id !== EXPECTED_ACCOUNT) {
@@ -213,12 +290,22 @@ async function assertAccount() {
 }
 
 async function stripePrices() {
-  const res = await fetch('https://api.stripe.com/v1/prices?limit=100&active=true', {
-    headers: { Authorization: `Bearer ${KEY}` },
-  });
-  const body = await res.json();
-  if (!res.ok) fail(`Stripe error (${res.status}): ${body?.error?.message ?? 'unknown'}`);
-  return body.data ?? [];
+  // Page through: Stripe mints a new active Price on every change, so the
+  // active catalogue grows monotonically — a single limit=100 page truncates
+  // the comparison (review deleg_dd2f886e B&L-F6 / Design-F7).
+  const out = [];
+  let startingAfter;
+  for (;;) {
+    const q = new URLSearchParams({ active: 'true', limit: '100' });
+    if (startingAfter) q.set('starting_after', startingAfter);
+    const res = await stripeFetch(`/v1/prices?${q}`);
+    const body = await res.json();
+    if (!res.ok) fail(`Stripe error (${res.status}): ${body?.error?.message ?? 'unknown'}`);
+    out.push(...(body.data ?? []));
+    if (!body.has_more || !body.data?.length) break;
+    startingAfter = body.data[body.data.length - 1].id;
+  }
+  return out;
 }
 
 await assertAccount();
@@ -273,6 +360,16 @@ if (WRITE) {
     }
     if (!Number.isSafeInteger(got.unit_amount) || got.unit_amount <= 0) {
       fail(`cannot rewrite: ${key} has unit_amount ${JSON.stringify(got.unit_amount)}`);
+    }
+    // The Price model has no interval_count, so a quarterly price is
+    // unrepresentable — writing one yields a file that still fails the guard
+    // (review deleg_dd2f886e B&L-F4 / Design-F3). Refuse instead of repairing
+    // into a permanently red state.
+    if ((got.recurring?.interval_count ?? 1) !== 1) {
+      fail(
+        `cannot rewrite: ${key} bills every ${got.recurring.interval_count} ${got.recurring.interval}s ` +
+          '— the site renders a simple "per <interval>" and the Price type cannot express a count',
+      );
     }
     if (got.currency !== 'usd') {
       fail(`cannot rewrite: ${key} is ${JSON.stringify(got.currency)}, expected usd`);

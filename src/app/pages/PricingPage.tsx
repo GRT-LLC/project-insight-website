@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { priceOf, annualSavingPercent, type PriceLookupKey } from '../data/pricing';
+import { priceOf, periodOf, annualSavingPercent, type PriceLookupKey } from '../data/pricing';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
 // Trip Pass is a real single-trip product, not a trial. Explore is the hero
@@ -31,8 +31,8 @@ const EXPLORE_POINTS = [
   'Full subscription access',
   'Best choice for travelers planning more than one trip',
   SAVING_PCT !== null
-    ? `Explore Annual is ${priceOf('jt_explore_annual')} per year, ${SAVING_PCT}% less than paying monthly`
-    : `Explore Annual is ${priceOf('jt_explore_annual')} per year`,
+    ? `Explore Annual is ${priceOf('jt_explore_annual')} per ${periodOf('jt_explore_annual')}, ${SAVING_PCT}% less than paying monthly`
+    : `Explore Annual is ${priceOf('jt_explore_annual')} per ${periodOf('jt_explore_annual')}`,
 ];
 
 type CadenceKey = 'annual' | 'monthly';
@@ -47,16 +47,17 @@ interface Cadence {
   // ticket exists to kill, one level up (core#36 review, M4). Typed this way,
   // a mismatch is a compile error.
   lookupKey: PriceLookupKey;
-  per: string;
   best?: boolean;
 }
 
 // Cadences of ONE subscription, not separate tiers. Amounts come from
 // src/app/data/pricing.ts, which mirrors Stripe by lookup key — a price change
-// there reaches this page with no edit here (JAR-660).
+// there reaches this page with no edit here (JAR-660). The rendered period
+// ("per year"/"per month") is derived from the interval via periodOf(), never
+// a parallel string (review deleg_dd2f886e).
 const CADENCES: Cadence[] = [
-  { key: 'annual', label: 'Annual', lookupKey: 'jt_explore_annual', per: 'year', best: true },
-  { key: 'monthly', label: 'Monthly', lookupKey: 'jt_explore_monthly', per: 'month' },
+  { key: 'annual', label: 'Annual', lookupKey: 'jt_explore_annual', best: true },
+  { key: 'monthly', label: 'Monthly', lookupKey: 'jt_explore_monthly' },
 ];
 
 // The two visual states a card can be in. Both keep a 1px border so nothing
@@ -249,7 +250,7 @@ export function PricingPage() {
                             exploreHot ? 'text-sky-200' : 'text-gray-500'
                           }`}
                         >
-                          /{option.per}
+                          /{periodOf(option.lookupKey)}
                         </span>
                       </span>
                     </button>
@@ -270,7 +271,7 @@ export function PricingPage() {
                     exploreHot ? 'text-sky-200' : 'text-gray-500'
                   }`}
                 >
-                  per {cadence.per}
+                  per {periodOf(cadence.lookupKey)}
                 </span>
               </div>
 

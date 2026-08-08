@@ -43,7 +43,7 @@ jobs:
       # makes no PR, so a green PR check says nothing about what is about to be
       # deployed. Reconcile again here, immediately before shipping.
       - name: Pricing guard
-        run: npm run lint:prices
+        run: npm run lint:prices -- --network-warn
         env:
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
 
