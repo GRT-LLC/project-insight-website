@@ -1,11 +1,19 @@
-# PR quality gate — runs on every pull request so non-compliant copy is
+# PR quality gate — runs on every branch push so non-compliant copy is
 # caught at review time, not at deploy (PR #21 review, M1). The deploy
 # workflow (node.js.yml) re-runs the guard on push to main as the final gate.
 name: PR checks
 
 on:
-  pull_request:
-    branches: ['main']
+  push:
+    # JAR-749: push-triggered only (all branches — branch pushes produce the
+    # required check on the PR's head commit, so same-repo PRs keep full
+    # coverage). NO pull_request: this repo is PUBLIC — any stranger can
+    # fork it, and pull_request events execute the fork's edited workflow
+    # file from the merge ref, handing them arbitrary code execution on the
+    # credential-bearing self-hosted runner. NO paths-ignore: docs-only PRs
+    # would get no required check and deadlock at merge (JAR-643);
+    # self-hosted runs cost zero Actions minutes.
+  workflow_dispatch:
 
 permissions:
   contents: read
