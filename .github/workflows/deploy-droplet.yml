@@ -46,10 +46,22 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
           HOST: ${{ secrets.DROPLET_HOST }}
+          DROPLET_HOST_KEY: ${{ secrets.DROPLET_HOST_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -avz --delete dist/ "root@$HOST:/var/www/jarvistravel-marketing/"
+          # JAR-749 review deleg_689cdd26 (web-app#187 F2): the key must never
+          # touch the persistent runner disk — load it into a job-scoped
+          # in-memory ssh-agent instead.
+          eval "$(ssh-agent -s)"
+          trap 'ssh-agent -k >/dev/null 2>&1 || true' EXIT
+          echo "$SSH_KEY" | ssh-add - >/dev/null
+          # Host-key pin (F3): verify the presented key against the expected
+          # SHA256 fingerprint secret — fail closed instead of TOFU.
+          HOST_KEY="$(ssh-keyscan -H "$HOST" 2>&1 || true)"
+          ACTUAL="$(printf '%s\n' "$HOST_KEY" | ssh-keygen -lf - 2>/dev/null | awk '{print $2}' | head -1)"
+          if [ -z "$DROPLET_HOST_KEY" ] || [ "$ACTUAL" != "$DROPLET_HOST_KEY" ]; then
+            echo "::error::Droplet host key mismatch (got '${ACTUAL}', expected '${DROPLET_HOST_KEY}') — refusing to deploy"
+            exit 1
+          fi
+          printf '%s\n' "$HOST_KEY" > ~/.ssh/known_hosts
+          rsync -avz --delete -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes" dist/ "root@$HOST:/var/www/jarvistravel-marketing/"
