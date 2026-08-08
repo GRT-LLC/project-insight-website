@@ -1,18 +1,20 @@
-# PR quality gate — runs on every branch push so non-compliant copy is
-# caught at review time, not at deploy (PR #21 review, M1). The deploy
-# workflow (node.js.yml) re-runs the guard on push to main as the final gate.
+# PR quality gate — runs on every non-main branch push so non-compliant copy is
+# caught at review time, not at deploy (PR #21 review, M1). Main pushes are
+# covered by node.js.yml (the deploy re-runs the guards as the final gate).
 name: PR checks
 
 on:
   push:
-    # JAR-749: push-triggered only (all branches — branch pushes produce the
-    # required check on the PR's head commit, so same-repo PRs keep full
-    # coverage). NO pull_request: this repo is PUBLIC — any stranger can
-    # fork it, and pull_request events execute the fork's edited workflow
-    # file from the merge ref, handing them arbitrary code execution on the
-    # credential-bearing self-hosted runner. NO paths-ignore: docs-only PRs
-    # would get no required check and deadlock at merge (JAR-643);
-    # self-hosted runs cost zero Actions minutes.
+    # JAR-749: push-triggered, branches-ignore main. Two reasons:
+    # 1. SECURITY (real): this repo is PUBLIC — a pull_request trigger would
+    #    execute a fork's edited workflow file from the merge ref on the
+    #    credential-bearing self-hosted runner. Push-only is the structural
+    #    exclusion: fork PRs never execute anything.
+    # 2. No ruleset requires this check (marketing has no required status
+    #    checks — org 'Protections for MAIN' has none). The check is
+    #    prophylaxis; main pushes are already guarded by node.js.yml, so
+    #    branches-ignore avoids doubling the guard on the 2-runner fleet.
+    branches-ignore: ['main']
   workflow_dispatch:
 
 permissions:
