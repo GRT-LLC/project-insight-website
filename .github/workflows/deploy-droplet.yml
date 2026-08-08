@@ -23,15 +23,15 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-24.04
+    runs-on: spare  # JAR-749: self-hosted runner (billing-limited hosted CI)
     timeout-minutes: 10
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22.x
           cache: 'npm'
@@ -46,10 +46,23 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
           HOST: ${{ secrets.DROPLET_HOST }}
+          DROPLET_HOST_KEY: ${{ secrets.DROPLET_HOST_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -avz --delete dist/ "root@$HOST:/var/www/jarvistravel-marketing/"
+          # JAR-749 review deleg_689cdd26 (web-app#187 F2): the key must never
+          # touch the persistent runner disk — load it into a job-scoped
+          # in-memory ssh-agent instead.
+          eval "$(ssh-agent -s)"
+          trap 'ssh-agent -k >/dev/null 2>&1 || true' EXIT
+          echo "$SSH_KEY" | ssh-add - >/dev/null
+          # Host-key pin (F3): the expected SHA256 fingerprint secret must
+          # match ANY of the host's presented keys (a host often emits
+          # ed25519 + rsa; the order is not a contract) — fail closed
+          # instead of TOFU, and never swallow keyscan errors.
+          HOST_KEY="$(ssh-keyscan -H "$HOST" 2>&1 || true)"
+          if [ -z "$DROPLET_HOST_KEY" ] || ! printf '%s\n' "$HOST_KEY" | ssh-keygen -lf - 2>/dev/null | awk '{print $2}' | grep -qx "$DROPLET_HOST_KEY"; then
+            echo "::error::Droplet host key mismatch — refusing to deploy (expected fingerprint ${DROPLET_HOST_KEY})"
+            exit 1
+          fi
+          printf '%s\n' "$HOST_KEY" > ~/.ssh/known_hosts
+          rsync -avz --delete -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes" dist/ "root@$HOST:/var/www/jarvistravel-marketing/"
