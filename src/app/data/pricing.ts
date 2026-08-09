@@ -1,13 +1,16 @@
 // ============================================================================
 // PRICING — the only place on this site that knows what anything costs.
 //
-// Amounts live in Stripe, in account acct_1ToBJsPDaNqc0Lek — test mode today,
-// the same account in live mode at launch. This file mirrors them, keyed by the
+// Amounts live in Stripe, in the org's JarvisTravel sandbox
+// acct_1ToBK0ABsvYNMJZ0 (JAR-660 decision, 2026-08-09). At launch the live
+// catalogue is minted in the org's live account with the same lookup keys, and
+// the account pins here and in check-prices.mjs move with it. This file
+// mirrors Stripe, keyed by the
 // same lookup_key the backend resolves at checkout (core: config/stripe/setup.js,
 // migration 063, JAR-658/659). A lookup key is a stable handle: Stripe Prices
 // are immutable, so a price change mints a new Price and the key transfers to
-// it — and it is per-mode, so the live catalogue must be created with the same
-// keys before the toggle.
+// it — and it is per-account-and-mode, so the live catalogue must exist before
+// the toggle.
 //
 // Regenerate rather than hand-edit:
 //

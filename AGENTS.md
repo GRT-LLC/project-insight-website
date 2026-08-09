@@ -42,7 +42,9 @@ npm run lint         # eslint with zero-warnings policy
 ### Pricing (single source of truth — JAR-660)
 
 The only place this site knows what anything costs is `src/app/data/pricing.ts`,
-which mirrors Stripe (account `acct_1ToBJsPDaNqc0Lek`, keyed by the same
+which mirrors Stripe (the org sandbox `acct_1ToBK0ABsvYNMJZ0`; at live launch
+the catalogue is re-minted in the org's live account and the pins move with
+it — keyed by the same
 `lookup_key` the backend resolves at checkout). The `lint:prices` guard fails
 CI when the site and Stripe disagree; `check-prices.mjs` also fails when a
 dollar amount reappears as a literal in a component.

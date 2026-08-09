@@ -126,15 +126,18 @@ console.log(`prices: ok — no amount literals in ${scanned.size} component file
 
 // ── half two: the constants match Stripe ────────────────────────────────────
 
-// The one Stripe account this catalogue belongs to. Same id in test and live
-// mode — the mode comes from which key you hand it — so pinning the account
-// survives the toggle that pinning price ids would not.
+// The one Stripe account this catalogue belongs to: the org's JarvisTravel
+// sandbox, decided on JAR-660 (2026-08-09) after the catalogue was found
+// stranded in a personal account the org cannot see or manage. A sandbox is
+// its own account id, so at live launch the catalogue is minted in the org's
+// live account and this pin moves in that same deliberate act — this guard
+// fails loudly if the edit is forgotten.
 //
 // This is not paranoia: a second account once held prices under the same
 // lookup keys at the same amounts, and nothing here could tell them apart,
 // because everything below resolves by lookup key (JAR-659). Right prices,
 // wrong Stripe, green check.
-const EXPECTED_ACCOUNT = 'acct_1ToBJsPDaNqc0Lek';
+const EXPECTED_ACCOUNT = 'acct_1ToBK0ABsvYNMJZ0';
 
 // The three keys this catalogue is defined as having. Asserted as an exact set
 // below, so a key *deleted* from pricing.ts fails here rather than at runtime
@@ -166,10 +169,12 @@ if (!KEY) {
 if (KEY.includes('_live_') && WRITE) {
   fail('refusing to write from a live key — use a restricted test key');
 }
-// Check-only mode may use a live restricted key: the account pin survives the
-// test→live toggle (same acct id), and launch-time catalogue verification is
-// exactly what the guard is for (review deleg_dd2f886e F1). Writing is still
-// banned — regenerate only from test.
+// Check-only mode still accepts a live restricted key, but while the pin
+// names the sandbox, a live key fails the account assert below — correctly:
+// there is no live catalogue yet. Launch mints one in the org's live account
+// and moves EXPECTED_ACCOUNT, and from then on live check-only verification
+// works as designed (review deleg_dd2f886e F1). Writing is still banned —
+// regenerate only from test.
 
 let module_;
 try {
