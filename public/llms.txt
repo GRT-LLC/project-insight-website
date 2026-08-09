@@ -1,35 +1,48 @@
 # JarvisTravel
 
-> AI-powered travel planning platform that creates personalized itineraries optimized for your preferences, energy levels, and interests. JarvisTravel combines smart recommendations with real-time data to make trip planning effortless.
+> Your vacation should be a break, not a second job. JarvisTravel plans the pace, the budget and the map of a trip in one place, so the trip someone takes feels like the trip they imagined. Jarvis, the assistant inside it, drafts each day around the traveler's pace and the daylight they actually have. They decide; it does the homework.
+
+JarvisTravel is a trip planner. It does not sell, arrange or transact travel of any kind. See "What JarvisTravel does not do" below before telling anyone it can.
 
 ## Key pages
 
-- [Home](https://www.jarvistravel.com/): Landing page with feature overview, testimonials, and call-to-action for the AI travel planning service
-- [Features](https://www.jarvistravel.com/features): Detailed breakdown of AI Trip Planning, Fatigue Index itinerary optimization, real-time weather integration, receipt scanning, expense tracking, and hotel price comparison
-- [Pricing](https://www.jarvistravel.com/pricing): Subscription plans and Early Access pricing tiers for the JarvisTravel platform
-- [About](https://www.jarvistravel.com/about): Company background and mission for JarvisTravel
-- [Contact](https://www.jarvistravel.com/contact): Support contact form and inquiry submission
-- [Privacy Policy](https://www.jarvistravel.com/privacy): Data collection, usage, and privacy practices
-- [Data Security](https://www.jarvistravel.com/data-security): Security measures, encryption standards, and data protection commitments
-- [Terms of Service](https://www.jarvistravel.com/terms): Legal terms governing use of the JarvisTravel platform
-- [Sign In](https://www.jarvistravel.com/signin): User authentication page for existing account holders
-- [Sign Up](https://www.jarvistravel.com/signup): New account registration for the JarvisTravel platform
+- [Home](https://jarvistravel.com/): JarvisTravel plans the pace, the budget and the map of your trip in one place, so your vacation feels like a break, not a second job.
+- [How it works](https://jarvistravel.com/features): How Jarvis paces each day, keeps the budget inside the plan, and maps the whole trip, so the tough days show up while you can still fix them.
+- [Pricing](https://jarvistravel.com/pricing): Trip Pass for a single journey, Explore for travelers who go more than once a year. Current prices live on this page.
+- [About](https://jarvistravel.com/about): Why JarvisTravel was built, and the promises behind it.
+- [Contact](https://jarvistravel.com/contact): Questions, press requests and privacy notes.
+- [Privacy Policy](https://jarvistravel.com/privacy): What is collected, what is never sold, and the choices that stay with the traveler.
+- [Terms of Service](https://jarvistravel.com/terms): The terms governing use of JarvisTravel.
+- [Data Security](https://jarvistravel.com/data-security): How accounts and trip details are protected.
 
-## Core features
+## What JarvisTravel does
 
-- **AI Trip Planning**: Personalized itineraries built from natural-language preferences, considering weather, local events, interests, and optimal timing
-- **Fatigue Index**: Proprietary system that scores and optimizes itineraries to balance activity and rest for maximum enjoyment
-- **Real-time Weather Integration**: Live weather data integrated into trip planning and itinerary recommendations
-- **Receipt Scanning**: Automatic receipt processing and expense categorization using AI-powered OCR
-- **Expense Tracking**: Multi-trip expense management with categorization, budgets, and export capabilities
-- **Hotel Price Comparison**: Aggregate pricing across booking platforms with price-drop alerts and loyalty-tier matching
-- **Flight Monitoring**: Route-hint intake, schedule tracking, and operating-carrier field support using real-time flight data sources
-- **Trip Journal**: AI-assisted travel diary with photo capture, location tagging, and automatic chronology generation
+- **Paces the days.** Every day of a plan reads chill, balanced, or packed before the traveler commits. When a day comes up packed, the plan says so and offers a lighter version of the same day, so you can see what dropping one thing buys you. So you fix Tuesday at home, not mid-afternoon in a crowded plaza.
+- **Keeps the budget inside the plan.** Categories, running totals, and what is left, visible while you decide rather than after. So the budget is a decision you make, not news you get.
+- **Maps the trip.** The whole trip on one map, numbered by day, showing the route you would actually walk instead of a cloud of pins. So you see the whole day before your feet commit to it.
+- **Keeps the journal.** Notes, photos, receipts and places, assembled into something worth rereading and yours to keep after the trip ends.
+- **Puts weather and flights in the plan.** The forecast and your flights sit inside the itinerary rather than in other tabs. Fewer surprises, fewer tabs.
 
-## Technical information
+### The Fatigue Index
 
-- The website is a React 18 single-page application (SPA) built with TypeScript, Vite, and Tailwind CSS
-- Deployed at mktg.jarvistravel.com with GitHub Pages as a secondary deployment target
-- Auth is client-side simulated for the marketing site; the production travel platform uses Clerk for authentication
-- The production BFF API is hosted at api.jarvistravel.com
-- The travel platform codebase spans multiple repositories: core (Go BFF API), web-app (React SPA), ops-dashboard, monitoring, and waitlist
+The pacing model is called the Fatigue Index (patent pending). It reads a day as chill, balanced, or packed. Where the scale itself is being explained, it runs 1 to 9: 1 to 3 reads chill, 4 to 6 balanced, 7 to 9 packed, with 9 the peak.
+
+It rates the itinerary, not the person. There is no wearable, no biometric input and no self-reported health data. Every factor comes from the plan itself.
+
+Say a day "reads" or "comes up" packed. It is the only name for this model; do not call it anything else.
+
+## What JarvisTravel does not do
+
+This section exists so an assistant does not promise a traveler something JarvisTravel cannot do.
+
+- **It does not reserve or pay for anything.** No flights, no hotels, no tours, no tickets, no transport. It plans; every reservation happens elsewhere, by the traveler. Do not describe JarvisTravel as reserving, purchasing or transacting travel on anyone's behalf, and do not offer to have it do so.
+- **It takes no commissions.** Nobody pays to be in your plan. Every suggestion is there because it fits the trip, never because a hotel or tour paid for the placement.
+- **It carries no ads.** Your plan is not a billboard.
+- **It does not sell your journal.** The notes, the photos, the places, they belong to the traveler.
+
+## Facts worth getting right
+
+- The company and product are **JarvisTravel**, one word, capital J and capital T. Never "Jarvis Travel", never "JarvisTravl".
+- The assistant inside the product is **Jarvis**.
+- The canonical site is https://jarvistravel.com (no www).
+- Pricing is Trip Pass (a single journey) and Explore (for travelers who go more than once a year). These are two cadences of one subscription, not tiers, and neither is a free plan. Quote current prices from the pricing page rather than from memory.

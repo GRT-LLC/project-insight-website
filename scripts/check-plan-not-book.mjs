@@ -20,8 +20,15 @@ import { readFileSync, readdirSync, lstatSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = process.cwd();
-const SCAN_DIRS = ['src'];
-const EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.css', '.md']);
+// `public` is scanned as well as `src`: files there are served verbatim to
+// crawlers, agents and anyone who asks for them, so they are copy in every
+// sense that matters legally. public/llms.txt described "aggregate pricing
+// across booking platforms" for months precisely because this guard could not
+// see it (JAR-20).
+const SCAN_DIRS = ['src', 'public'];
+// .txt included for the same reason: llms.txt and robots.txt are published
+// copy, not configuration.
+const EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.css', '.md', '.txt']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', '.cache', '.next', 'coverage']);
 const MAX_FILE_BYTES = 2 * 1024 * 1024; // generated/binary blobs are not copy
 
