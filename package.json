@@ -14,7 +14,7 @@
     "logo:gen": "node scripts/gen-logo-component.mjs",
     "logo:check": "node scripts/gen-logo-component.mjs --check",
     "logo:vendor": "node scripts/vendor-logo.mjs",
-    "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs",
+    "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs && node scripts/__tests__/check-plan-not-book.test.mjs",
     "type-check": "tsc --noEmit",
     "lint:prices": "node scripts/check-prices.mjs",
     "sync:prices": "node scripts/check-prices.mjs --write"
