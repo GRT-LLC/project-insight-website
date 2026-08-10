@@ -282,11 +282,24 @@ async function assertAccount() {
   const res = await stripeFetch('/v1/account');
   const body = await res.json();
   if (!res.ok) {
+    const message = body?.error?.message ?? String(res.status);
+    // Stripe names the key's own account in the permission error, so when that
+    // account is ALREADY the wrong one, say both things now. Reporting only the
+    // missing permission sends the reader to the dashboard to grant it, and
+    // buys a second failing run that finally names the real problem — and CI
+    // round-trips here are minutes each.
+    const named = message.match(/account '(acct_[A-Za-z0-9]+)'/)?.[1];
+    const alsoWrongAccount = named && named !== EXPECTED_ACCOUNT
+      ? `\n\n       AND that key belongs to ${named}, not ${EXPECTED_ACCOUNT}.\n` +
+        `       The permission alone will not fix this. Issue a restricted, read-only\n` +
+        `       TEST key from ${EXPECTED_ACCOUNT} and replace the STRIPE_API_KEY secret.`
+      : '';
     // Not knowing which account we are reading is itself the failure.
-    fail(`cannot read /v1/account (${body?.error?.message ?? res.status}).\n` +
+    fail(`cannot read /v1/account (${message}).\n` +
       `       Add the "Basic Business Contact Information Read" permission\n` +
       `       (accounts_kyc_basic_read) to this restricted key.\n` +
-      `       Without it this check cannot confirm it is reading ${EXPECTED_ACCOUNT}.`);
+      `       Without it this check cannot confirm it is reading ${EXPECTED_ACCOUNT}.` +
+      alsoWrongAccount);
   }
   if (body.id !== EXPECTED_ACCOUNT) {
     fail(`key belongs to ${body.id}, expected ${EXPECTED_ACCOUNT} — comparing against the wrong Stripe account`);
