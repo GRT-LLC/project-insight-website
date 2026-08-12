@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { priceOf, periodOf, annualSavingPercent, type PriceLookupKey } from '../data/pricing';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
 // Trip Pass is a real single-trip product, not a trial. Explore is the hero
@@ -22,10 +23,16 @@ const TRIP_PASS_POINTS = [
   'Good for travelers who have one trip in mind right now',
 ];
 
+// Derived from the generated PRICES block, so the badge and this bullet can
+// never disagree with the amounts rendered beside them.
+const SAVING_PCT = annualSavingPercent();
+
 const EXPLORE_POINTS = [
   'Full subscription access',
   'Best choice for travelers planning more than one trip',
-  'Explore Annual is the best value at $99 per year',
+  SAVING_PCT !== null
+    ? `Explore Annual is ${priceOf('jt_explore_annual')} per ${periodOf('jt_explore_annual')}, ${SAVING_PCT}% less than paying monthly`
+    : `Explore Annual is ${priceOf('jt_explore_annual')} per ${periodOf('jt_explore_annual')}`,
 ];
 
 type CadenceKey = 'annual' | 'monthly';
@@ -33,16 +40,24 @@ type CadenceKey = 'annual' | 'monthly';
 interface Cadence {
   key: CadenceKey;
   label: string;
-  amount: string;
-  per: string;
+  // The Stripe lookup key, not a rendered string. Carrying a pre-formatted
+  // amount meant CadenceKey and PriceLookupKey were parallel namespaces with
+  // nothing tying them together, so a new cadence pointing at the wrong key
+  // would compile cleanly and render a wrong price — the exact failure this
+  // ticket exists to kill, one level up (core#36 review, M4). Typed this way,
+  // a mismatch is a compile error.
+  lookupKey: PriceLookupKey;
   best?: boolean;
 }
 
-// Single source of truth for Explore pricing - rows and the summary price
-// both render from here.
+// Cadences of ONE subscription, not separate tiers. Amounts come from
+// src/app/data/pricing.ts, which mirrors Stripe by lookup key — a price change
+// there reaches this page with no edit here (JAR-660). The rendered period
+// ("per year"/"per month") is derived from the interval via periodOf(), never
+// a parallel string (review deleg_dd2f886e).
 const CADENCES: Cadence[] = [
-  { key: 'annual', label: 'Annual', amount: '$99', per: 'year', best: true },
-  { key: 'monthly', label: 'Monthly', amount: '$11.95', per: 'month' },
+  { key: 'annual', label: 'Annual', lookupKey: 'jt_explore_annual', best: true },
+  { key: 'monthly', label: 'Monthly', lookupKey: 'jt_explore_monthly' },
 ];
 
 // The two visual states a card can be in. Both keep a 1px border so nothing
@@ -103,7 +118,7 @@ export function PricingPage() {
                     tripActive ? 'text-gray-50' : 'text-gray-900'
                   }`}
                 >
-                  $24.99
+                  {priceOf('jt_trip_pass')}
                 </span>
                 <span
                   className={`ml-2 transition-colors ${
@@ -143,7 +158,7 @@ export function PricingPage() {
               {/* Routes to the interest form until the app/payment flow is live. */}
               <Link
                 to="/contact"
-                className={`mt-auto self-start px-8 py-3.5 rounded-sm font-semibold border transition-colors text-gray-900 ${
+                className={`mt-auto self-start px-8 py-3.5 rounded-full font-semibold border transition-colors text-gray-900 ${
                   tripActive
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'
                     : 'bg-transparent border-gray-300'
@@ -214,13 +229,13 @@ export function PricingPage() {
                         >
                           {option.label}
                         </span>
-                        {option.best && (
+                        {option.best && SAVING_PCT !== null && (
                           <span
-                            className={`text-[11px] font-semibold tracking-wide uppercase bg-amber-400/[0.12] border border-amber-400/30 px-2 py-0.5 rounded-sm transition-colors ${
+                            className={`text-[11px] font-semibold tracking-wide uppercase bg-amber-400/[0.12] border border-amber-400/30 px-2 py-0.5 rounded-full transition-colors ${
                               exploreHot ? 'text-amber-400' : 'text-amber-700'
                             }`}
                           >
-                            Best value
+                            Save {SAVING_PCT}%
                           </span>
                         )}
                       </span>
@@ -229,13 +244,13 @@ export function PricingPage() {
                           exploreHot ? 'text-sky-100' : 'text-gray-600'
                         }`}
                       >
-                        {option.amount}
+                        {priceOf(option.lookupKey)}
                         <span
                           className={`transition-colors ${
                             exploreHot ? 'text-sky-200' : 'text-gray-500'
                           }`}
                         >
-                          /{option.per}
+                          /{periodOf(option.lookupKey)}
                         </span>
                       </span>
                     </button>
@@ -249,14 +264,14 @@ export function PricingPage() {
                     exploreHot ? 'text-gray-50' : 'text-gray-900'
                   }`}
                 >
-                  {cadence.amount}
+                  {priceOf(cadence.lookupKey)}
                 </span>
                 <span
                   className={`ml-2 transition-colors ${
                     exploreHot ? 'text-sky-200' : 'text-gray-500'
                   }`}
                 >
-                  per {cadence.per}
+                  per {periodOf(cadence.lookupKey)}
                 </span>
               </div>
 
@@ -284,7 +299,7 @@ export function PricingPage() {
               {/* Routes to the interest form until the app/payment flow is live. */}
               <Link
                 to="/contact"
-                className={`mt-auto w-full py-3.5 rounded-sm font-semibold text-center border transition-colors text-gray-900 ${
+                className={`mt-auto w-full py-3.5 rounded-full font-semibold text-center border transition-colors text-gray-900 ${
                   exploreHot
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'
                     : 'bg-transparent border-gray-300'

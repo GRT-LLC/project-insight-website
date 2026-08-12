@@ -39,6 +39,32 @@ npm run type-check   # tsc --noEmit
 npm run lint         # eslint with zero-warnings policy
 ```
 
+### Pricing (single source of truth — JAR-660)
+
+The only place this site knows what anything costs is `src/app/data/pricing.ts`,
+which mirrors Stripe (the org sandbox `acct_1ToBK0ABsvYNMJZ0`; at live launch
+the catalogue is re-minted in the org's live account and the pins move with
+it — keyed by the same
+`lookup_key` the backend resolves at checkout). The `lint:prices` guard fails
+CI when the site and Stripe disagree; `check-prices.mjs` also fails when a
+dollar amount reappears as a literal in a component.
+
+**Changing a price or adding a plan (runbook):**
+1. Edit/create the price in the Stripe dashboard (test mode; same lookup_key
+   in live mode at launch).
+2. `STRIPE_API_KEY=rk_test_... npm run sync:prices` — regenerates the
+   generated block in `pricing.ts` from Stripe (the `Price` type + the guard's
+   `EXPECTED_KEYS` fail loudly if the catalogue shape changes; `interval_count
+   != 1` is refused — the site cannot render it).
+3. Update `PriceLookupKey` + `EXPECTED_KEYS` in `check-prices.mjs` if the key
+   set changed.
+4. Open the PR — `pr-checks` runs the guard (literal scan + Stripe
+   reconciliation). The droplet + Pages deploys re-run it immediately before
+   shipping (`--network-warn`: a Stripe outage warns; a verified mismatch
+   fails).
+5. The daily `pr-checks` schedule (06:00 UTC) catches Stripe-side edits that
+   make no PR.
+
 ### Base path & routing
 
 - Routes are served at the domain root (`/`) on both deployments (configured in `vite.config.ts` and `tsconfig.json`)
