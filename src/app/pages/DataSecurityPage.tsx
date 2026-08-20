@@ -23,8 +23,8 @@ const PROTECTIONS = [
 ];
 
 const COMMITMENTS = [
-  'We never sell your data.',
-  'We never share your data without your consent.',
+  'We don’t sell your personal information.',
+  'Your data is shared only with the services that run JarvisTravel.',
   'We don’t track you across other sites.',
 ];
 

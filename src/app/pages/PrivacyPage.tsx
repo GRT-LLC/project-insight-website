@@ -24,7 +24,7 @@ const SECTIONS: Section[] = [
     body: (
       <>
         We use your data to plan your trips: the suggestions you see, each
-        day&rsquo;s Fatigue Index read, and your budget. We never sell your
+        day&rsquo;s Fatigue Index read, and your budget. We don&rsquo;t sell your
         personal information.
       </>
     ),

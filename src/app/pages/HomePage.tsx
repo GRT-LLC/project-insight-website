@@ -255,7 +255,7 @@ export function HomePage() {
             </li>
             <li className="py-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No ads, ever.
+                No ads.
               </h3>
               <p className="text-gray-600 leading-relaxed">
                 Your plan doesn&rsquo;t need billboards.
@@ -267,7 +267,7 @@ export function HomePage() {
               </h3>
               <p className="text-gray-600 leading-relaxed">
                 Your journal is yours: the notes, the photos, the places. We
-                never sell it.
+                don&rsquo;t sell it.
               </p>
             </li>
           </ul>

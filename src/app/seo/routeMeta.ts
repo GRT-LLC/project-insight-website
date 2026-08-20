@@ -52,7 +52,7 @@ export const ROUTE_META: Record<string, RouteMeta> = {
   '/privacy': {
     title: 'Privacy Policy: JarvisTravel',
     description:
-      'How JarvisTravel handles your data: what we collect, what we never sell, and the choices that stay yours.',
+      'How JarvisTravel handles your data: what we collect, what we do not sell, and the choices that stay yours.',
   },
   '/terms': {
     title: 'Terms of Service: JarvisTravel',
