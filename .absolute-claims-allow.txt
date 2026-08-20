@@ -1,0 +1,8 @@
+# Narrow exceptions to the absolute-claim guard. One case-insensitive regex per
+# line, matched against the flagged SEGMENT. Say why, every time.
+#
+# The not-a-seller-of-travel position (Cal. Bus. & Prof. Code §17550). This is a
+# legal status claim about travel, NOT a data claim, and counsel asked us to
+# keep it in substance. It is the only "never sells" that stays.
+never sells travel
+

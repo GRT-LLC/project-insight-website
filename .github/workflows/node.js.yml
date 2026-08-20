@@ -48,6 +48,8 @@ jobs:
         run: npm i
       - name: Plan-not-book language guard
         run: npm run lint:plan-not-book
+      - name: Absolute-claim guard (FTC §5 / Lanham §43(a))
+        run: npm run lint:absolute-claims
       - name: Social meta guard
         run: npm run lint:social-meta
 
