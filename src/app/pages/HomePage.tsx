@@ -267,7 +267,7 @@ export function HomePage() {
               </h3>
               <p className="text-gray-600 leading-relaxed">
                 Your journal is yours: the notes, the photos, the places. We
-                don&rsquo;t sell it.
+                do not sell it.
               </p>
             </li>
           </ul>
