@@ -63,6 +63,23 @@ const BANNED = [
   { re: /\b(forever|in perpetuity)\b/i, why: 'perpetual promise' },
   { re: /\bguarantee(d|s)?\b/i, why: 'guarantee language; state what the product does instead' },
 
+  // "always X" is a promise about the future, which is the same thing rule 9
+  // bans "Ever." and "forever" for: it binds management that has not happened
+  // yet. The copy skill has banned the word since the JAR-896 sweep and NO
+  // guard implemented it, so the rule was advice and the lexicon was the
+  // enforcement, and the two had quietly diverged (JAR-964).
+  //
+  // Constructions, not the bare adverb. "This always runs first" in a string
+  // literal is not a claim, and a guard that flags it is a guard someone turns
+  // off. Approved shape, brand owner, 2026-08-21.
+  //
+  // "be" and "been" are deliberately NOT in the list. A live broadcast says
+  // "think of a place you've always BEEN curious about", which is the reader's
+  // own past and not a promise anybody is making. `will always` below catches
+  // the promise form ("it will always be there") without that cost.
+  { re: /\balways\s+(?:remain|remains|stay|stays|current|free|available|up[- ]to[- ]date|on|yours|works?|working|private|secure|encrypted|protected|safe|accurate|in\s+sync)\b/i, why: 'forward-looking promise; "always X" binds future management, say what is true today' },
+  { re: /\bwill\s+always\b/i, why: 'forward-looking promise; state present practice instead' },
+
   // --- AI claims we cannot make (claim sweep §6.2) ---
   { re: /\bnever\s+trains?\b/i, why: 'false: a claim about our own training practice' },
   { re: /\btrains?\s+on\s+(your|it|the)\b/i, why: 'training claim; say "Jarvis is sent your trip, not your identity"' },

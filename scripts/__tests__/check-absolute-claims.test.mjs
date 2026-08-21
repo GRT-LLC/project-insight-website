@@ -175,5 +175,29 @@ test('a malformed allowlist fails the run rather than disabling the gate', () =>
   });
 });
 
+// --- "always" (JAR-964) -----------------------------------------------
+//
+// Rule 9 of the copy skill has banned "always" since the JAR-896 sweep and NO
+// guard implemented it, so the rule was advice and the lexicon was the
+// enforcement, and the two had quietly diverged. "always X" is a promise about
+// the future, which is what "Ever." and "forever" are banned for.
+//
+// Constructions rather than the bare adverb (brand owner, 2026-08-21): a guard
+// that flags "this always runs first" inside a string literal is a guard
+// someone switches off.
+
+test('a forward-looking "always" promise is caught', () => {
+  assert(flags(`export const L = 'Your plan is always current.';`), '"always current" not caught');
+  assert(flags(`export const L = 'Always free, always yours.';`), '"always free" not caught');
+  assert(flags(`export const L = 'It will always be there.';`), '"will always" not caught');
+});
+
+// The other half, and the reason this is a construction list. Without it a bare
+// \balways\b passes this file and then starts flagging ordinary code.
+test('"always" about behaviour is not a promise about the future', () => {
+  assert(clean(`export const L = 'This always runs before the sync.';`), 'a behaviour statement was flagged');
+  assert(clean(`export const L = 'Always ask before sharing';`), 'a settings label was flagged');
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
