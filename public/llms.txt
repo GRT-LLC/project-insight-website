@@ -11,7 +11,7 @@ JarvisTravel is a trip planner. It does not sell, arrange or transact travel of 
 - [Pricing](https://jarvistravel.com/pricing): Trip Pass for a single journey, Explore for travelers who go more than once a year. Current prices live on this page.
 - [About](https://jarvistravel.com/about): Why JarvisTravel was built, and the promises behind it.
 - [Contact](https://jarvistravel.com/contact): Questions, press requests and privacy notes.
-- [Privacy Policy](https://jarvistravel.com/privacy): What is collected, what is never sold, and the choices that stay with the traveler.
+- [Privacy Policy](https://jarvistravel.com/privacy): What is collected, what we don't sell, and the choices that stay with the traveler.
 - [Terms of Service](https://jarvistravel.com/terms): The terms governing use of JarvisTravel.
 - [Data Security](https://jarvistravel.com/data-security): How accounts and trip details are protected.
 

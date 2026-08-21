@@ -29,10 +29,10 @@ export function AboutPage() {
               actually cost: in hours, in miles, in energy.
             </p>
             <p>
-              So we built the pacing model first. Jarvis reads every day of a
-              plan as chill, balanced, or packed, based on what actually
+              So we built the pacing model first. Jarvis rates every day of a
+              plan chill, balanced, or packed, based on what actually
               drains you: the time-zone shift, the transit, the walking, and
-              the downtime you have left. The itinerary hangs off that read,
+              the downtime you have left. The itinerary hangs off that rating,
               not the other way around.
             </p>
             <p>

@@ -1,0 +1,240 @@
+#!/usr/bin/env node
+// Absolute-claim guard: fails if forward-looking or unverifiable claims about
+// data, security or competitors reappear in user-visible strings.
+//
+// Why this exists. Outside privacy counsel reviewed "No ads. No data selling.
+// Ever." and told us three things (Q6, 23 Jul 2026):
+//
+//   1. "Ever" is a promise binding future management. Under FTC Act §5 it is a
+//      representation we cannot guarantee, and it bought us nothing.
+//   2. Several absolutes rested on processor contracts we had not signed. Four
+//      of nine sub-processor DPAs are still open today.
+//   3. "We never share your personal information" is simply false. We do share
+//      it, with the services that run the product. A false claim shown at the
+//      point of consent is a misrepresentation, not marketing puffery.
+//
+// The claim had reached 80 places across five repos, Resend and our own docs,
+// because nothing was watching for it (claim sweep, 19 Aug 2026). Whatever
+// wording replaces it will spread the same way, so the guard is the fix and
+// the copy edit is only the cleanup.
+//
+// Shape deliberately mirrors check-plan-not-book.mjs: same fold, same segment
+// extraction, same fail-closed allowlist, same CLI/import split. Two guards
+// that behave differently are two guards nobody trusts.
+//
+// Allowlist: .absolute-claims-allow.txt (one regex per line, matched against
+// the flagged SEGMENT, case-insensitive). A malformed pattern fails the run.
+
+import { readFileSync, readdirSync, lstatSync, existsSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const ROOT = process.cwd();
+const SCAN_DIRS = ['src', 'public'];
+const EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.css', '.md', '.txt']);
+const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', '.cache', '.next', 'coverage']);
+const MAX_FILE_BYTES = 2 * 1024 * 1024;
+
+// This guard's own test necessarily contains the banned lexicon as fixtures.
+// Excluded by EXACT path, never via the allowlist: allowlist patterns carry no
+// file scoping, so allowlisting "Ever." there would switch the gate off
+// everywhere. One named file is auditable; a global pattern is not.
+const SELF_TEST_FILES = new Set([
+  'scripts/__tests__/check-absolute-claims.test.mjs',
+  'scripts/check-absolute-claims.mjs',
+]);
+
+const BANNED = [
+  // --- forward-looking absolutes (FTC Act §5) ---
+  { re: /\bever[.!]/i, why: 'forward-looking absolute ("Ever.") binds future management' },
+  { re: /\b(no|zero)\s+(ads|spam|tracking),?\s+ever\b/i, why: 'forward-looking absolute' },
+  { re: /\bnever\s+(sell|sells|sold|selling)\b/i, why: 'absolute data claim; say "we don\'t sell" in the present tense' },
+  { re: /\bnever\s+(share|shares|shared|sharing)\b/i, why: 'false: we do share data with the services that run the product' },
+  { re: /\bnever\s+(track|tracks|tracked|tracking)\s+(you|your)\b/i, why: 'absolute; state present practice instead' },
+  { re: /\b(forever|in perpetuity)\b/i, why: 'perpetual promise' },
+  { re: /\bguarantee(d|s)?\b/i, why: 'guarantee language; state what the product does instead' },
+
+  // --- AI claims we cannot make (claim sweep §6.2) ---
+  { re: /\bnever\s+trains?\b/i, why: 'false: a claim about our own training practice' },
+  { re: /\btrains?\s+on\s+(your|it|the)\b/i, why: 'training claim; say "Jarvis is sent your trip, not your identity"' },
+  { re: /does not use your personal data/i, why: 'false: Jarvis is sent trip context and free text' },
+  { re: /\banonymi[sz]ed\b/i, why: 'counsel: the operation is pseudonymisation, not anonymisation' },
+
+  // --- attested statuses we do not hold ---
+  { re: /\b(bank[- ]level|military[- ]grade|256[- ]bit)\b/i, why: 'security specific we do not attest' },
+  { re: /\bend[- ]to[- ]end encryption\b/i, why: 'we do not offer E2E encryption' },
+  { re: /\b(PCI[- ]?DSS|SOC ?2|ISO ?27001|HIPAA)\b/i, why: 'attested status held by a processor, not by us' },
+  { re: /\bfully compliant\b/i, why: 'compliance is not a status we can assert' },
+
+  // --- competitor claims (Lanham Act §43(a)) ---
+  { re: /\bmost (travel|free)\s+(apps|companies|planners|tools)\b/i, why: 'factual assertion about competitors needs substantiation' },
+  { re: /\bother travel (apps|companies|planners)\b/i, why: 'factual assertion about competitors needs substantiation' },
+];
+
+// Cross-script homoglyphs. NFKC does not fold these, so they need a map, and
+// the lowercase counterpart of every uppercase entry must be present or the
+// fold is one-sided (the bug that let "вook" through the sibling guard).
+const CONFUSABLES = {
+  'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p', 'с': 'c', 'у': 'y', 'х': 'x',
+  'і': 'i', 'ѕ': 's', 'ј': 'j', 'ԁ': 'd', 'һ': 'h', 'в': 'b', 'к': 'k',
+  'т': 't', 'м': 'm', 'н': 'h',
+  'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H', 'О': 'O',
+  'Р': 'P', 'С': 'C', 'Т': 'T', 'Х': 'X', 'У': 'Y',
+  'α': 'a', 'ε': 'e', 'ι': 'i', 'κ': 'k', 'ο': 'o', 'ρ': 'p', 'τ': 't',
+  'υ': 'u', 'ν': 'v', 'χ': 'x',
+  'Α': 'A', 'Β': 'B', 'Ε': 'E', 'Ζ': 'Z', 'Η': 'H', 'Ι': 'I', 'Κ': 'K',
+  'Μ': 'M', 'Ν': 'N', 'Ο': 'O', 'Ρ': 'P', 'Τ': 'T', 'Υ': 'Y', 'Χ': 'X',
+  'ɡ': 'g', 'ı': 'i',
+};
+const ZERO_WIDTH = /[​‌‍⁠﻿­]/g;
+
+const fold = (s) =>
+  [...s.normalize('NFKC').replace(ZERO_WIDTH, '')]
+    .map((c) => CONFUSABLES[c] ?? c)
+    .join('');
+
+// Lazy, and that matters: importing this module for its lexicon must do no
+// filesystem work. The sibling guard learned that the hard way (JAR-600).
+const loadAllow = () => {
+  const allowPath = join(ROOT, '.absolute-claims-allow.txt');
+  const allow = [];
+  if (!existsSync(allowPath)) return allow;
+  for (const raw of readFileSync(allowPath, 'utf8').split('\n')) {
+    const l = raw.trim();
+    if (!l || l.startsWith('#')) continue;
+    try {
+      allow.push(new RegExp(l, 'i'));
+    } catch (e) {
+      console.error(`absolute-claims check FAILED — invalid allowlist pattern: ${l}\n  ${e.message}`);
+      console.error('A broken allowlist must not silently disable the compliance gate.');
+      process.exit(1);
+    }
+  }
+  return allow;
+};
+
+const isCommentLine = (line) => /^\s*(\/\/|\/\*|\*|\{\/\*|#)/.test(line);
+
+// A line that is nothing but prose. This is how multi-line JSX text looks, and
+// a legal guard that cannot see the most natural way to write a paragraph is
+// worth very little.
+const isBareProseLine = (line) => {
+  const t = line.trim();
+  if (t.length === 0) return false;
+  const withoutContractions = t.replace(/([A-Za-z])['’]([A-Za-z])/g, '$1$2');
+  if (/[<>{}'"`=;()[\]]/.test(withoutContractions)) return false;
+  if (!/[A-Za-z]/.test(t)) return false;
+  if (/,$/.test(t)) return false;
+  if (/^[A-Za-z_$][\w$]*\s*:/.test(t)) return false;
+  return t.split(/\s+/).filter((w) => /[A-Za-z]/.test(w)).length >= 2;
+};
+
+// A module specifier is a path, not copy.
+const stripModuleSpecifier = (line) =>
+  line
+    .replace(/(^\s*(?:import|export)\b[^'"]*\bfrom\s*)(['"])[^'"]*\2/, '$1$2$2')
+    .replace(/(^\s*import\s*)(['"])[^'"]*\2/, '$1$2$2')
+    .replace(/(\brequire\s*\(\s*)(['"])[^'"]*\2/g, '$1$2$2');
+
+// Humanly-visible segments: quoted strings and JSX text. For .md/.txt/.html
+// the whole line is copy, so it is passed through as one segment.
+const PROSE_EXTS = new Set(['.md', '.txt', '.html']);
+const segments = (line, ext) => {
+  if (PROSE_EXTS.has(ext)) return [line];
+  const out = [];
+  line = stripModuleSpecifier(line);
+  const quoted = line.match(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g) || [];
+  for (const q of quoted) out.push(q.slice(1, -1));
+  const jsx = line.match(/>([^<>{}]+)</g) || [];
+  for (const j of jsx) out.push(j.slice(1, -1));
+  const tail = line.match(/\}\s*([A-Za-z][^<>{}]*)</g) || [];
+  for (const t of tail) out.push(t.replace(/^\}\s*/, '').slice(0, -1));
+  if (isBareProseLine(line)) out.push(line.trim());
+  return out;
+};
+
+const warnings = [];
+const walk = (d, out = []) => {
+  let entries;
+  try {
+    entries = readdirSync(d);
+  } catch (e) {
+    warnings.push(`unreadable dir ${d}: ${e.message}`);
+    return out;
+  }
+  for (const name of entries) {
+    if (SKIP_DIRS.has(name)) continue;
+    const p = join(d, name);
+    let st;
+    try {
+      st = lstatSync(p); // lstat: never follow symlinks
+    } catch (e) {
+      warnings.push(`unreadable ${p}: ${e.message}`);
+      continue;
+    }
+    if (st.isSymbolicLink()) continue;
+    if (st.isDirectory()) walk(p, out);
+    else if (EXTS.has(p.slice(p.lastIndexOf('.')))) {
+      if (st.size > MAX_FILE_BYTES) {
+        warnings.push(`skipped oversized file ${p} (${st.size} bytes)`);
+        continue;
+      }
+      out.push(p);
+    }
+  }
+  return out;
+};
+
+export { fold, BANNED, segments, isCommentLine, CONFUSABLES };
+
+const isCLI = (() => {
+  try {
+    return Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+  } catch {
+    return false;
+  }
+})();
+
+if (!isCLI) {
+  // Imported for its helpers (tests). Nothing else to do.
+} else {
+  const allow = loadAllow();
+  const hits = [];
+  for (const dir of SCAN_DIRS) {
+    if (!existsSync(join(ROOT, dir))) continue;
+    for (const file of walk(join(ROOT, dir))) {
+      const rel = relative(ROOT, file);
+      if (SELF_TEST_FILES.has(rel)) continue;
+      const ext = file.slice(file.lastIndexOf('.'));
+      let text;
+      try {
+        text = readFileSync(file, 'utf8');
+      } catch (e) {
+        warnings.push(`unreadable ${file}: ${e.message}`);
+        continue;
+      }
+      text.split('\n').forEach((rawLine, i) => {
+        const line = fold(rawLine);
+        if (isCommentLine(line)) return; // comments document, they don't advertise
+        for (const seg of segments(line, ext)) {
+          for (const { re, why } of BANNED) {
+            if (re.test(seg) && !allow.some((a) => a.test(seg))) {
+              hits.push({ file: rel, line: i + 1, why, text: seg.trim().slice(0, 100) });
+            }
+          }
+        }
+      });
+    }
+  }
+
+  for (const w of warnings) console.warn(`absolute-claims warning: ${w}`);
+  if (hits.length) {
+    console.error(`absolute-claims check FAILED — ${hits.length} hit(s):\n`);
+    for (const h of hits) console.error(`  ${h.file}:${h.line}  [${h.why}]\n    "${h.text}"\n`);
+    console.error('State present practice, not a perpetual promise: "No ads. No data selling." /');
+    console.error('"We don\'t sell your personal information." For a legitimate exception, add a');
+    console.error('narrow regex to .absolute-claims-allow.txt and say why in a comment.');
+    process.exit(1);
+  }
+  console.log('absolute-claims check passed — no absolute or unverifiable claims in copy.');
+}
