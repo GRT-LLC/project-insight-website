@@ -56,7 +56,7 @@ const MOMENTS: Moment[] = [
   {
     numeral: '2',
     name: 'The day that comes up packed',
-    desc: 'When a day reads packed, the plan says so before you commit, and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
+    desc: 'When the Fatigue Index rates a day packed, the plan says so before you commit, and offers a lighter version of the same day, so you can see what dropping one thing buys you.',
     soWhat: 'So you fix Tuesday at home, not mid-afternoon in a crowded plaza.',
   },
   {
@@ -109,8 +109,8 @@ export function FeaturesPage() {
               if the filing lapses. */}
           <p className="text-sm font-medium text-gray-500 mb-6">Patent pending</p>
           <p className="text-lg text-gray-600 leading-relaxed mb-8">
-            As you build a plan, Jarvis reads each day and calls it chill,
-            balanced, or packed. The read comes from how far your body clock
+            As you build a plan, Jarvis rates each day chill, balanced,
+            or packed. The rating comes from how far your body clock
             moves, how long you&rsquo;re in transit, how far you walk, how much
             is packed in, and how much downtime is left.
           </p>
@@ -121,7 +121,7 @@ export function FeaturesPage() {
               provided to screen readers via the aria-label. */}
           <div
             role="img"
-            aria-label="The Fatigue Index scale: days 1 to 3 read chill, 4 to 6 balanced, and 7 to 9 packed, with 9 the peak. The example shows a day reading 7."
+            aria-label="The Fatigue Index scale: days 1 to 3 are rated chill, 4 to 6 balanced, and 7 to 9 packed, with 9 the peak. The example shows a day rated 7."
             className="flex flex-wrap gap-2 mb-8"
           >
             {FI_SCALE.flatMap((band) =>
@@ -142,7 +142,7 @@ export function FeaturesPage() {
 
           <p className="text-gray-600 leading-relaxed">
             When a day comes up packed, one tap shows you a lighter version of
-            it. And that&rsquo;s all the Fatigue Index is: a read on how each
+            it. And that&rsquo;s all the Fatigue Index is: a rating for how each
             day will feel, not medical advice.
           </p>
         </div>
@@ -159,7 +159,7 @@ export function FeaturesPage() {
               This is what a day looks like.
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Every stop, timed and paced, with the day&rsquo;s read right at
+              Every stop, timed and paced, with the day&rsquo;s rating right at
               the top. Here&rsquo;s day one of a week in Rome.
             </p>
           </div>
@@ -180,7 +180,7 @@ export function FeaturesPage() {
 
             <div
               role="img"
-              aria-label="A JarvisTravel trip plan for day one in Rome: the day reads balanced, and five stops are laid out from a nine-thirty airport arrival to a seven-thirty welcome dinner, each tagged chill or balanced."
+              aria-label="A JarvisTravel trip plan for day one in Rome: the day is rated balanced, and five stops are laid out from a nine-thirty airport arrival to a seven-thirty welcome dinner, each tagged chill or balanced."
               className="relative mx-auto max-w-md bg-white rounded-[14px] p-6 shadow-[0_24px_48px_-12px_rgba(4,16,30,0.45)]"
             >
               <div className="flex items-baseline justify-between mb-1">
