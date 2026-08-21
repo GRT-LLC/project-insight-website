@@ -31,6 +31,15 @@ import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const SCAN_DIRS = ['src', 'public'];
+// Files served to visitors that no directory walk reaches, because they sit in
+// the repo ROOT (JAR-963).
+//
+// index.html is the document every page is built from. Its <title>, meta
+// description and OG tags are the first copy a search result or a shared link
+// shows anyone, and often the last copy anybody re-reads. A banned claim there
+// passed this guard with exit 0; verified by putting one there and watching the
+// check succeed.
+const SCAN_FILES = ['index.html'];
 const EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.css', '.md', '.txt']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', '.cache', '.next', 'coverage']);
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
@@ -185,7 +194,7 @@ const walk = (d, out = []) => {
   return out;
 };
 
-export { fold, BANNED, segments, isCommentLine, CONFUSABLES };
+export { fold, BANNED, segments, isCommentLine, CONFUSABLES, SCAN_DIRS, SCAN_FILES };
 
 const isCLI = (() => {
   try {
@@ -200,31 +209,35 @@ if (!isCLI) {
 } else {
   const allow = loadAllow();
   const hits = [];
-  for (const dir of SCAN_DIRS) {
-    if (!existsSync(join(ROOT, dir))) continue;
-    for (const file of walk(join(ROOT, dir))) {
-      const rel = relative(ROOT, file);
-      if (SELF_TEST_FILES.has(rel)) continue;
-      const ext = file.slice(file.lastIndexOf('.'));
-      let text;
-      try {
-        text = readFileSync(file, 'utf8');
-      } catch (e) {
-        warnings.push(`unreadable ${file}: ${e.message}`);
-        continue;
-      }
-      text.split('\n').forEach((rawLine, i) => {
-        const line = fold(rawLine);
-        if (isCommentLine(line)) return; // comments document, they don't advertise
-        for (const seg of segments(line, ext)) {
-          for (const { re, why } of BANNED) {
-            if (re.test(seg) && !allow.some((a) => a.test(seg))) {
-              hits.push({ file: rel, line: i + 1, why, text: seg.trim().slice(0, 100) });
-            }
+  // Named root files first, then everything the directory walk finds. One list,
+  // so a file cannot be scanned by one code path and skipped by the other.
+  const files = [
+    ...SCAN_FILES.map((f) => join(ROOT, f)).filter((f) => existsSync(f)),
+    ...SCAN_DIRS.flatMap((dir) => (existsSync(join(ROOT, dir)) ? walk(join(ROOT, dir)) : [])),
+  ];
+
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (SELF_TEST_FILES.has(rel)) continue;
+    const ext = file.slice(file.lastIndexOf('.'));
+    let text;
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch (e) {
+      warnings.push(`unreadable ${file}: ${e.message}`);
+      continue;
+    }
+    text.split('\n').forEach((rawLine, i) => {
+      const line = fold(rawLine);
+      if (isCommentLine(line)) return; // comments document, they don't advertise
+      for (const seg of segments(line, ext)) {
+        for (const { re, why } of BANNED) {
+          if (re.test(seg) && !allow.some((a) => a.test(seg))) {
+            hits.push({ file: rel, line: i + 1, why, text: seg.trim().slice(0, 100) });
           }
         }
-      });
-    }
+      }
+    });
   }
 
   for (const w of warnings) console.warn(`absolute-claims warning: ${w}`);
