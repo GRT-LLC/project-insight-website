@@ -54,6 +54,27 @@ const SECTIONS: Section[] = [
       </>
     ),
   },
+  {
+    // Scoped to THIS WEBSITE on purpose, and verified rather than asserted:
+    // no document.cookie, no localStorage, no analytics tag and no external
+    // script, font or CDN reference anywhere in the source, and the deployed
+    // site returns zero Set-Cookie headers (JAR-770). The only outbound
+    // references are the two social links in the footer, which are links, not
+    // embeds.
+    //
+    // It deliberately says nothing about the app at app.jarvistravel.com. That
+    // is a different surface with a different answer, and its policy is
+    // JAR-69. Claiming anything here about a surface this page does not cover
+    // is the shape of overclaim this ticket exists to remove.
+    title: '5. Cookies',
+    body: (
+      <>
+        This website doesn&rsquo;t set cookies. No analytics, no advertising
+        tags, and nothing loading from another company in the background. If
+        that changes, this page changes first.
+      </>
+    ),
+  },
 ];
 
 export function PrivacyPage() {
@@ -68,7 +89,7 @@ export function PrivacyPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-50 leading-tight [text-wrap:balance]">
             Privacy Policy
           </h1>
-          <p className="text-sky-200 text-sm mt-4">Last updated: July 2026</p>
+          <p className="text-sky-200 text-sm mt-4">Last updated: August 2026</p>
         </div>
       </section>
 
