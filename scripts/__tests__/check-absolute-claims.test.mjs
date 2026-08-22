@@ -131,6 +131,41 @@ test('a Cyrillic homoglyph does not smuggle the claim through', () => {
   assert(flags(`const L = 'No ads. No data selling. Еver.';`), 'homoglyph evaded the fold');
 });
 
+// --- scan scope -------------------------------------------------------
+//
+// A guard is only as wide as the files it opens, and that width is invisible:
+// it reports "passed" identically whether the file was clean or never read.
+// Reproduced before fixing — a banned claim in root index.html exited 0
+// (JAR-963).
+
+test('a claim in root index.html is caught', () => {
+  withTempDir((d) => {
+    const r = runCheck(d, '<meta name="description" content="We never sell your data.">', 'index.html');
+    assert(
+      r.code === 1 && /index\.html/.test(r.out),
+      'index.html is not scanned. It carries the title, meta description and OG tags — ' +
+        'the first copy a search result or a shared link shows anyone'
+    );
+  });
+});
+
+test('a claim in public/ is caught', () => {
+  withTempDir((d) => {
+    mkdirSync(join(d, 'public'), { recursive: true });
+    const r = runCheck(d, 'We never sell your data.', 'public/llms.txt');
+    assert(r.code === 1 && /public\/llms\.txt/.test(r.out), 'public/ is not scanned');
+  });
+});
+
+// The other half. Without this, a guard that flagged every root file would
+// pass the case above.
+test('a clean root index.html still passes', () => {
+  withTempDir((d) => {
+    const r = runCheck(d, '<meta name="description" content="No ads. No data selling.">', 'index.html');
+    assert(r.code === 0, `clean index.html was flagged:\n${r.out}`);
+  });
+});
+
 // --- fail closed ------------------------------------------------------
 test('a malformed allowlist fails the run rather than disabling the gate', () => {
   withTempDir((d) => {
@@ -138,6 +173,30 @@ test('a malformed allowlist fails the run rather than disabling the gate', () =>
     const r = runCheck(d, `const x = 1;`);
     assert(r.code === 1 && /invalid allowlist pattern/.test(r.out), 'did not fail closed');
   });
+});
+
+// --- "always" (JAR-964) -----------------------------------------------
+//
+// Rule 9 of the copy skill has banned "always" since the JAR-896 sweep and NO
+// guard implemented it, so the rule was advice and the lexicon was the
+// enforcement, and the two had quietly diverged. "always X" is a promise about
+// the future, which is what "Ever." and "forever" are banned for.
+//
+// Constructions rather than the bare adverb (brand owner, 2026-08-21): a guard
+// that flags "this always runs first" inside a string literal is a guard
+// someone switches off.
+
+test('a forward-looking "always" promise is caught', () => {
+  assert(flags(`export const L = 'Your plan is always current.';`), '"always current" not caught');
+  assert(flags(`export const L = 'Always free, always yours.';`), '"always free" not caught');
+  assert(flags(`export const L = 'It will always be there.';`), '"will always" not caught');
+});
+
+// The other half, and the reason this is a construction list. Without it a bare
+// \balways\b passes this file and then starts flagging ordinary code.
+test('"always" about behaviour is not a promise about the future', () => {
+  assert(clean(`export const L = 'This always runs before the sync.';`), 'a behaviour statement was flagged');
+  assert(clean(`export const L = 'Always ask before sharing';`), 'a settings label was flagged');
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

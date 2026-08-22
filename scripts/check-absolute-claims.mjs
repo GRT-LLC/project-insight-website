@@ -31,6 +31,15 @@ import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const SCAN_DIRS = ['src', 'public'];
+// Files served to visitors that no directory walk reaches, because they sit in
+// the repo ROOT (JAR-963).
+//
+// index.html is the document every page is built from. Its <title>, meta
+// description and OG tags are the first copy a search result or a shared link
+// shows anyone, and often the last copy anybody re-reads. A banned claim there
+// passed this guard with exit 0; verified by putting one there and watching the
+// check succeed.
+const SCAN_FILES = ['index.html'];
 const EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.css', '.md', '.txt']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', '.cache', '.next', 'coverage']);
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
@@ -53,6 +62,23 @@ const BANNED = [
   { re: /\bnever\s+(track|tracks|tracked|tracking)\s+(you|your)\b/i, why: 'absolute; state present practice instead' },
   { re: /\b(forever|in perpetuity)\b/i, why: 'perpetual promise' },
   { re: /\bguarantee(d|s)?\b/i, why: 'guarantee language; state what the product does instead' },
+
+  // "always X" is a promise about the future, which is the same thing rule 9
+  // bans "Ever." and "forever" for: it binds management that has not happened
+  // yet. The copy skill has banned the word since the JAR-896 sweep and NO
+  // guard implemented it, so the rule was advice and the lexicon was the
+  // enforcement, and the two had quietly diverged (JAR-964).
+  //
+  // Constructions, not the bare adverb. "This always runs first" in a string
+  // literal is not a claim, and a guard that flags it is a guard someone turns
+  // off. Approved shape, brand owner, 2026-08-21.
+  //
+  // "be" and "been" are deliberately NOT in the list. A live broadcast says
+  // "think of a place you've always BEEN curious about", which is the reader's
+  // own past and not a promise anybody is making. `will always` below catches
+  // the promise form ("it will always be there") without that cost.
+  { re: /\balways\s+(?:remain|remains|stay|stays|current|free|available|up[- ]to[- ]date|on|yours|works?|working|private|secure|encrypted|protected|safe|accurate|in\s+sync)\b/i, why: 'forward-looking promise; "always X" binds future management, say what is true today' },
+  { re: /\bwill\s+always\b/i, why: 'forward-looking promise; state present practice instead' },
 
   // --- AI claims we cannot make (claim sweep §6.2) ---
   { re: /\bnever\s+trains?\b/i, why: 'false: a claim about our own training practice' },
@@ -185,7 +211,7 @@ const walk = (d, out = []) => {
   return out;
 };
 
-export { fold, BANNED, segments, isCommentLine, CONFUSABLES };
+export { fold, BANNED, segments, isCommentLine, CONFUSABLES, SCAN_DIRS, SCAN_FILES };
 
 const isCLI = (() => {
   try {
@@ -200,31 +226,35 @@ if (!isCLI) {
 } else {
   const allow = loadAllow();
   const hits = [];
-  for (const dir of SCAN_DIRS) {
-    if (!existsSync(join(ROOT, dir))) continue;
-    for (const file of walk(join(ROOT, dir))) {
-      const rel = relative(ROOT, file);
-      if (SELF_TEST_FILES.has(rel)) continue;
-      const ext = file.slice(file.lastIndexOf('.'));
-      let text;
-      try {
-        text = readFileSync(file, 'utf8');
-      } catch (e) {
-        warnings.push(`unreadable ${file}: ${e.message}`);
-        continue;
-      }
-      text.split('\n').forEach((rawLine, i) => {
-        const line = fold(rawLine);
-        if (isCommentLine(line)) return; // comments document, they don't advertise
-        for (const seg of segments(line, ext)) {
-          for (const { re, why } of BANNED) {
-            if (re.test(seg) && !allow.some((a) => a.test(seg))) {
-              hits.push({ file: rel, line: i + 1, why, text: seg.trim().slice(0, 100) });
-            }
+  // Named root files first, then everything the directory walk finds. One list,
+  // so a file cannot be scanned by one code path and skipped by the other.
+  const files = [
+    ...SCAN_FILES.map((f) => join(ROOT, f)).filter((f) => existsSync(f)),
+    ...SCAN_DIRS.flatMap((dir) => (existsSync(join(ROOT, dir)) ? walk(join(ROOT, dir)) : [])),
+  ];
+
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (SELF_TEST_FILES.has(rel)) continue;
+    const ext = file.slice(file.lastIndexOf('.'));
+    let text;
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch (e) {
+      warnings.push(`unreadable ${file}: ${e.message}`);
+      continue;
+    }
+    text.split('\n').forEach((rawLine, i) => {
+      const line = fold(rawLine);
+      if (isCommentLine(line)) return; // comments document, they don't advertise
+      for (const seg of segments(line, ext)) {
+        for (const { re, why } of BANNED) {
+          if (re.test(seg) && !allow.some((a) => a.test(seg))) {
+            hits.push({ file: rel, line: i + 1, why, text: seg.trim().slice(0, 100) });
           }
         }
-      });
-    }
+      }
+    });
   }
 
   for (const w of warnings) console.warn(`absolute-claims warning: ${w}`);
