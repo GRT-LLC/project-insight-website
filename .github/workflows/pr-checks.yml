@@ -71,6 +71,8 @@ jobs:
         run: npm run lint:absolute-claims
       - name: Social meta guard
         run: npm run lint:social-meta
+      - name: Fonts are self-hosted (no third-party font CDN)
+        run: npm run lint:fonts
       - name: OG card is the real lockup
         # JAR-628 said marketing#32 "must be closed, not merged" because it
         # installed a card drawing a placeholder "JT" tile. It was merged, and

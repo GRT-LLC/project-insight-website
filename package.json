@@ -15,10 +15,11 @@
     "logo:gen": "node scripts/gen-logo-component.mjs",
     "logo:check": "node scripts/gen-logo-component.mjs --check",
     "logo:vendor": "node scripts/vendor-logo.mjs",
-    "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs && node scripts/__tests__/check-plan-not-book.test.mjs && node scripts/__tests__/check-prices.test.mjs && node scripts/__tests__/check-absolute-claims.test.mjs",
+    "test:scripts": "node scripts/__tests__/gen-logo-component.test.mjs && node scripts/__tests__/check-plan-not-book.test.mjs && node scripts/__tests__/check-prices.test.mjs && node scripts/__tests__/check-absolute-claims.test.mjs && node scripts/__tests__/check-fonts.test.mjs",
     "type-check": "tsc --noEmit",
     "lint:prices": "node scripts/check-prices.mjs",
-    "sync:prices": "node scripts/check-prices.mjs --write"
+    "sync:prices": "node scripts/check-prices.mjs --write",
+    "lint:fonts": "node scripts/check-fonts.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.460.0",
