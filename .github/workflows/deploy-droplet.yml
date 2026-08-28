@@ -1,6 +1,13 @@
 # Deploy marketing website to production Droplet
-# Runs on pushes to main that touch marketing-website files, or manually.
+# Runs on every push to main (same trigger as node.js.yml's Pages deploy), or manually.
 # Built artifact is rsynced to /var/www/jarvistravel-marketing/ on the DO Droplet.
+#
+# JAR-683: this workflow previously filtered on a hardcoded path list (src/**,
+# index.html, vite.config.ts, package.json, package-lock.json) that drifted —
+# public/**, tailwind.config.js, postcss.config.js, brand/**, scripts/** were
+# missing, so commits touching only those files shipped to GitHub Pages and
+# never reached the droplet (silent staleness; see JAR-683/JAR-1023). Removing
+# the filter keeps the Pages and Droplet deploy paths in lockstep by construction.
 #
 # Reuses the same DROPLET_SSH_KEY and DROPLET_HOST secrets as core & web-app.
 
@@ -9,12 +16,6 @@ name: Deploy marketing site to Droplet
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'index.html'
-      - 'vite.config.ts'
-      - 'package.json'
-      - 'package-lock.json'
   workflow_dispatch:
 
 concurrency:
