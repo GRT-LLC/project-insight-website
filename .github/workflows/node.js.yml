@@ -50,6 +50,8 @@ jobs:
         run: npm run lint:plan-not-book
       - name: Absolute-claim guard (FTC §5 / Lanham §43(a))
         run: npm run lint:absolute-claims
+      - name: Pricing CTAs link into the app
+        run: npm run lint:pricing-ctas
       - name: Social meta guard
         run: npm run lint:social-meta
 
