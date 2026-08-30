@@ -50,7 +50,7 @@ connection that fires on every page.
 `scripts/check-fonts.mjs` is the gate, and it runs on ALL shipping paths:
 `pr-checks` (PRs), `node.js.yml` (GitHub Pages deploy), and
 `deploy-droplet.yml` (droplet deploy). Its self-tests run via
-`npm test`/`test:scripts`. The guard refuses: any font-CDN fetch spelling
+`npm run test:scripts` (there is no bare `npm test` script in this repo). The guard refuses: any font-CDN fetch spelling
 (`url()`, `href=`/`src=`, `@import` string form, protocol-relative `//host`),
 faces with no local file, placeholder (stub/zero-byte) font files, and a
 missing or stubbed `public/fonts/LICENSE.txt` (the OFL requires the verbatim
