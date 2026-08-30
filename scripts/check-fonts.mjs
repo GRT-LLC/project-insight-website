@@ -106,7 +106,7 @@ if (faces.length > 0) {
     const p = resolve(ROOT, 'public', f.replace(/^\//, ''));
     if (!existsSync(p)) continue; // already reported above
     if (statSync(p).size < 1024) {
-      problems.push(`public${f} is suspiciously small (${statSync(p).size} bytes) — a real font subset is tens of KiB; this looks like a placeholder`);
+      problems.push(`public${f} is suspiciously small (${statSync(p).size} bytes) — a real font subset is tens of KiB; this looks like a stub`);
     }
   }
 }

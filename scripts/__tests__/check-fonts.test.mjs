@@ -32,7 +32,8 @@ function withRepo({ css, html = '<!doctype html><html><head></head><body></body>
     }
     // The real licence text, not a placeholder — the guard (JAR-1165) refuses
     // a stub notice, so the fixture must ship the genuine file.
-    if (licence) writeFileSync(join(dir, 'public/fonts/LICENSE.txt'), readFileSync(join(new URL('../../public/fonts', import.meta.url).pathname, 'LICENSE.txt'), 'utf8'));
+    if (licence === true) writeFileSync(join(dir, 'public/fonts/LICENSE.txt'), readFileSync(join(new URL('../../public/fonts', import.meta.url).pathname, 'LICENSE.txt'), 'utf8'));
+    else if (typeof licence === 'string') writeFileSync(join(dir, 'public/fonts/LICENSE.txt'), licence);
     writeFileSync(join(dir, 'src/index.css'), css);
     writeFileSync(join(dir, 'index.html'), html);
     return fn(dir);
@@ -112,6 +113,22 @@ test('a comment naming a font CDN is not treated as a load', () => {
   });
 });
 
+test('the failure hint names the file the faces actually live in', () => {
+  withRepo({ css: '@font-face{font-family:\'Inter\';src:url(\'/fonts/missing.woff2\') format(\'woff2\');}' }, (d) => {
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a missing font file');
+    assert(/src\/index\.css/.test(r.out), `failure hint points at the wrong file: ${r.out}`);
+  });
+});
+
+test('refuses a stub licence shorter than the real OFL text', () => {
+  withRepo({ css: GOOD, licence: 'TODO' }, (d) => {
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a placeholder licence');
+    assert(/stub/.test(r.out), `wrong reason: ${r.out}`);
+  });
+});
+
 // ── JAR-1165 (ported from the waitlist guard, JAR-1167): more spellings of fetch
 
 test('refuses a CSS string-form @import of a font CDN', () => {
@@ -130,7 +147,7 @@ test('refuses a protocol-relative //fonts.gstatic.com load', () => {
   });
 });
 
-test('refuses a zero-byte font file that merely exists', () => {
+test('refuses a zero-byte (stub) font file that merely exists', () => {
   withRepo({
     css: `@font-face{font-family:'Inter';src:url('/fonts/inter-latin.woff2') format('woff2');}`,
     fonts: false,
