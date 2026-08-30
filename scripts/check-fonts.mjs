@@ -48,11 +48,26 @@ if (html !== null) files.unshift(resolve(ROOT, 'index.html'));
 for (const f of files) {
   const body = readFileSync(f, 'utf8');
   // A comment explaining why we DON'T use one is not a load. Only flag a host
-  // that appears inside a url()/href/src, which is what actually fetches.
-  const fetching = [...body.matchAll(/(?:url\(|href=|src=)["']?(https?:\/\/[^"')\s]+)/g)].map((m) => m[1]);
+  // that appears inside a url()/href/src — or a CSS string-form @import, which
+  // fetches the sheet and every font it declares without touching url() or an
+  // attribute (JAR-1167 port). url( also legally allows whitespace before the
+  // value, so the match tolerates it.
+  const fetching = [
+    ...body.matchAll(/(?:url\s*\(|href\s*=|src\s*=)\s*["']?(https?:\/\/[^"')\s]+)/g),
+    ...body.matchAll(/@import\s+["'](https?:\/\/[^"']+)["']/g),
+  ].map((m) => m[1]);
   for (const host of FONT_HOSTS) {
     if (fetching.some((u) => u.includes(host))) {
       problems.push(`${f.replace(ROOT + '/', '')} fetches from ${host} — every page load sends the visitor's IP there`);
+    }
+  }
+  // Protocol-relative //host/... is the same third-party load with the scheme
+  // omitted; compare the authority up to the first slash, case-insensitively
+  // (JAR-1167 port).
+  for (const m of body.matchAll(/(?:url\s*\(|href\s*=|src\s*=|@import\s+)["']?(\/\/[^"')\s/][^"')\s]*)/g)) {
+    const authority = m[1].slice(2).split('/')[0].toLowerCase();
+    if (FONT_HOSTS.some((h) => h.toLowerCase() === authority)) {
+      problems.push(`${f.replace(ROOT + '/', '')} fetches from //${m[1]} (protocol-relative) — same third-party load, just spelled differently`);
     }
   }
 }
@@ -61,7 +76,11 @@ for (const f of files) {
 // Without these, deleting every @font-face passes check (1) and silently drops
 // the typeface — the exact state this repo was in.
 const css = files.filter((f) => f.endsWith('.css')).map((f) => readFileSync(f, 'utf8')).join('\n');
-const faces = [...css.matchAll(/src:\s*url\(["']?(\/fonts\/[^"')]+)["']?\)/g)].map((m) => m[1]);
+// url( tolerates whitespace before the value (JAR-1167 port); only /fonts/
+// urls count as self-hosted — a CDN url is someone else's host and is caught
+// by check (1) above, which keeps the "no self-hosted face" message from
+// masking the real finding.
+const faces = [...css.matchAll(/src:\s*url\(\s*["']?(\/fonts\/[^"')]+)["']?\s*\)/g)].map((m) => m[1]);
 
 if (faces.length === 0) {
   problems.push('no self-hosted @font-face found — the family name is declared but no font is shipped, so most visitors get the system stack');
@@ -72,15 +91,30 @@ for (const f of faces) {
   }
 }
 
-// (4) the OFL notice travels with the files, as the licence requires.
+// (4) the OFL notice travels with the files, as the licence requires, and a
+// shipped font that is really a placeholder is not shipped at all: a real
+// Inter subset is tens of KiB, the licence is the full OFL text (JAR-1165).
 if (faces.length > 0 && !existsSync(resolve(ROOT, 'public/fonts/LICENSE.txt'))) {
   problems.push('public/fonts/LICENSE.txt is missing — Inter is SIL OFL 1.1 and the notice must ship with the files');
+}
+if (faces.length > 0) {
+  const licence = read('public/fonts/LICENSE.txt');
+  if (licence !== null && licence.trim().length < 200) {
+    problems.push('public/fonts/LICENSE.txt is a stub — the OFL notice must be the real licence text');
+  }
+  for (const f of faces) {
+    const p = resolve(ROOT, 'public', f.replace(/^\//, ''));
+    if (!existsSync(p)) continue; // already reported above
+    if (statSync(p).size < 1024) {
+      problems.push(`public${f} is suspiciously small (${statSync(p).size} bytes) — a real font subset is tens of KiB; this looks like a placeholder`);
+    }
+  }
 }
 
 if (problems.length > 0) {
   console.error('Font guard failed:\n');
   for (const p of problems) console.error(`  - ${p}`);
-  console.error('\nFonts are served from public/fonts and declared in src/index.css. See JAR-1152.');
+  console.error('\nFonts are self-hosted from public/fonts and declared in src/index.css. See JAR-1152.');
   process.exit(1);
 }
 
