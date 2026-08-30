@@ -6,7 +6,7 @@
 // that only banned font CDNs would have called that clean, which is why it is
 // the first fixture rather than an afterthought.
 
-import { mkdtempSync, writeFileSync, rmSync, mkdirSync, cpSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync, cpSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execSync } from 'node:child_process';
@@ -30,7 +30,10 @@ function withRepo({ css, html = '<!doctype html><html><head></head><body></body>
       cpSync(join(REAL_FONTS, 'inter-latin.woff2'), join(dir, 'public/fonts/inter-latin.woff2'));
       cpSync(join(REAL_FONTS, 'inter-latin-ext.woff2'), join(dir, 'public/fonts/inter-latin-ext.woff2'));
     }
-    if (licence) writeFileSync(join(dir, 'public/fonts/LICENSE.txt'), 'OFL 1.1');
+    // The real licence text, not a placeholder — the guard (JAR-1165) refuses
+    // a stub notice, so the fixture must ship the genuine file.
+    if (licence === true) writeFileSync(join(dir, 'public/fonts/LICENSE.txt'), readFileSync(join(new URL('../../public/fonts', import.meta.url).pathname, 'LICENSE.txt'), 'utf8'));
+    else if (typeof licence === 'string') writeFileSync(join(dir, 'public/fonts/LICENSE.txt'), licence);
     writeFileSync(join(dir, 'src/index.css'), css);
     writeFileSync(join(dir, 'index.html'), html);
     return fn(dir);
@@ -107,6 +110,52 @@ test('a comment naming a font CDN is not treated as a load', () => {
   withRepo({ css: `/* was fonts.googleapis.com before JAR-1152 */\n${GOOD}` }, (d) => {
     const r = run(d);
     assert(r.code === 0, `a prose mention tripped the guard: ${r.out}`);
+  });
+});
+
+test('the failure hint names the file the faces actually live in', () => {
+  withRepo({ css: '@font-face{font-family:\'Inter\';src:url(\'/fonts/missing.woff2\') format(\'woff2\');}' }, (d) => {
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a missing font file');
+    assert(/src\/index\.css/.test(r.out), `failure hint points at the wrong file: ${r.out}`);
+  });
+});
+
+test('refuses a stub licence shorter than the real OFL text', () => {
+  withRepo({ css: GOOD, licence: 'TODO' }, (d) => {
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a placeholder licence');
+    assert(/stub/.test(r.out), `wrong reason: ${r.out}`);
+  });
+});
+
+// ── JAR-1165 (ported from the waitlist guard, JAR-1167): more spellings of fetch
+
+test('refuses a CSS string-form @import of a font CDN', () => {
+  withRepo({ css: `@import "https://fonts.googleapis.com/css2?family=Inter";\n${GOOD}` }, (d) => {
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a string-form @import of fonts.googleapis.com');
+    assert(/fetches from fonts\.googleapis\.com/.test(r.out), `wrong reason: ${r.out}`);
+  });
+});
+
+test('refuses a protocol-relative //fonts.gstatic.com load', () => {
+  withRepo({ css: `@font-face{font-family:'Inter';src:url('//fonts.gstatic.com/s/inter.woff2') format('woff2');}` }, (d) => {
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a protocol-relative third-party font');
+    assert(/protocol-relative/.test(r.out), `wrong reason: ${r.out}`);
+  });
+});
+
+test('refuses a zero-byte (stub) font file that merely exists', () => {
+  withRepo({
+    css: `@font-face{font-family:'Inter';src:url('/fonts/inter-latin.woff2') format('woff2');}`,
+    fonts: false,
+  }, (d) => {
+    writeFileSync(join(d, 'public/fonts/inter-latin.woff2'), '');
+    const r = run(d);
+    assert(r.code === 1, 'guard passed a zero-byte font file');
+    assert(/suspiciously small/.test(r.out), `wrong reason: ${r.out}`);
   });
 });
 

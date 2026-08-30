@@ -39,6 +39,26 @@ npm run type-check   # tsc --noEmit
 npm run lint         # eslint with zero-warnings policy
 ```
 
+### Fonts (self-hosting invariant — JAR-1152/JAR-1165)
+
+The site's typeface (Inter) is served from `public/fonts/` and declared in
+`src/index.css`. It must never load from a third-party font CDN
+(fonts.googleapis.com et al.): a webfont fetch transmits every visitor's IP
+before consent (LG München I, 3 O 17493/20), and it is the one third-party
+connection that fires on every page.
+
+`scripts/check-fonts.mjs` is the gate, and it runs on ALL shipping paths:
+`pr-checks` (PRs), `node.js.yml` (GitHub Pages deploy), and
+`deploy-droplet.yml` (droplet deploy). Its self-tests run via
+`npm run test:scripts` (there is no bare `npm test` script in this repo). The guard refuses: any font-CDN fetch spelling
+(`url()`, `href=`/`src=`, `@import` string form, protocol-relative `//host`),
+faces with no local file, placeholder (stub/zero-byte) font files, and a
+missing or stubbed `public/fonts/LICENSE.txt` (the OFL requires the verbatim
+notice to travel with the files — the shipped copy is byte-identical to
+upstream). Adding a subset or weight means adding the file AND its
+`@font-face` in `src/index.css`; nothing about fonts is configured anywhere
+else.
+
 ### Pricing (single source of truth — JAR-660)
 
 The only place this site knows what anything costs is `src/app/data/pricing.ts`,
