@@ -60,7 +60,13 @@ export function checkPricingCtas(root = ROOT) {
 
   for (const label of labels) {
     const before = page.slice(0, label.index);
-    const open = Math.max(before.lastIndexOf('<a'), before.lastIndexOf('<Link'));
+    // Boundary-checked, not prefix-checked: `<a` alone also matches `<article`
+    // and `<aside`, so a formatter nesting a card between the anchor open and
+    // the label made the scan read the WRONG tag and flag a correct CTA
+    // (review F3). `<a`/`<Link` must be followed by whitespace or `>`; the
+    // LAST such match before the label is the enclosing opener.
+    const opens = [...before.matchAll(/<a[\s>]|<Link[\s>]/g)];
+    const open = opens.length ? opens[opens.length - 1].index : -1;
     if (open === -1) {
       problems.push(`${PAGE}: a "Join Now" label has no <a> or <Link> before it`);
       continue;
@@ -83,7 +89,12 @@ export function checkPricingCtas(root = ROOT) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const problems = checkPricingCtas();
+  // CLI reads from the working directory, not this file's location: the
+  // workflow runs from the repo root (identical result), but a contract test
+  // must be able to point the guard at a fixture repo. Hardcoding ROOT here
+  // made the guard untestable - every invocation graded the real page
+  // regardless of what the caller aimed it at.
+  const problems = checkPricingCtas(process.cwd());
   for (const p of problems) console.error(`  ${p}`);
   console.log(problems.length ? `\n${problems.length} problem(s)` : 'pricing CTAs OK');
   process.exit(problems.length ? 1 : 0);

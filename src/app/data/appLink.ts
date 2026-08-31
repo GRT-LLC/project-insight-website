@@ -13,7 +13,19 @@ import type { PriceLookupKey } from './pricing';
  * that serves jarvistravel.com, and an unset variable must not silently produce
  * a link to nowhere.
  */
-const APP_ORIGIN = import.meta.env.VITE_APP_ORIGIN || 'https://app.jarvistravel.com';
+const RAW_ORIGIN = import.meta.env.VITE_APP_ORIGIN || 'https://app.jarvistravel.com';
+
+// Fail fast on a staging misconfig: `VITE_APP_ORIGIN=localhost:5173` (no
+// scheme) would silently turn every CTA into a relative href that 404s inside
+// the marketing site. A missing scheme is a config bug, not a graceful
+// degradation — refuse to build the link at all.
+if (!RAW_ORIGIN.startsWith('https://')) {
+  throw new Error(
+    `VITE_APP_ORIGIN must be an https:// origin (got "${RAW_ORIGIN}"). ` +
+      'Local app development should use an https tunnel or the production origin.',
+  );
+}
+const APP_ORIGIN = RAW_ORIGIN;
 
 /**
  * The signup link for a chosen plan.
@@ -31,6 +43,10 @@ const APP_ORIGIN = import.meta.env.VITE_APP_ORIGIN || 'https://app.jarvistravel.
  * the site would keep sending people to a waitlist after signup opened, or into
  * a signup form after it closed. One flag, one owner.
  */
-export function appJoinUrl(plan: PriceLookupKey): string {
-  return `${APP_ORIGIN}/auth/sign-up?plan=${encodeURIComponent(plan)}`;
+export function appJoinUrl(plan: PriceLookupKey, cadence?: 'annual' | 'monthly'): string {
+  // The cadence rides along when the visitor already picked one (Explore card).
+  // The billing question is re-asked in checkout if the app never receives it,
+  // but the ticket's contract is that the pricing-page choice survives the hop.
+  const c = cadence ? `&cadence=${encodeURIComponent(cadence)}` : '';
+  return `${APP_ORIGIN}/auth/sign-up?plan=${encodeURIComponent(plan)}${c}`;
 }
