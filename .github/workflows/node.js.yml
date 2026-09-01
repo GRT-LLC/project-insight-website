@@ -72,7 +72,14 @@ jobs:
           if [ -z "$STRIPE_SECRET_KEY" ]; then
             echo "::error::STRIPE_SECRET_KEY repo secret is not configured. The pricing guard"
             echo "::error::cannot reconcile against Stripe without it, and a green check here"
-            echo "::error::would mean nothing. Add a restricted, read-only test-mode key."
+            echo "::error::would mean nothing."
+            echo "::error::"
+            echo "::error::Add a restricted, read-only, TEST-mode key from acct_1ToBJsPDaNqc0Lek."
+            echo "::error::"
+            echo "::error::Do NOT copy the value out of the old STRIPE_API_KEY secret: that key is"
+            echo "::error::EXPIRED (Stripe returned 'Expired API Key provided' on 2026-09-01), so"
+            echo "::error::re-adding it under the new name turns this error into a less obvious"
+            echo "::error::one further down. Mint a new key. The old secret can then be deleted."
             exit 1
           fi
         env:
