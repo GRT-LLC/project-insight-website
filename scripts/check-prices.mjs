@@ -2,8 +2,8 @@
 // Pricing guard, in two halves (JAR-660).
 //
 //   node scripts/check-prices.mjs           # always: no price literals in components
-//   STRIPE_SECRET_KEY=rk_... node scripts/check-prices.mjs         # + reconcile with Stripe
-//   STRIPE_SECRET_KEY=rk_... node scripts/check-prices.mjs --write # + rewrite pricing.ts
+//   STRIPE_READ_API_KEY=rk_... node scripts/check-prices.mjs         # + reconcile with Stripe
+//   STRIPE_READ_API_KEY=rk_... node scripts/check-prices.mjs --write # + rewrite pricing.ts
 //
 // Half one — no literals. Every dollar amount on this site renders from
 // src/app/data/pricing.ts. The page used to carry them inline, which is how it
@@ -26,7 +26,7 @@ const ROOT = process.cwd();
 const PRICING_FILE = join(ROOT, 'src/app/data/pricing.ts');
 const COMPONENT_DIRS = ['src/app/pages', 'src/app/components', 'src/app'];
 const WRITE = process.argv.includes('--write');
-// Skipping the Stripe half has to be asked for. See the STRIPE_SECRET_KEY branch.
+// Skipping the Stripe half has to be asked for. See the STRIPE_READ_API_KEY branch.
 const ALLOW_SKIP = process.argv.includes('--allow-skip');
 // Deploy-time mode: a network/API outage warns instead of failing the deploy
 // (pr-checks stays strict). A verified mismatch still fails in both modes.
@@ -149,7 +149,7 @@ const EXPECTED_ACCOUNT = 'acct_1ToBJsPDaNqc0Lek';
 // when priceOf() reaches into undefined.
 const EXPECTED_KEYS = ['jt_trip_pass', 'jt_explore_annual', 'jt_explore_monthly'];
 
-const KEY = process.env.STRIPE_SECRET_KEY;
+const KEY = process.env.STRIPE_READ_API_KEY;
 if (!KEY) {
   // Fail closed. A guard whose whole promise is "fail when it drifts" must not
   // report success when it did not check — and it did exactly that in CI,
@@ -159,15 +159,15 @@ if (!KEY) {
   // Local runs without a key are legitimate, so they can opt out explicitly.
   // CI cannot: there is no reading of an unset secret that means "verified".
   if (!ALLOW_SKIP) {
-    console.error('prices: STRIPE_SECRET_KEY is not set, so the Stripe reconciliation did not run.');
+    console.error('prices: STRIPE_READ_API_KEY is not set, so the Stripe reconciliation did not run.');
     console.error('');
-    console.error('  In CI: configure the STRIPE_SECRET_KEY repo secret (restricted, read-only, test mode).');
+    console.error('  In CI: configure the STRIPE_READ_API_KEY repo secret (restricted, read-only, test mode).');
     console.error('  Locally: pass --allow-skip to run only the literal scan.');
     console.error('');
     console.error('Exiting non-zero rather than passing as if the amounts had been checked.');
     process.exit(1);
   }
-  console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_SECRET_KEY is not set (--allow-skip).');
+  console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_READ_API_KEY is not set (--allow-skip).');
   console.log('        The literal scan above still ran. Amounts were NOT verified against Stripe.');
   process.exit(0);
 }
@@ -320,7 +320,7 @@ async function assertAccount() {
     if (verdict === 'wrong') {
       fail(`that key belongs to ${named}, not ${EXPECTED_ACCOUNT}.\n` +
         `       No permission grant fixes this. Issue a restricted, read-only TEST\n` +
-        `       key from ${EXPECTED_ACCOUNT} and replace the STRIPE_SECRET_KEY secret.`);
+        `       key from ${EXPECTED_ACCOUNT} and replace the STRIPE_READ_API_KEY secret.`);
     }
 
     // Neither readable nor self-identifying. Not knowing which account we are

@@ -137,12 +137,17 @@ test('the guard still tells the reader a permission grant is not the fix', () =>
 });
 
 // A name, not a shape — so asserting it in the source is the right tool here.
-// The guard read STRIPE_API_KEY, which this org sets nowhere in Infisical; the
-// same class of defect as the account pin, where the code named something that
-// does not exist in our world and reported its absence as misconfiguration.
+// The guard read STRIPE_API_KEY. That name IS set -- as a repo secret on this
+// repository -- but it holds an EXPIRED key. The org's name for a read-only
+// Stripe key is STRIPE_READ_API_KEY.
+//
+// NOT STRIPE_SECRET_KEY: that name already holds the account's FULL secret
+// key, so pointing the guard at it would swap a restricted credential for an
+// unrestricted one in CI. That was proposed during review and caught before
+// merge; this assertion is what stops it being proposed again.
 test('the guard reads the env var this org actually sets', () => {
-  if (!/process\.env\.STRIPE_SECRET_KEY/.test(source)) {
-    throw new Error('the guard does not read STRIPE_SECRET_KEY');
+  if (!/process\.env\.STRIPE_READ_API_KEY/.test(source)) {
+    throw new Error('the guard does not read STRIPE_READ_API_KEY');
   }
   if (/STRIPE_API_KEY/.test(source)) {
     throw new Error('STRIPE_API_KEY still appears in check-prices.mjs');

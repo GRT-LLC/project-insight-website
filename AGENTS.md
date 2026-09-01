@@ -74,7 +74,7 @@ dollar amount reappears as a literal in a component.
 **Changing a price or adding a plan (runbook):**
 1. Edit/create the price in the Stripe dashboard (test mode; same lookup_key
    in live mode at launch).
-2. `STRIPE_SECRET_KEY=rk_test_... npm run sync:prices` — regenerates the
+2. `STRIPE_READ_API_KEY=rk_test_... npm run sync:prices` — regenerates the
    generated block in `pricing.ts` from Stripe (the `Price` type + the guard's
    `EXPECTED_KEYS` fail loudly if the catalogue shape changes; `interval_count
    != 1` is refused — the site cannot render it).
