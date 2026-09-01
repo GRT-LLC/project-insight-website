@@ -90,6 +90,33 @@ test('accepts the shipped page: both CTAs via appJoinUrl with declared keys', ()
 
 // MUTATION 1: the regression the guard exists for - a CTA reverted to the
 // waitlist. Building, rendering, and screenshotting all stay green.
+// Review F3. The scan took the LAST opener before the label; an inline anchor
+// that opened and closed in between — a "see plans" aside inside the card —
+// became "the CTA" and its href was read instead of the real one. The CTA
+// below is a correct appJoinUrl link; the guard used to flag it anyway.
+test('is not fooled by a closed inline anchor between the CTA opener and its label', () => {
+  withRepo({
+    page: `import { appJoinUrl } from '../data/appLink';
+export function PricingPage() {
+  return (
+    <div>
+      <a
+        href={appJoinUrl('jt_trip_pass')}
+        className="px-8 py-3.5"
+      >
+        <small><a href="/pricing#faq">see plans</a></small>
+        <span>Join Now</span>
+      </a>
+    </div>
+  );
+}`,
+  }, (dir) => {
+    const r = run(dir);
+    assert(r.code === 0, `guard should accept the real CTA: ${r.out}`);
+    assert(/pricing CTAs OK/.test(r.out), `unexpected output: ${r.out}`);
+  });
+});
+
 test('refuses a Join Now reverted to /contact', () => {
   withRepo({
     page: `import { Link } from 'react-router-dom';

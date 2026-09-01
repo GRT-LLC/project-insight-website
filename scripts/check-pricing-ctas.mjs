@@ -65,8 +65,30 @@ export function checkPricingCtas(root = ROOT) {
     // the label made the scan read the WRONG tag and flag a correct CTA
     // (review F3). `<a`/`<Link` must be followed by whitespace or `>`; the
     // LAST such match before the label is the enclosing opener.
-    const opens = [...before.matchAll(/<a[\s>]|<Link[\s>]/g)];
-    const open = opens.length ? opens[opens.length - 1].index : -1;
+    // The enclosing opener is the LAST <a>/<Link> before the label that is
+    // still OPEN at the label — not merely the last one. An inline anchor that
+    // opened and closed between the real opener and the label (a "see plans"
+    // aside inside the card) would otherwise be taken as the CTA's tag and its
+    // href read instead (review F3).
+    //
+    // "Still open" is a depth question, not "is there a close tag after it":
+    // the inline anchor's </a> sits after the REAL opener too, so a naive
+    // "any close after this opener" check skips the real one as well. Count
+    // instead: for a candidate opener, every opener after it that has a
+    // matching close after it cancels out. The candidate is enclosing iff the
+    // closes after it are all accounted for by openers after it — one extra
+    // close means the candidate itself was closed.
+    const opens = [...before.matchAll(/<a[\s>]|<Link[\s>]/g)].map((m) => m.index);
+    const closes = [...before.matchAll(/<\/a>|<\/Link>/g)].map((m) => m.index);
+    let open = -1;
+    for (let k = opens.length - 1; k >= 0; k--) {
+      const at = opens[k];
+      const opensAfter = opens.filter((o) => o > at).length;
+      const closesAfter = closes.filter((c) => c > at).length;
+      if (closesAfter <= opensAfter) { open = at; break; }
+      // closesAfter > opensAfter: one of those closes is this opener's own.
+      // It is a finished inline anchor, not the one wrapping the CTA.
+    }
     if (open === -1) {
       problems.push(`${PAGE}: a "Join Now" label has no <a> or <Link> before it`);
       continue;

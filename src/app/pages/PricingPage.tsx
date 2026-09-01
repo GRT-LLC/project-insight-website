@@ -303,7 +303,7 @@ export function PricingPage() {
                   choice they just made survives into checkout instead of being
                   asked for a second time. */}
               <a
-                href={appJoinUrl(cadence.lookupKey, cadence.key)}
+                href={appJoinUrl(cadence.lookupKey)}
                 className={`mt-auto w-full py-3.5 rounded-full font-semibold text-center border transition-colors text-gray-900 ${
                   exploreHot
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'

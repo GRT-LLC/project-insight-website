@@ -15,16 +15,11 @@ import type { PriceLookupKey } from './pricing';
  */
 const RAW_ORIGIN = import.meta.env.VITE_APP_ORIGIN || 'https://app.jarvistravel.com';
 
-// Fail fast on a staging misconfig: `VITE_APP_ORIGIN=localhost:5173` (no
-// scheme) would silently turn every CTA into a relative href that 404s inside
-// the marketing site. A missing scheme is a config bug, not a graceful
-// degradation — refuse to build the link at all.
-if (!RAW_ORIGIN.startsWith('https://')) {
-  throw new Error(
-    `VITE_APP_ORIGIN must be an https:// origin (got "${RAW_ORIGIN}"). ` +
-      'Local app development should use an https tunnel or the production origin.',
-  );
-}
+// Validated at BUILD time by requireAppOrigin() in vite.config.ts, not here.
+// This used to throw at module scope, which reads as fail-fast and is the
+// opposite: Vite bundles this file, so the throw ran in the visitor's browser
+// after a green build — every page white-screened and CI said nothing
+// (review F2). The build-time guard catches the same value before deploy.
 const APP_ORIGIN = RAW_ORIGIN;
 
 /**
@@ -43,10 +38,15 @@ const APP_ORIGIN = RAW_ORIGIN;
  * the site would keep sending people to a waitlist after signup opened, or into
  * a signup form after it closed. One flag, one owner.
  */
-export function appJoinUrl(plan: PriceLookupKey, cadence?: 'annual' | 'monthly'): string {
-  // The cadence rides along when the visitor already picked one (Explore card).
-  // The billing question is re-asked in checkout if the app never receives it,
-  // but the ticket's contract is that the pricing-page choice survives the hop.
-  const c = cadence ? `&cadence=${encodeURIComponent(cadence)}` : '';
-  return `${APP_ORIGIN}/auth/sign-up?plan=${encodeURIComponent(plan)}${c}`;
+export function appJoinUrl(plan: PriceLookupKey): string {
+  // The plan key is the WHOLE choice. The cadence is not a second argument:
+  // jt_explore_annual and jt_explore_monthly are distinct PriceLookupKeys
+  // (pricing.ts), so a visitor who picked Monthly arrives as
+  // ?plan=jt_explore_monthly and nothing has to re-ask. An earlier version
+  // also appended &cadence=annual|monthly and said the app read it. The app
+  // never did (web-app reads only `plan`), so that parameter was dead on the
+  // wire and the sentence describing it was false. Removed rather than
+  // implemented on the app side: it would carry no information the key does
+  // not already carry (marketing-website#46 review).
+  return `${APP_ORIGIN}/auth/sign-up?plan=${encodeURIComponent(plan)}`;
 }
