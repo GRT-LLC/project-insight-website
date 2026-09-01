@@ -55,6 +55,13 @@ jobs:
       - name: Social meta guard
         run: npm run lint:social-meta
 
+      # JAR-1165: this is a Pages SHIPPING path — a font regression that skips
+      # the guard here ships third-party font loads to production. Same gate
+      # as pr-checks, by the repo's own "guards run on shipping paths" rule
+      # (mirrors the pricing guard's droplet-vs-Pages history).
+      - name: Fonts are self-hosted (no third-party font CDN)
+        run: npm run lint:fonts
+
       - name: OG card is the real lockup
         run: npm run lint:og-card
       # Pricing guard — this is the Pages shipping path, so it must carry the
