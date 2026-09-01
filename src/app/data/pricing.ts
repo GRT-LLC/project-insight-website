@@ -1,10 +1,12 @@
 // ============================================================================
 // PRICING — the only place on this site that knows what anything costs.
 //
-// Amounts live in Stripe, in the org's JarvisTravel sandbox
-// acct_1ToBK0ABsvYNMJZ0 (JAR-660 decision, 2026-08-09). At launch the live
-// catalogue is minted in the org's live account with the same lookup keys, and
-// the account pins here and in check-prices.mjs move with it. This file
+// Amounts live in Stripe, in the org's JarvisTravel account
+// acct_1ToBJsPDaNqc0Lek. There is no separate sandbox account: test and live
+// are MODES of that one account (JAR-1207 — the earlier note here named a
+// sandbox account that does not exist). At launch the live catalogue is minted
+// in live mode under the same account with the same lookup keys, so the pin
+// here and in check-prices.mjs stays put. This file
 // mirrors Stripe, keyed by the
 // same lookup_key the backend resolves at checkout (core: config/stripe/setup.js,
 // migration 063, JAR-658/659). A lookup key is a stable handle: Stripe Prices
@@ -14,8 +16,8 @@
 //
 // Regenerate rather than hand-edit:
 //
-//   STRIPE_API_KEY=rk_test_... npm run sync:prices        # rewrite from Stripe
-//   STRIPE_API_KEY=rk_test_... npm run lint:prices        # verify, change nothing
+//   STRIPE_SECRET_KEY=rk_test_... npm run sync:prices        # rewrite from Stripe
+//   STRIPE_SECRET_KEY=rk_test_... npm run lint:prices        # verify, change nothing
 //
 // The literals used to sit in PricingPage.tsx, where the site advertised
 // $24.95 for a Trip Pass we would never have charged — for weeks, found by

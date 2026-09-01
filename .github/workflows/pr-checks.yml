@@ -46,25 +46,32 @@ jobs:
       - name: Install dependencies
         run: npm i
       # Two halves: the literal scan always runs; the Stripe reconciliation
-      # needs STRIPE_API_KEY (restricted, read-only).
+      # needs STRIPE_READ_API_KEY (restricted, read-only).
       # The guard's promise is "fail when the site and Stripe drift". It can only
       # keep that promise if the secret exists, so its absence is a failure here
       # rather than a skip — this step passed vacuously on every PR while the
       # secret was unconfigured, and the log said SKIPPED where nobody read it.
       - name: Assert the pricing secret is configured
         run: |
-          if [ -z "$STRIPE_API_KEY" ]; then
-            echo "::error::STRIPE_API_KEY repo secret is not configured. The pricing guard"
+          if [ -z "$STRIPE_READ_API_KEY" ]; then
+            echo "::error::STRIPE_READ_API_KEY repo secret is not configured. The pricing guard"
             echo "::error::cannot reconcile against Stripe without it, and a green check here"
-            echo "::error::would mean nothing. Add a restricted, read-only test-mode key."
+            echo "::error::would mean nothing."
+            echo "::error::"
+            echo "::error::Add a restricted, read-only, TEST-mode key from acct_1ToBJsPDaNqc0Lek."
+            echo "::error::"
+            echo "::error::Do NOT copy the value out of the old STRIPE_API_KEY secret: that key is"
+            echo "::error::EXPIRED (Stripe returned 'Expired API Key provided' on 2026-09-01), so"
+            echo "::error::re-adding it under the new name turns this error into a less obvious"
+            echo "::error::one further down. Mint a new key. The old secret can then be deleted."
             exit 1
           fi
         env:
-          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_READ_API_KEY: ${{ secrets.STRIPE_READ_API_KEY }}
       - name: Pricing guard
         run: npm run lint:prices
         env:
-          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_READ_API_KEY: ${{ secrets.STRIPE_READ_API_KEY }}
       - name: Plan-not-book language guard
         run: npm run lint:plan-not-book
       - name: Absolute-claim guard (FTC §5 / Lanham §43(a))
