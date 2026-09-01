@@ -2,8 +2,8 @@
 // Pricing guard, in two halves (JAR-660).
 //
 //   node scripts/check-prices.mjs           # always: no price literals in components
-//   STRIPE_API_KEY=rk_... node scripts/check-prices.mjs         # + reconcile with Stripe
-//   STRIPE_API_KEY=rk_... node scripts/check-prices.mjs --write # + rewrite pricing.ts
+//   STRIPE_SECRET_KEY=rk_... node scripts/check-prices.mjs         # + reconcile with Stripe
+//   STRIPE_SECRET_KEY=rk_... node scripts/check-prices.mjs --write # + rewrite pricing.ts
 //
 // Half one — no literals. Every dollar amount on this site renders from
 // src/app/data/pricing.ts. The page used to carry them inline, which is how it
@@ -18,6 +18,7 @@
 // Fail closed: an unreadable file, an unparseable module or a Stripe error is
 // a failure, never a pass.
 
+import { classifyAccountError } from './lib/account-error.mjs';
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname, sep } from 'node:path';
 
@@ -25,7 +26,7 @@ const ROOT = process.cwd();
 const PRICING_FILE = join(ROOT, 'src/app/data/pricing.ts');
 const COMPONENT_DIRS = ['src/app/pages', 'src/app/components', 'src/app'];
 const WRITE = process.argv.includes('--write');
-// Skipping the Stripe half has to be asked for. See the STRIPE_API_KEY branch.
+// Skipping the Stripe half has to be asked for. See the STRIPE_SECRET_KEY branch.
 const ALLOW_SKIP = process.argv.includes('--allow-skip');
 // Deploy-time mode: a network/API outage warns instead of failing the deploy
 // (pr-checks stays strict). A verified mismatch still fails in both modes.
@@ -137,14 +138,18 @@ console.log(`prices: ok — no amount literals in ${scanned.size} component file
 // lookup keys at the same amounts, and nothing here could tell them apart,
 // because everything below resolves by lookup key (JAR-659). Right prices,
 // wrong Stripe, green check.
-const EXPECTED_ACCOUNT = 'acct_1ToBK0ABsvYNMJZ0';
+// The org has ONE Stripe account; test and live are modes of it, not separate
+// accounts. This pin was wrong from the commit that introduced it (JAR-1207):
+// the catalogue has always lived here, so no key we can issue could satisfy the
+// old value and the guard could not pass at all.
+const EXPECTED_ACCOUNT = 'acct_1ToBJsPDaNqc0Lek';
 
 // The three keys this catalogue is defined as having. Asserted as an exact set
 // below, so a key *deleted* from pricing.ts fails here rather than at runtime
 // when priceOf() reaches into undefined.
 const EXPECTED_KEYS = ['jt_trip_pass', 'jt_explore_annual', 'jt_explore_monthly'];
 
-const KEY = process.env.STRIPE_API_KEY;
+const KEY = process.env.STRIPE_SECRET_KEY;
 if (!KEY) {
   // Fail closed. A guard whose whole promise is "fail when it drifts" must not
   // report success when it did not check — and it did exactly that in CI,
@@ -154,15 +159,15 @@ if (!KEY) {
   // Local runs without a key are legitimate, so they can opt out explicitly.
   // CI cannot: there is no reading of an unset secret that means "verified".
   if (!ALLOW_SKIP) {
-    console.error('prices: STRIPE_API_KEY is not set, so the Stripe reconciliation did not run.');
+    console.error('prices: STRIPE_SECRET_KEY is not set, so the Stripe reconciliation did not run.');
     console.error('');
-    console.error('  In CI: configure the STRIPE_API_KEY repo secret (restricted, read-only, test mode).');
+    console.error('  In CI: configure the STRIPE_SECRET_KEY repo secret (restricted, read-only, test mode).');
     console.error('  Locally: pass --allow-skip to run only the literal scan.');
     console.error('');
     console.error('Exiting non-zero rather than passing as if the amounts had been checked.');
     process.exit(1);
   }
-  console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_API_KEY is not set (--allow-skip).');
+  console.log('prices: SKIPPED the Stripe reconciliation — STRIPE_SECRET_KEY is not set (--allow-skip).');
   console.log('        The literal scan above still ran. Amounts were NOT verified against Stripe.');
   process.exit(0);
 }
@@ -288,18 +293,42 @@ async function assertAccount() {
     // missing permission sends the reader to the dashboard to grant it, and
     // buys a second failing run that finally names the real problem — and CI
     // round-trips here are minutes each.
-    const named = message.match(/account '(acct_[A-Za-z0-9]+)'/)?.[1];
-    const alsoWrongAccount = named && named !== EXPECTED_ACCOUNT
-      ? `\n\n       AND that key belongs to ${named}, not ${EXPECTED_ACCOUNT}.\n` +
-        `       The permission alone will not fix this. Issue a restricted, read-only\n` +
-        `       TEST key from ${EXPECTED_ACCOUNT} and replace the STRIPE_API_KEY secret.`
-      : '';
-    // Not knowing which account we are reading is itself the failure.
-    fail(`cannot read /v1/account (${message}).\n` +
-      `       Add the "Basic Business Contact Information Read" permission\n` +
-      `       (accounts_kyc_basic_read) to this restricted key.\n` +
-      `       Without it this check cannot confirm it is reading ${EXPECTED_ACCOUNT}.` +
-      alsoWrongAccount);
+    const { verdict, named } = classifyAccountError(message, EXPECTED_ACCOUNT);
+
+    // A permission denial NAMES the key's own account, which is the single fact
+    // this request exists to establish. The old code extracted it, used it only
+    // to write a nicer error, and failed anyway -- discarding the answer it had
+    // just been given, and putting the accounts_kyc_basic_read grant on the
+    // critical path for information Stripe had already volunteered (JAR-1207).
+    //
+    // Stated tradeoff rather than an accident: this reads Stripe's error TEXT,
+    // which is more brittle than a response field. This file already parses
+    // that same message today, so it is not new exposure -- and if Stripe
+    // rewords it, `named` goes undefined and we fall through to the failure
+    // below rather than guessing. Fail-closed is what makes it acceptable.
+    if (verdict === 'confirmed') {
+      // Mode comes from the key prefix, not from the API: /v1/account is what
+      // carries `livemode` and it is exactly what we could not read. Labelled
+      // as derived so nobody reads it as confirmed by Stripe.
+      const mode = KEY.startsWith('rk_live_') || KEY.startsWith('sk_live_') ? 'LIVE' : 'test';
+      console.log(`prices: reading ${named} (${mode} mode, inferred from the key prefix)`);
+      console.log('        Account confirmed from Stripe\'s permission error — /v1/account is');
+      console.log('        not readable with this key and does not need to be.');
+      return;
+    }
+
+    if (verdict === 'wrong') {
+      fail(`that key belongs to ${named}, not ${EXPECTED_ACCOUNT}.\n` +
+        `       No permission grant fixes this. Issue a restricted, read-only TEST\n` +
+        `       key from ${EXPECTED_ACCOUNT} and replace the STRIPE_SECRET_KEY secret.`);
+    }
+
+    // Neither readable nor self-identifying. Not knowing which account we are
+    // reading is itself the failure -- never assume it is the right one.
+    fail(`cannot read /v1/account (${message}), and the error does not name an\n` +
+      `       account either, so this check cannot confirm it is reading\n` +
+      `       ${EXPECTED_ACCOUNT}. If the key is expired or revoked, replace it;\n` +
+      `       if Stripe reworded the permission error, update the parse.`);
   }
   if (body.id !== EXPECTED_ACCOUNT) {
     fail(`key belongs to ${body.id}, expected ${EXPECTED_ACCOUNT} — comparing against the wrong Stripe account`);

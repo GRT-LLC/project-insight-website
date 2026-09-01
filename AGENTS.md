@@ -62,9 +62,11 @@ else.
 ### Pricing (single source of truth — JAR-660)
 
 The only place this site knows what anything costs is `src/app/data/pricing.ts`,
-which mirrors Stripe (the org sandbox `acct_1ToBK0ABsvYNMJZ0`; at live launch
-the catalogue is re-minted in the org's live account and the pins move with
-it — keyed by the same
+which mirrors Stripe (the org account `acct_1ToBJsPDaNqc0Lek`; there is no
+separate sandbox account — test and live are modes of that one account, and a
+`lookup_key` is per-account-and-mode, so at live launch the catalogue is
+re-minted in live mode under the same account and the pin does not move —
+keyed by the same
 `lookup_key` the backend resolves at checkout). The `lint:prices` guard fails
 CI when the site and Stripe disagree; `check-prices.mjs` also fails when a
 dollar amount reappears as a literal in a component.
@@ -72,7 +74,7 @@ dollar amount reappears as a literal in a component.
 **Changing a price or adding a plan (runbook):**
 1. Edit/create the price in the Stripe dashboard (test mode; same lookup_key
    in live mode at launch).
-2. `STRIPE_API_KEY=rk_test_... npm run sync:prices` — regenerates the
+2. `STRIPE_SECRET_KEY=rk_test_... npm run sync:prices` — regenerates the
    generated block in `pricing.ts` from Stripe (the `Price` type + the guard's
    `EXPECTED_KEYS` fail loudly if the catalogue shape changes; `interval_count
    != 1` is refused — the site cannot render it).
