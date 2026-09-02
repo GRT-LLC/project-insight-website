@@ -19,6 +19,7 @@
 // a failure, never a pass.
 
 import { classifyAccountError } from './lib/account-error.mjs';
+import { modeOf, refuseUnexpectedMode } from './lib/account-mode.mjs';
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname, sep } from 'node:path';
 
@@ -142,6 +143,10 @@ console.log(`prices: ok — no amount literals in ${scanned.size} component file
 // accounts. This pin was wrong from the commit that introduced it (JAR-1207):
 // the catalogue has always lived here, so no key we can issue could satisfy the
 // old value and the guard could not pass at all.
+// Reconciling against LIVE is a decision, never a default. Without this the
+// only way to end up reading live is by accident, which is the whole finding.
+const ALLOW_LIVE = process.argv.includes('--allow-live');
+
 const EXPECTED_ACCOUNT = 'acct_1ToBJsPDaNqc0Lek';
 
 // The three keys this catalogue is defined as having. Asserted as an exact set
@@ -310,8 +315,10 @@ async function assertAccount() {
       // Mode comes from the key prefix, not from the API: /v1/account is what
       // carries `livemode` and it is exactly what we could not read. Labelled
       // as derived so nobody reads it as confirmed by Stripe.
-      const mode = KEY.startsWith('rk_live_') || KEY.startsWith('sk_live_') ? 'LIVE' : 'test';
-      console.log(`prices: reading ${named} (${mode} mode, inferred from the key prefix)`);
+      const { mode, source } = modeOf({ key: KEY });
+      const refusal = refuseUnexpectedMode({ mode, source, allowLive: ALLOW_LIVE });
+      if (refusal) fail(refusal);
+      console.log(`prices: reading ${named} (${mode} mode, inferred from ${source})`);
       console.log('        Account confirmed from Stripe\'s permission error — /v1/account is');
       console.log('        not readable with this key and does not need to be.');
       return;
@@ -333,7 +340,10 @@ async function assertAccount() {
   if (body.id !== EXPECTED_ACCOUNT) {
     fail(`key belongs to ${body.id}, expected ${EXPECTED_ACCOUNT} — comparing against the wrong Stripe account`);
   }
-  console.log(`prices: reading ${body.id} (${body.livemode ? 'LIVE' : 'test'} mode)`);
+  const { mode, source } = modeOf({ livemode: body.livemode, key: KEY });
+  const refusal = refuseUnexpectedMode({ mode, source, allowLive: ALLOW_LIVE });
+  if (refusal) fail(refusal);
+  console.log(`prices: reading ${body.id} (${mode} mode, reported by ${source})`);
 }
 
 async function stripePrices() {

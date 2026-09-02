@@ -17,6 +17,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { NAMED_ACCOUNT_RE, classifyAccountError } from '../lib/account-error.mjs';
+import { modeOf, refuseUnexpectedMode } from '../lib/account-mode.mjs';
 
 const ROOT = new URL('../..', import.meta.url).pathname;
 const SCRIPT = resolve(ROOT, 'scripts/check-prices.mjs');
@@ -63,6 +64,65 @@ const WRONG_ACCOUNT_ERROR = STRIPE_PERMISSION_ERROR.replace(
   'acct_1ToBJsPDaNqc0Lek',
   WRONG_ACCOUNT,
 );
+
+
+// ── JAR-1209: the mode was read, printed, and never acted on ────────────────
+//
+// Imported and CALLED, not grepped. The defect this closes is precisely a
+// branch that exists and decides nothing, and a source-grep cannot tell those
+// apart — it would have passed against the `console.log` this replaces.
+//
+// `livemode` is faked here; no live key is needed, and needing one would make
+// the case unwritable, which is why the gap survived until live mode existed.
+
+test('the account\'s own livemode is believed when it is present', () => {
+  if (modeOf({ livemode: false, key: 'rk_test_x' }).mode !== 'test') throw new Error('livemode false must read as test');
+  // THE DISCRIMINATING CASE. `livemode: false` with a LIVE key prefix is the
+  // only input where reading livemode by truthiness differs from reading it
+  // explicitly: truthiness makes `false` fall through to the prefix and answer
+  // LIVE, while the account said test. Every other fixture agrees under both,
+  // so without this one the explicit `=== true || === false` check could be
+  // replaced by `if (livemode)` with the suite still green — verified.
+  if (modeOf({ livemode: false, key: 'rk_live_x' }).mode !== 'test') throw new Error('a present livemode:false must win over the key prefix — absent and false are different');
+  // LIVE even though the key prefix says test: the account is the better source.
+  if (modeOf({ livemode: true, key: 'rk_test_x' }).mode !== 'LIVE') throw new Error('livemode true must read as LIVE regardless of the key prefix');
+  if (modeOf({ livemode: true }).source !== 'the account') throw new Error('the source must say it came from the account');
+});
+
+test('an ABSENT livemode falls back to the key prefix, and absent is not false', () => {
+  // The permission-error path never reads /v1/account, so this is the only
+  // signal it has. Truthiness would collapse "did not tell us" into "test".
+  if (modeOf({ livemode: undefined, key: 'rk_live_x' }).mode !== 'LIVE') throw new Error('a live prefix with no readable account must read as LIVE');
+  if (modeOf({ livemode: null, key: 'sk_live_x' }).mode !== 'LIVE') throw new Error('null livemode is absent, not false');
+  if (modeOf({ livemode: undefined, key: 'rk_test_x' }).mode !== 'test') throw new Error('a test prefix with no readable account must read as test');
+  if (modeOf({ livemode: undefined, key: 'rk_live_x' }).source !== 'the key prefix') throw new Error('the source must say it was inferred');
+  if (modeOf({}).mode !== 'test') throw new Error('knowing nothing must not read as LIVE');
+});
+
+test('LIVE is refused, and the refusal is not mistakable for a credential problem', () => {
+  const msg = refuseUnexpectedMode({ mode: 'LIVE', source: 'the account' });
+  if (!msg) throw new Error('LIVE must be refused, not merely printed');
+  if (!/LIVE/.test(msg) || !/TEST/.test(msg)) throw new Error('the refusal must name the mode found AND the one expected');
+  // A mode mismatch reading like a bad key sends the reader to rotate a secret
+  // that is working perfectly — a different fix, in a different place.
+  if (!/NOT a credential problem/.test(msg)) throw new Error('the refusal must not read as a credential problem');
+  if (!/--allow-live/.test(msg)) throw new Error('the refusal must name the deliberate opt-in');
+});
+
+test('test mode proceeds, and --allow-live is the only way LIVE does', () => {
+  if (refuseUnexpectedMode({ mode: 'test', source: 'the account' }) !== null) throw new Error('test mode must proceed');
+  if (refuseUnexpectedMode({ mode: 'LIVE', source: 'the account', allowLive: true }) !== null) throw new Error('--allow-live must let a deliberate live reconciliation proceed');
+});
+
+test('BOTH call sites assert, not just the readable-account one', () => {
+  // The early `return` in the permission-error path is what makes this worth a
+  // case: asserting only where /v1/account is readable would let a live key
+  // that CANNOT read it pass straight through — the more likely accident, not
+  // the less. Counted, so adding a third path without a guard fails here.
+  const calls = source.match(/refuseUnexpectedMode\(/g) ?? [];
+  if (calls.length !== 2) throw new Error(`${calls.length} call site(s) refuse an unexpected mode, expected 2 — every path that determines a mode must act on it`);
+  if (/livemode \? 'LIVE' : 'test'/.test(source)) throw new Error('the un-asserted inline formatting is still present — it must be replaced, not supplemented');
+});
 
 console.log('check-prices: account-pin diagnostics');
 
