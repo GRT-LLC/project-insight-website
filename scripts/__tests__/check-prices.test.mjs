@@ -16,6 +16,7 @@
 // foreign account, the guard must say BOTH things at once.
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { NAMED_ACCOUNT_RE, classifyAccountError } from '../lib/account-error.mjs';
 
 const ROOT = new URL('../..', import.meta.url).pathname;
 const SCRIPT = resolve(ROOT, 'scripts/check-prices.mjs');
@@ -39,17 +40,11 @@ const source = readFileSync(SCRIPT, 'utf8');
  *  so the test cannot drift from the pin it is describing. */
 const EXPECTED_ACCOUNT = source.match(/const EXPECTED_ACCOUNT = '(acct_[A-Za-z0-9]+)'/)?.[1];
 
-/**
- * Reproduce the guard's extraction against a real Stripe error string.
- * The regex is read out of the source rather than copied, so a change to the
- * guard's pattern is tested rather than shadowed by a stale duplicate.
- */
-const NAMED_ACCOUNT_RE = (() => {
-  const literal = source.match(/message\.match\((\/.+?\/)\)/)?.[1];
-  if (!literal) throw new Error('could not find the account-extraction regex in check-prices.mjs');
-  const body = literal.slice(1, literal.lastIndexOf('/'));
-  return new RegExp(body);
-})();
+// The guard's own classifier, imported and CALLED rather than grepped. It used
+// to live inline in check-prices.mjs, which runs its whole check at import
+// time, so this file could only read it as text -- and a source-grep proves a
+// branch exists, never that it decides correctly. That is precisely how a pin
+// naming a non-existent account survived here (JAR-1207).
 
 // The verbatim shape Stripe returns for an under-scoped restricted key.
 const STRIPE_PERMISSION_ERROR =
@@ -57,6 +52,17 @@ const STRIPE_PERMISSION_ERROR =
   "permissions for this endpoint on account 'acct_1ToBJsPDaNqc0Lek'. Enabling " +
   '"Basic Business Contact Information Read" (\'accounts_kyc_basic_read\') permissions ' +
   'on this key would allow this request to continue.';
+
+// A DIFFERENT account, for the not-pinned branch. Synthetic and obviously so:
+// the only real account we have is the one above, and manufacturing a second
+// real-looking id invites someone to believe in it. Previously this branch was
+// fed the captured error unmodified -- which only worked because the pin named
+// an account that does not exist (JAR-1207).
+const WRONG_ACCOUNT = 'acct_0000000000NOTOURS';
+const WRONG_ACCOUNT_ERROR = STRIPE_PERMISSION_ERROR.replace(
+  'acct_1ToBJsPDaNqc0Lek',
+  WRONG_ACCOUNT,
+);
 
 console.log('check-prices: account-pin diagnostics');
 
@@ -71,26 +77,90 @@ test("extracts the key's own account from Stripe's permission error", () => {
   }
 });
 
-test('recognises that account as NOT the pinned one', () => {
+// The test this file did not have, and the reason the wrong pin survived from
+// the commit that introduced it. Everything else here checks the guard's
+// mechanics against a fixture; nothing checked the guard's CONSTANT against
+// reality. This is the assertion that goes red if EXPECTED_ACCOUNT drifts.
+//
+// It reads the pin out of the source and compares it to an account id captured
+// from a real Stripe response, so the two cannot be reconciled by editing one
+// of them -- which is exactly what the old `.replace()` below used to do.
+test('the pin names the same account our captured Stripe error does', () => {
   const named = STRIPE_PERMISSION_ERROR.match(NAMED_ACCOUNT_RE)?.[1];
-  if (named === EXPECTED_ACCOUNT) {
-    throw new Error('the fixture account equals the pin, so this test proves nothing');
+  if (named !== EXPECTED_ACCOUNT) {
+    throw new Error(
+      `the guard pins ${EXPECTED_ACCOUNT}, but the account Stripe actually named ` +
+        `for our key is ${named}. One of them is wrong, and it is not Stripe.`,
+    );
   }
 });
 
-test('the failure path reports the wrong account, not only the permission', () => {
-  // The guard must contain the both-problems branch, keyed on the comparison.
-  if (!/named && named !== EXPECTED_ACCOUNT/.test(source)) {
-    throw new Error('no branch compares the key\'s account against the pin on the permission-error path');
+test('recognises a different account as NOT the pinned one', () => {
+  const named = WRONG_ACCOUNT_ERROR.match(NAMED_ACCOUNT_RE)?.[1];
+  if (named !== WRONG_ACCOUNT) throw new Error('extraction broke on the wrong-account fixture');
+  if (named === EXPECTED_ACCOUNT) {
+    throw new Error('the wrong-account fixture equals the pin, so this test proves nothing');
   }
-  if (!/permission alone will not fix this/i.test(source)) {
-    throw new Error('the message does not tell the reader the permission alone is not the fix');
+});
+
+// The three outcomes the guard has to tell apart, exercised by calling it.
+// The previous version of this test asserted that a particular EXPRESSION
+// appeared in the source. That passes for a branch that is present and wrong,
+// and it broke the moment the branch was rewritten without its behaviour
+// changing -- a test coupled to the shape of the code rather than its result.
+
+test('a denial naming the pinned account CONFIRMS it — the grant is not needed', () => {
+  const { verdict, named } = classifyAccountError(STRIPE_PERMISSION_ERROR, EXPECTED_ACCOUNT);
+  if (verdict !== 'confirmed') throw new Error(`verdict was ${verdict}, want confirmed`);
+  if (named !== EXPECTED_ACCOUNT) throw new Error(`named ${named}, want ${EXPECTED_ACCOUNT}`);
+});
+
+test('a denial naming a different account is a failure no permission fixes', () => {
+  const { verdict, named } = classifyAccountError(WRONG_ACCOUNT_ERROR, EXPECTED_ACCOUNT);
+  if (verdict !== 'wrong') throw new Error(`verdict was ${verdict}, want wrong`);
+  if (named !== WRONG_ACCOUNT) throw new Error(`named ${named}, want ${WRONG_ACCOUNT}`);
+});
+
+test('an error naming NO account is unknown, never assumed to be ours', () => {
+  // The real message CI is failing on today. An expired key names no account,
+  // so there is nothing to confirm and the only safe verdict is unknown.
+  const expired = 'Expired API Key provided: rk_test_*****ER0mQf';
+  const { verdict, named } = classifyAccountError(expired, EXPECTED_ACCOUNT);
+  if (verdict !== 'unknown') throw new Error(`verdict was ${verdict}, want unknown`);
+  if (named !== null) throw new Error(`named ${named}, want null`);
+});
+
+test('the guard still tells the reader a permission grant is not the fix', () => {
+  if (!/No permission grant fixes this/i.test(source)) {
+    throw new Error('the wrong-account message no longer says the permission is not the fix');
+  }
+});
+
+// A name, not a shape — so asserting it in the source is the right tool here.
+// The guard read STRIPE_API_KEY. That name IS set -- as a repo secret on this
+// repository -- but it holds an EXPIRED key. The org's name for a read-only
+// Stripe key is STRIPE_READ_API_KEY.
+//
+// NOT STRIPE_SECRET_KEY: that name already holds the account's FULL secret
+// key, so pointing the guard at it would swap a restricted credential for an
+// unrestricted one in CI. That was proposed during review and caught before
+// merge; this assertion is what stops it being proposed again.
+test('the guard reads the env var this org actually sets', () => {
+  if (!/process\.env\.STRIPE_READ_API_KEY/.test(source)) {
+    throw new Error('the guard does not read STRIPE_READ_API_KEY');
+  }
+  if (/STRIPE_API_KEY/.test(source)) {
+    throw new Error('STRIPE_API_KEY still appears in check-prices.mjs');
   }
 });
 
 test('a matching account produces no extra noise', () => {
-  const sameAccount = STRIPE_PERMISSION_ERROR.replace('acct_1ToBJsPDaNqc0Lek', EXPECTED_ACCOUNT);
-  const named = sameAccount.match(NAMED_ACCOUNT_RE)?.[1];
+  // Uses the captured error AS CAPTURED. It used to be rewritten first --
+  //   STRIPE_PERMISSION_ERROR.replace('acct_1ToBJsPDaNqc0Lek', EXPECTED_ACCOUNT)
+  // -- which substituted reality with the expectation before comparing them, so
+  // the fixture could never contradict the constant. That single line is what
+  // let a wrong pin live in this repo from the commit that added it (JAR-1207).
+  const named = STRIPE_PERMISSION_ERROR.match(NAMED_ACCOUNT_RE)?.[1];
   if (named !== EXPECTED_ACCOUNT) throw new Error('extraction broke on the matching-account case');
   // The guard's branch is `named !== EXPECTED_ACCOUNT`, so this case adds nothing.
 });

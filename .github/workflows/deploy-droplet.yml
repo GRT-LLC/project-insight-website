@@ -46,7 +46,7 @@ jobs:
       - name: Pricing guard
         run: npm run lint:prices -- --network-warn
         env:
-          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_READ_API_KEY: ${{ secrets.STRIPE_READ_API_KEY }}
       # JAR-1165: same gate as pr-checks, on the droplet shipping path.
       - name: Fonts are self-hosted (no third-party font CDN)
         run: npm run lint:fonts
