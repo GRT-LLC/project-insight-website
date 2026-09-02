@@ -142,7 +142,7 @@ export function HomePage() {
             {hero.sub}
           </p>
           {/* Still the waitlist: pricing CTAs are the payment flow's entry (JAR-1184);
-              nav/home/features migration is a tracked follow-up, not drift. */}
+              nav/home/features migration is JAR-1217, not drift. */}
           <Link
             to="/contact"
             className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
@@ -287,7 +287,7 @@ export function HomePage() {
             Planning is hard. Jarvis does the heavy lifting.
           </p>
           {/* Still the waitlist: pricing CTAs are the payment flow's entry (JAR-1184);
-              nav/home/features migration is a tracked follow-up, not drift. */}
+              nav/home/features migration is JAR-1217, not drift. */}
           <Link
             to="/contact"
             className="inline-block px-10 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
