@@ -44,7 +44,7 @@ const WAITLIST_CTA = `export default function P() {
   return <Link to="/contact" className="px-8 py-3.5">Join Now</Link>;
 }`;
 
-function withRepo({ page, pricing = PRICES, nav = WAITLIST_CTA, home = WAITLIST_CTA, features = WAITLIST_CTA }, fn) {
+function withRepo({ page, pricing = PRICES, nav = WAITLIST_CTA, home = WAITLIST_CTA, features = WAITLIST_CTA, contact = WAITLIST_CTA }, fn) {
   const dir = mkdtempSync(join(tmpdir(), 'ctaguard-'));
   try {
     mkdirSync(join(dir, 'src/app/pages'), { recursive: true });
@@ -55,6 +55,7 @@ function withRepo({ page, pricing = PRICES, nav = WAITLIST_CTA, home = WAITLIST_
     writeFileSync(join(dir, 'src/app/components/Navigation.tsx'), nav);
     writeFileSync(join(dir, 'src/app/pages/HomePage.tsx'), home);
     writeFileSync(join(dir, 'src/app/pages/FeaturesPage.tsx'), features);
+    writeFileSync(join(dir, 'src/app/pages/ContactPage.tsx'), contact);
     return fn(dir);
   } finally {
     rmSync(dir, { recursive: true, force: true });

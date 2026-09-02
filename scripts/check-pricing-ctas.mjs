@@ -53,6 +53,7 @@ const OFF_PRICING = [
   'src/app/components/Navigation.tsx',
   'src/app/pages/HomePage.tsx',
   'src/app/pages/FeaturesPage.tsx',
+  'src/app/pages/ContactPage.tsx',
 ];
 const WAITLIST = '/contact';
 
@@ -96,7 +97,7 @@ function ctaTargets(source, file, problems) {
       continue;
     }
     const tag = before.slice(open, label.index + 1);
-    const target = (tag.match(/(?:href|to)=\{?["']?([^"'}\n]+)/) || [, '(none)'])[1];
+    const target = (tag.match(/(?:href|to)=\{?["']?([^"'}\n(]+)/) || [, '(none)'])[1];
     found.push({ tag, target });
   }
   return found;
