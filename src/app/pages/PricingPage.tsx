@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { priceOf, periodOf, annualSavingPercent, type PriceLookupKey } from '../data/pricing';
+import { appJoinUrl } from '../data/appLink';
 
 // Approved offer structure (pricing handoff, 2026-07): exactly two offers.
 // Trip Pass is a real single-trip product, not a trial. Explore is the hero
@@ -155,9 +155,12 @@ export function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {/* Routes to the interest form until the app/payment flow is live. */}
-              <Link
-                to="/contact"
+              {/* Into the app with the plan already chosen. A plain anchor, not a
+                  router Link: this is a cross-origin navigation and react-router
+                  would try to resolve it as an internal route. Whether signup is
+                  open is the app's call, not this site's. */}
+              <a
+                href={appJoinUrl('jt_trip_pass')}
                 className={`mt-auto self-start px-8 py-3.5 rounded-full font-semibold border transition-colors text-gray-900 ${
                   tripActive
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'
@@ -165,7 +168,7 @@ export function PricingPage() {
                 }`}
               >
                 Join Now
-              </Link>
+              </a>
             </div>
 
             {/* Explore - the hero offer; holds the highlight unless Trip Pass
@@ -296,9 +299,11 @@ export function PricingPage() {
                 ))}
               </ul>
 
-              {/* Routes to the interest form until the app/payment flow is live. */}
-              <Link
-                to="/contact"
+              {/* Carries whichever cadence the visitor selected above, so the
+                  choice they just made survives into checkout instead of being
+                  asked for a second time. */}
+              <a
+                href={appJoinUrl(cadence.lookupKey)}
                 className={`mt-auto w-full py-3.5 rounded-full font-semibold text-center border transition-colors text-gray-900 ${
                   exploreHot
                     ? 'bg-amber-400 border-amber-400 hover:bg-amber-300 hover:border-amber-300'
@@ -306,7 +311,7 @@ export function PricingPage() {
                 }`}
               >
                 Join Now
-              </Link>
+              </a>
             </div>
           </div>
 
