@@ -1,6 +1,12 @@
 #!/usr/bin/env node
-// Pricing CTA guard: every "Join Now" on the pricing page must link into the
-// app carrying a plan, and must name a plan the shared contract knows about.
+// Signup CTA guard. Two halves of one decision about where "Join Now" goes:
+//
+//   pricing page  -> into the app carrying a plan, via appJoinUrl(), naming a
+//                    plan the shared contract knows about
+//   everywhere else -> the /contact waitlist, until JAR-1196 decides otherwise
+//
+// Both are asserted. Watching only the first would leave the other five CTAs
+// free to drift either way, which is how this split arrived unnoticed.
 //
 // Why this exists. Until JAR-1184 both CTAs routed to /contact, the waitlist
 // form, behind a comment saying they would change when the payment flow was
@@ -33,6 +39,70 @@ const ROOT = join(import.meta.dirname, '..');
 const PAGE = 'src/app/pages/PricingPage.tsx';
 const PRICING = 'src/app/data/pricing.ts';
 
+// The other files carrying a signup CTA. Every "Join Now" in these routes to the
+// waitlist, and THIS LIST IS WHERE THAT DECISION IS RECORDED (JAR-1196, open).
+//
+// The guard is deliberately two-sided. Asserting only "pricing CTAs use
+// appJoinUrl" leaves the other five free to drift in either direction, which is
+// how the split arrived unnoticed in the first place. Asserting both halves
+// means a migration cannot be quiet: moving any CTA below to the app fails here
+// and the mover has to edit this list, in the same commit, on purpose.
+//
+// A guard that accommodates both answers records neither.
+const OFF_PRICING = [
+  'src/app/components/Navigation.tsx',
+  'src/app/pages/HomePage.tsx',
+  'src/app/pages/FeaturesPage.tsx',
+  'src/app/pages/ContactPage.tsx',
+];
+const WAITLIST = '/contact';
+
+/**
+ * Every "Join Now" in `source`, paired with the target of the <a>/<Link> that
+ * encloses it. Shared by both halves rather than written twice: the backward
+ * scan below is the subtle part, and a second copy would drift from this one
+ * exactly as the CTAs drifted from each other.
+ */
+function ctaTargets(source, file, problems) {
+  const labels = [...source.matchAll(/>\s*Join Now\s*</g)];
+  if (labels.length === 0) {
+    problems.push(`${file}: no "Join Now" CTA found at all — either the page changed shape or this guard is now watching nothing`);
+    return [];
+  }
+
+  const found = [];
+  for (const label of labels) {
+    const before = source.slice(0, label.index);
+    // Boundary-checked, not prefix-checked: `<a` alone also matches `<article`
+    // and `<aside`, so a formatter nesting a card between the anchor open and
+    // the label made the scan read the WRONG tag and flag a correct CTA
+    // (review F3). `<a`/`<Link` must be followed by whitespace or `>`.
+    //
+    // The enclosing opener is the LAST <a>/<Link> before the label that is
+    // still OPEN at the label — not merely the last one. "Still open" is a
+    // depth question: for a candidate, every opener after it with a matching
+    // close after it cancels out; one extra close means the candidate was
+    // itself closed (a finished inline anchor, not the CTA's tag).
+    const opens = [...before.matchAll(/<a[\s>]|<Link[\s>]/g)].map((m) => m.index);
+    const closes = [...before.matchAll(/<\/a>|<\/Link>/g)].map((m) => m.index);
+    let open = -1;
+    for (let k = opens.length - 1; k >= 0; k--) {
+      const at = opens[k];
+      const opensAfter = opens.filter((o) => o > at).length;
+      const closesAfter = closes.filter((c) => c > at).length;
+      if (closesAfter <= opensAfter) { open = at; break; }
+    }
+    if (open === -1) {
+      problems.push(`${file}: a "Join Now" label has no <a> or <Link> before it`);
+      continue;
+    }
+    const tag = before.slice(open, label.index + 1);
+    const target = (tag.match(/(?:href|to)=\{?["']?([^"'}\n(]+)/) || [, '(none)'])[1];
+    found.push({ tag, target });
+  }
+  return found;
+}
+
 export function checkPricingCtas(root = ROOT) {
   const page = readFileSync(join(root, PAGE), 'utf8');
   const pricing = readFileSync(join(root, PRICING), 'utf8');
@@ -46,57 +116,26 @@ export function checkPricingCtas(root = ROOT) {
     problems.push(`${PRICING}: no lookup keys found — the guard cannot verify anything, so it fails rather than passing vacuously`);
   }
 
-  // Every Join Now must sit inside an element whose target calls appJoinUrl.
-  //
-  // Scanning BACKWARD from each label rather than matching a tag pattern
-  // forward: the opening tag and the label are separated by a multi-line
-  // className holding backticks, braces and ">" characters, so a forward regex
-  // either stops early or swallows the next element. Walking back to the
-  // nearest unclosed <a/<Link is the only reading that survives the formatter.
-  const labels = [...page.matchAll(/>\s*Join Now\s*</g)];
-  if (labels.length === 0) {
-    problems.push(`${PAGE}: no "Join Now" CTA found at all — either the page changed shape or this guard is now watching nothing`);
+  // Every Join Now on the pricing page must sit inside an element whose target
+  // calls appJoinUrl.
+  for (const { tag, target } of ctaTargets(page, PAGE, problems)) {
+    if (!tag.includes('appJoinUrl')) {
+      problems.push(`${PAGE}: a "Join Now" CTA targets ${target} instead of appJoinUrl(...) — visitors land there instead of signup`);
+    }
   }
 
-  for (const label of labels) {
-    const before = page.slice(0, label.index);
-    // Boundary-checked, not prefix-checked: `<a` alone also matches `<article`
-    // and `<aside`, so a formatter nesting a card between the anchor open and
-    // the label made the scan read the WRONG tag and flag a correct CTA
-    // (review F3). `<a`/`<Link` must be followed by whitespace or `>`; the
-    // LAST such match before the label is the enclosing opener.
-    // The enclosing opener is the LAST <a>/<Link> before the label that is
-    // still OPEN at the label — not merely the last one. An inline anchor that
-    // opened and closed between the real opener and the label (a "see plans"
-    // aside inside the card) would otherwise be taken as the CTA's tag and its
-    // href read instead (review F3).
-    //
-    // "Still open" is a depth question, not "is there a close tag after it":
-    // the inline anchor's </a> sits after the REAL opener too, so a naive
-    // "any close after this opener" check skips the real one as well. Count
-    // instead: for a candidate opener, every opener after it that has a
-    // matching close after it cancels out. The candidate is enclosing iff the
-    // closes after it are all accounted for by openers after it — one extra
-    // close means the candidate itself was closed.
-    const opens = [...before.matchAll(/<a[\s>]|<Link[\s>]/g)].map((m) => m.index);
-    const closes = [...before.matchAll(/<\/a>|<\/Link>/g)].map((m) => m.index);
-    let open = -1;
-    for (let k = opens.length - 1; k >= 0; k--) {
-      const at = opens[k];
-      const opensAfter = opens.filter((o) => o > at).length;
-      const closesAfter = closes.filter((c) => c > at).length;
-      if (closesAfter <= opensAfter) { open = at; break; }
-      // closesAfter > opensAfter: one of those closes is this opener's own.
-      // It is a finished inline anchor, not the one wrapping the CTA.
-    }
-    if (open === -1) {
-      problems.push(`${PAGE}: a "Join Now" label has no <a> or <Link> before it`);
-      continue;
-    }
-    const tag = before.slice(open, label.index + 1);
-    if (!tag.includes('appJoinUrl')) {
-      const target = (tag.match(/(?:href|to)=\{?["']?([^"'}\n]+)/) || [, '(none)'])[1];
-      problems.push(`${PAGE}: a "Join Now" CTA targets ${target} instead of appJoinUrl(...) — visitors land there instead of signup`);
+  // And every Join Now OUTSIDE it must still route to the waitlist. This is the
+  // half that makes the split a contract rather than a coincidence: it fails on
+  // a migration, which is the point — see OFF_PRICING above.
+  for (const file of OFF_PRICING) {
+    const source = readFileSync(join(root, file), 'utf8');
+    for (const { target } of ctaTargets(source, file, problems)) {
+      if (target !== WAITLIST) {
+        problems.push(
+          `${file}: a "Join Now" CTA targets ${target}, not ${WAITLIST} — every signup CTA outside the pricing page routes to the waitlist by decision (JAR-1196, still open). ` +
+          `If that decision changed, edit OFF_PRICING in this guard in the same commit: this file is where the split is recorded, and a migration that does not touch it is drift.`,
+        );
+      }
     }
   }
 
@@ -118,6 +157,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   // regardless of what the caller aimed it at.
   const problems = checkPricingCtas(process.cwd());
   for (const p of problems) console.error(`  ${p}`);
-  console.log(problems.length ? `\n${problems.length} problem(s)` : 'pricing CTAs OK');
+  console.log(problems.length ? `\n${problems.length} problem(s)` : 'signup CTAs OK — pricing links into the app, the rest route to the waitlist');
   process.exit(problems.length ? 1 : 0);
 }

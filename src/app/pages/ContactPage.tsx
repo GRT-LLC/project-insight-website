@@ -36,11 +36,11 @@ export function ContactPage() {
             <p className="text-gray-600 leading-relaxed mb-6">
               Join now and plan your next trip with Jarvis.
             </p>
-            {/* External on purpose: the waitlist capture at jarvistravel.com is
-                live; this page's own form endpoint is not built yet. Points at
-                the app/payment flow when that is hooked up. */}
+            {/* Routes to the waitlist like every signup CTA outside the pricing
+                page (JAR-1196). Migrating it into the app is exactly what the
+                guard's OFF_PRICING list records - change both in one commit. */}
             <a
-              href="https://www.jarvistravel.com/"
+              href="/contact"
               className="inline-block px-8 py-4 bg-amber-400 text-gray-900 rounded-sm font-semibold hover:bg-amber-300 transition-colors"
             >
               Join Now

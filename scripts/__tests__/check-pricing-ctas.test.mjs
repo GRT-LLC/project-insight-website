@@ -37,13 +37,25 @@ const PRICES = `export const PRICES = {
   jt_explore_monthly: { amount: 1195, interval: 'month' },
 } as const;`;
 
-function withRepo({ page, pricing = PRICES }, fn) {
+// The off-pricing CTAs the guard now also reads. Valid by default so the cases
+// above keep testing what they tested — a fixture that fails for a reason the
+// case is not about proves nothing. Each is overridable per case.
+const WAITLIST_CTA = `export default function P() {
+  return <Link to="/contact" className="px-8 py-3.5">Join Now</Link>;
+}`;
+
+function withRepo({ page, pricing = PRICES, nav = WAITLIST_CTA, home = WAITLIST_CTA, features = WAITLIST_CTA, contact = WAITLIST_CTA }, fn) {
   const dir = mkdtempSync(join(tmpdir(), 'ctaguard-'));
   try {
     mkdirSync(join(dir, 'src/app/pages'), { recursive: true });
     mkdirSync(join(dir, 'src/app/data'), { recursive: true });
+    mkdirSync(join(dir, 'src/app/components'), { recursive: true });
     writeFileSync(join(dir, 'src/app/pages/PricingPage.tsx'), page);
     writeFileSync(join(dir, 'src/app/data/pricing.ts'), pricing);
+    writeFileSync(join(dir, 'src/app/components/Navigation.tsx'), nav);
+    writeFileSync(join(dir, 'src/app/pages/HomePage.tsx'), home);
+    writeFileSync(join(dir, 'src/app/pages/FeaturesPage.tsx'), features);
+    writeFileSync(join(dir, 'src/app/pages/ContactPage.tsx'), contact);
     return fn(dir);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -84,7 +96,7 @@ test('accepts the shipped page: both CTAs via appJoinUrl with declared keys', ()
   withRepo({ page: GOOD_PAGE }, (d) => {
     const r = run(d);
     assert(r.code === 0, `guard failed a correct page: ${r.out}`);
-    assert(/pricing CTAs OK/.test(r.out), `unexpected output: ${r.out}`);
+    assert(/signup CTAs OK/.test(r.out), `unexpected output: ${r.out}`);
   });
 });
 
@@ -113,7 +125,7 @@ export function PricingPage() {
   }, (dir) => {
     const r = run(dir);
     assert(r.code === 0, `guard should accept the real CTA: ${r.out}`);
-    assert(/pricing CTAs OK/.test(r.out), `unexpected output: ${r.out}`);
+    assert(/signup CTAs OK/.test(r.out), `unexpected output: ${r.out}`);
   });
 });
 
@@ -211,6 +223,75 @@ test('refuses a hand-written signup href that bypasses appJoinUrl', () => {
     const r = run(d);
     assert(r.code === 1, 'guard passed a hand-written href bypassing appJoinUrl');
     assert(/instead of appJoinUrl/.test(r.out), `wrong reason: ${r.out}`);
+  });
+});
+
+// ── JAR-1196: the OTHER half of the split ────────────────────────────────────
+//
+// The guard now asserts both directions, and both are mutated below. If only
+// one reddens, the guard encodes a preference rather than a contract: it would
+// stop a revert while permitting a silent migration, and the migration is the
+// change this ticket exists to make deliberate.
+
+test('refuses an off-pricing CTA migrated to the app', () => {
+  withRepo(
+    {
+      page: GOOD_PAGE,
+      nav: `export default function N() {
+  return <a href={appJoinUrl('jt_explore_annual')} className="px-5 py-2.5">Join Now</a>;
+}`,
+    },
+    (dir) => {
+      const r = run(dir);
+      assert(r.code === 1, 'guard permitted a silent migration off the waitlist');
+      assert(/Navigation\.tsx/.test(r.out), `wrong file named: ${r.out}`);
+      assert(/JAR-1196/.test(r.out), `the error does not point at the open decision: ${r.out}`);
+      // The message must tell the migrator what to do, not merely refuse.
+      assert(/OFF_PRICING/.test(r.out), `the error does not say how to make it deliberate: ${r.out}`);
+    },
+  );
+});
+
+test('refuses an off-pricing CTA pointed at any third destination', () => {
+  // Not just app-vs-waitlist: "/signup" is neither, and a guard that only knew
+  // the two known answers would pass it.
+  withRepo(
+    {
+      page: GOOD_PAGE,
+      home: `export default function H() {
+  return <Link to="/signup" className="px-8 py-4">Join Now</Link>;
+}`,
+    },
+    (dir) => {
+      const r = run(dir);
+      assert(r.code === 1, 'guard permitted a CTA to a third destination');
+      assert(/HomePage\.tsx/.test(r.out), `wrong file named: ${r.out}`);
+      assert(/\/signup/.test(r.out), `the error does not name what it found: ${r.out}`);
+    },
+  );
+});
+
+test('refuses a file whose Join Now disappeared — a guard watching nothing', () => {
+  // The vacuity case. Deleting the CTA rather than migrating it would otherwise
+  // pass silently: zero labels means zero violations.
+  withRepo(
+    { page: GOOD_PAGE, features: 'export default function F() { return <div>no cta here</div>; }' },
+    (dir) => {
+      const r = run(dir);
+      assert(r.code === 1, 'guard passed a file with no CTA at all');
+      assert(/FeaturesPage\.tsx/.test(r.out), `wrong file named: ${r.out}`);
+      assert(/watching nothing/.test(r.out), `unexpected reason: ${r.out}`);
+    },
+  );
+});
+
+test('accepts the shipped split: pricing into the app, the rest on the waitlist', () => {
+  // The control for all three above. Without it, a guard that failed everything
+  // would satisfy every mutation case in this file.
+  withRepo({ page: GOOD_PAGE }, (dir) => {
+    const r = run(dir);
+    assert(r.code === 0, `guard failed the shipped split: ${r.out}`);
+    assert(/signup CTAs OK/.test(r.out), `unexpected output: ${r.out}`);
   });
 });
 
