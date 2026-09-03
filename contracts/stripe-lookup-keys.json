@@ -1,0 +1,8 @@
+{
+  "note": "PUBLISHED COPY — do not edit here. Generated from core/config/stripe/lookup-keys.json. This copy lives in marketing-website because it is the one public repo whose raw files every consumer's CI can read without a credential (documentation, core and web-app are private). core's CI asserts this copy equals core's canonical, so a change made in core and not here fails core, and a change made here and not in core fails core. To change the key set: edit core's lookup-keys.json, then re-publish this copy. Stripe is the source of truth for the live catalogue and is paused (JAR-1174/1181); this records intended provisioning. JAR-1197.",
+  "lookup_keys": [
+    "jt_trip_pass",
+    "jt_explore_annual",
+    "jt_explore_monthly"
+  ]
+}
