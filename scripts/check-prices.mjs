@@ -20,6 +20,7 @@
 
 import { classifyAccountError } from './lib/account-error.mjs';
 import { modeOf, refuseUnexpectedMode } from './lib/account-mode.mjs';
+import { comparePrice } from './lib/price-compare.mjs';
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname, sep } from 'node:path';
 
@@ -373,31 +374,12 @@ for (const price of await stripePrices()) {
 }
 
 const mismatches = [];
-const money = (c) => `$${(c / 100).toFixed(2)}`;
 
+// The per-price rules live in scripts/lib/price-compare.mjs so they can be
+// exercised against fixtures. They used to run only when a live Stripe call
+// succeeded, which meant no test could reach them.
 for (const [key, want] of local) {
-  const got = remote.get(key);
-  if (!got) {
-    mismatches.push(`${key}: no active Stripe price with that lookup_key`);
-    continue;
-  }
-  if (got.unit_amount !== want.amountCents) {
-    mismatches.push(`${key}: site says ${money(want.amountCents)}, Stripe says ${money(got.unit_amount)}`);
-  }
-  // interval_count, not just interval: a quarterly price is interval=month
-  // with count=3, and the page would render it as "per month" (L2).
-  if ((got.recurring?.interval_count ?? 1) !== 1) {
-    mismatches.push(`${key}: Stripe bills every ${got.recurring.interval_count} ${got.recurring.interval}s — the site renders a simple "per ${got.recurring.interval}"`);
-  }
-  const gotInterval = got.recurring?.interval ?? null;
-  if (gotInterval !== (want.interval === 'null' ? null : want.interval)) {
-    mismatches.push(`${key}: site says interval ${want.interval}, Stripe says ${gotInterval}`);
-  }
-  // currency was parsed and then never compared, so a price flipped to another
-  // currency in Stripe passed green while the site kept rendering a $ sign.
-  if (got.currency !== want.currency) {
-    mismatches.push(`${key}: site says ${want.currency}, Stripe says ${got.currency}`);
-  }
+  mismatches.push(...comparePrice(key, want, remote.get(key)));
 }
 
 if (WRITE) {
