@@ -1,0 +1,8 @@
+{
+  "note": "PUBLISHED COPY — generated from core/config/stripe/lookup-keys.json. Do not edit here. Nothing in CI prevents you from editing this file directly, so treat this as a request, not a hard gate: core's cross-check (config/stripe/check-published-copy.sh) runs on every core PR and daily on a schedule, and catches a divergence — within a day at worst — by failing core's required job. To change the key set, edit core's canonical and re-publish this copy. This repo hosts the copy because it is the one public repo every consumer's CI can read token-free (documentation, core and web-app are private). Stripe is the source of truth for the live catalogue and is paused (JAR-1174/1181); this records intended provisioning. JAR-1197.",
+  "lookup_keys": [
+    "jt_trip_pass",
+    "jt_explore_annual",
+    "jt_explore_monthly"
+  ]
+}

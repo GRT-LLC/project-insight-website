@@ -78,6 +78,8 @@ jobs:
         run: npm run lint:absolute-claims
       - name: Pricing CTAs link into the app
         run: npm run lint:pricing-ctas
+      - name: Lookup-key contract guard
+        run: npm run lint:lookup-keys
       - name: Social meta guard
         run: npm run lint:social-meta
       - name: Fonts are self-hosted (no third-party font CDN)
