@@ -18,6 +18,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { NAMED_ACCOUNT_RE, classifyAccountError } from '../lib/account-error.mjs';
 import { modeOf, refuseUnexpectedMode } from '../lib/account-mode.mjs';
+import { comparePrice } from '../lib/price-compare.mjs';
 
 const ROOT = new URL('../..', import.meta.url).pathname;
 const SCRIPT = resolve(ROOT, 'scripts/check-prices.mjs');
@@ -223,6 +224,94 @@ test('a matching account produces no extra noise', () => {
   const named = STRIPE_PERMISSION_ERROR.match(NAMED_ACCOUNT_RE)?.[1];
   if (named !== EXPECTED_ACCOUNT) throw new Error('extraction broke on the matching-account case');
   // The guard's branch is `named !== EXPECTED_ACCOUNT`, so this case adds nothing.
+});
+
+
+// ── JAR-1319: tax_behavior, the one field whose failure lands at CHECKOUT ────
+//
+// comparePrice is imported and CALLED against fixtures. Until this ticket the
+// per-price rules only ran after a successful Stripe call, so no test could
+// reach any of them -- the guard's most-cited checks were believed, never
+// exercised. Extracting them is what makes the cases below writable at all.
+
+/** A price that agrees with the site on everything. Each case below breaks
+ *  exactly one field, so a failure names the rule that caught it. */
+const OK_WANT = { amountCents: 9900, currency: 'usd', interval: 'year' };
+const OK_GOT = {
+  unit_amount: 9900,
+  currency: 'usd',
+  recurring: { interval: 'year', interval_count: 1 },
+  tax_behavior: 'exclusive',
+};
+const withGot = (o) => ({ ...OK_GOT, ...o });
+
+test('a fully-agreeing price reports nothing — the control', () => {
+  // Without this, every case below could pass because comparePrice always
+  // returns something, and "it complained" would look like "it caught it".
+  const out = comparePrice('jt_explore_annual', OK_WANT, OK_GOT);
+  if (out.length !== 0) throw new Error(`expected silence, got: ${out.join(' | ')}`);
+});
+
+test('tax_behavior `unspecified` is caught — the state both Explore prices sat in', () => {
+  const out = comparePrice('jt_explore_annual', OK_WANT, withGot({ tax_behavior: 'unspecified' }));
+  if (out.length !== 1) throw new Error(`expected exactly one mismatch, got ${out.length}: ${out.join(' | ')}`);
+  if (!out[0].includes('jt_explore_annual')) throw new Error('the offending lookup_key must be named');
+  if (!out[0].includes('unspecified')) throw new Error('the message must say what it found, not only what it wanted');
+});
+
+test('tax_behavior ABSENT is caught, and is not read as agreement', () => {
+  // The discriminating case. `got.tax_behavior !== 'exclusive'` catches this,
+  // but a check written as `got.tax_behavior === 'unspecified'` would not --
+  // and Stripe omits the field entirely on some prices rather than sending
+  // the string. Undefined must fail closed.
+  const bare = withGot({});
+  delete bare.tax_behavior;
+  const out = comparePrice('jt_trip_pass', { ...OK_WANT, interval: 'null' }, { ...bare, recurring: null });
+  if (out.length !== 1) throw new Error(`expected exactly one mismatch, got ${out.length}: ${out.join(' | ')}`);
+  if (!out[0].includes('unset')) throw new Error('an absent tax_behavior must report as unset, not as "undefined"');
+});
+
+test('`inclusive` is caught too — this is not an unspecified-only check', () => {
+  // Brent's ruling is that JarvisTravel prices EXCLUDE tax. An inclusive price
+  // would transact happily and quietly pay the tax out of revenue, so it is
+  // the case least likely to be noticed in production and most likely to be
+  // waved through by a check that only looks for `unspecified`.
+  const out = comparePrice('jt_explore_monthly', OK_WANT, withGot({ tax_behavior: 'inclusive' }));
+  if (out.length !== 1) throw new Error(`expected exactly one mismatch, got ${out.length}: ${out.join(' | ')}`);
+  if (!out[0].includes('inclusive')) throw new Error('must report the inclusive value it found');
+});
+
+test('the message says the price cannot be repaired in place', () => {
+  // tax_behavior is set-once. A reader who tries to "just fix it in the
+  // dashboard" finds no editable field and has to rediscover why; the guard
+  // that caught it is the right place to say so.
+  const [msg] = comparePrice('jt_explore_annual', OK_WANT, withGot({ tax_behavior: 'unspecified' }));
+  if (!/new Price/i.test(msg) || !/lookup_key transfer/i.test(msg)) {
+    throw new Error('the remedy (new Price + lookup_key transfer) must be in the message');
+  }
+});
+
+test('the pre-existing rules still fire after the extraction', () => {
+  // The move out of check-prices.mjs was verbatim, and this is what says so.
+  // A refactor that dropped a rule would leave every tax case above green.
+  const amount = comparePrice('k', OK_WANT, withGot({ unit_amount: 8800 }));
+  if (amount.length !== 1 || !amount[0].includes('$88.00')) throw new Error('amount rule lost');
+  const currency = comparePrice('k', OK_WANT, withGot({ currency: 'eur' }));
+  if (currency.length !== 1 || !currency[0].includes('eur')) throw new Error('currency rule lost');
+  const interval = comparePrice('k', OK_WANT, withGot({ recurring: { interval: 'month', interval_count: 1 } }));
+  if (interval.length !== 1) throw new Error('interval rule lost');
+  const count = comparePrice('k', OK_WANT, withGot({ recurring: { interval: 'year', interval_count: 3 } }));
+  if (count.length !== 1) throw new Error('interval_count rule lost');
+  const absent = comparePrice('k', OK_WANT, undefined);
+  if (absent.length !== 1 || !absent[0].includes('no active Stripe price')) throw new Error('missing-price rule lost');
+});
+
+test('a missing price reports ONCE, not once per rule', () => {
+  // Early return, not fallthrough: without it an absent price would also be
+  // reported as a tax_behavior failure, and the reader would chase the wrong
+  // problem first.
+  const out = comparePrice('k', OK_WANT, undefined);
+  if (out.length !== 1) throw new Error(`expected 1 message, got ${out.length}: ${out.join(' | ')}`);
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);
